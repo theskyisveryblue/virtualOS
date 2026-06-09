@@ -20,6 +20,7 @@ ALLOWED_APPS = {
     "virtualOS",
     "Simulator",
     "Finder",
+    "Figma",
     "Terminal",
     "Google Chrome",
 }
