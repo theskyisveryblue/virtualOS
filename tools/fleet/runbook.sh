@@ -15,7 +15,7 @@
 #   runbook.sh frame <vm> [out.jpg]   # capture one frame
 #   runbook.sh desktop <vm> [timeout] # poll frames until non-blank, save it
 #   runbook.sh stream <vm> [relay]    # push status + a live frame to Cloudflare
-#   runbook.sh cloud [labs|r2]        # storage plane: disposable labs or real R2 boot
+#   runbook.sh cloud [labs|r2|checkpoint] # storage plane: labs, real R2 boot, real R2 checkpoint
 #   runbook.sh stop                   # stop the launch agent / supervisor
 #   runbook.sh clean                  # remove clones + agent (never ~/VirtualOSMachines)
 #
@@ -237,7 +237,14 @@ cloud() {
       [[ -r "$cfg" ]] || die "no config: set VOS_CLOUD_DISK_CONFIG or write $cfg"
       VOS_CLOUD_DISK_CONFIG="$cfg" bash "$cs" --cloud-disk-r2-boot-lab
       ;;
-    *) die "cloud [labs|r2]";;
+    checkpoint)
+      local cfg="${VOS_CLOUD_DISK_CONFIG:-$HOME/.config/virtualos/r2-chk-config.json}"
+      local env_file="$HOME/.config/virtualos/r2.env"
+      [[ -r "$env_file" ]] && source "$env_file"
+      [[ -r "$cfg" ]] || die "no config: set VOS_CLOUD_DISK_CONFIG or write $cfg"
+      VOS_CLOUD_DISK_CONFIG="$cfg" bash "$cs" --cloud-disk-r2-checkpoint-lab
+      ;;
+    *) die "cloud [labs|r2|checkpoint]";;
   esac
 }
 clean() {

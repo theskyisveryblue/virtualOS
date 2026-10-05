@@ -106,6 +106,25 @@ Authorization: Bearer <broad-scoped-token>
 The token `value` is shown once; the secret is `sha256(value)` hex. Store both in
 a 0600 file (e.g. `~/.config/virtualos/r2.env`) and never in the repo.
 
+## Real R2 checkpoint (durability) — verified
+
+`--cloud-disk-r2-checkpoint-lab` proves the *write/durability* half against real
+R2: it uploads a disposable base, writes two blocks into a local SQLite overlay,
+snapshots the overlay into a content-addressed checkpoint, uploads the
+checkpoint objects (manifest last) under its own `<prefix>/checkpoints/<sha>`
+prefix, then restores from real R2 into a fresh overlay and verifies the blocks
+and base identity match byte-for-byte.
+
+```bash
+tools/fleet/runbook.sh cloud checkpoint
+# {"r2_checkpoint_lab":"real_r2_verified","blocks":2,"restored_blocks":2,
+#  "identity_matches":true,"manifest_last":true,...}
+```
+
+Rerunning is idempotent: immutable objects are reused (`uploaded_bytes:0`) and the
+manifest is written last, so a crash mid-upload never publishes a partial
+checkpoint.
+
 ## A full macOS disk over R2 (the remaining scale step)
 
 A real R2 boot is deliberately gated and not yet run end-to-end:

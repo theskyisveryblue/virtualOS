@@ -267,8 +267,8 @@ if [[ "${1:-}" == --cloud-disk-r2-upload-clone ]]; then
   exit 0
 fi
 
-if [[ $# -gt 1 || ( $# -eq 1 && "$1" != --reclaim-caches && "$1" != --reclaim-local-lab && "$1" != --vm-summary && "$1" != --raw-hole-lab && "$1" != --nbd-api-probe && "$1" != --nbd-source-build-check && "$1" != --nbd-r2-metadata-prepare && "$1" != --nbd-r2-metadata-check && "$1" != --nbd-vz-lab && "$1" != --nbd-macos-config-check && "$1" != --nbd-r2-macos-config-check && "$1" != --nbd-macos-clone-test && "$1" != --nbd-clone-serve && "$1" != --guest-tree-probe && "$1" != --guest-tree-transport && "$1" != --guest-hex-smoke && "$1" != --guest-accessibility-open && "$1" != --intent-plan-compile && "$1" != --promote-debug-app && "$1" != --virtualization-api-inventory && "$1" != --cloud-disk-self-test && "$1" != --cloud-disk-checkpoint-self-test && "$1" != --cloud-disk-config-check && "$1" != --cloud-disk-lab-pack && "$1" != --cloud-disk-lab-serve && "$1" != --cloud-disk-r2-serve && "$1" != --cloud-disk-r2-boot-lab ) ]]; then
-  echo 'Usage: ./tools/computer-space.sh [--display-diagnostics|--guest-ax-verify finder_window_present|--reclaim-operator-playwright-cache|--reclaim-operator-puppeteer-cache|--reclaim-operator-uv-cache|--reclaim-operator-go-cache|--reclaim-operator-build-cache|--reclaim-caches|--reclaim-local-lab|--vm-summary|--raw-hole-lab|--nbd-api-probe|--nbd-source-build-check|--nbd-r2-metadata-prepare|--nbd-r2-metadata-check|--nbd-vz-lab|--nbd-macos-config-check|--nbd-r2-macos-config-check|--nbd-macos-clone-test|--nbd-clone-serve|--guest-tree-probe|--guest-tree-transport|--guest-hex-smoke|--guest-accessibility-open|--guest-accessibility-authorize|--intent-plan-compile|--promote-debug-app|--virtualization-api-inventory|--cloud-disk-self-test|--cloud-disk-config-check|--cloud-disk-lab-pack|--cloud-disk-lab-serve|--cloud-disk-r2-serve|--cloud-disk-r2-upload-clone|--cloud-disk-r2-boot-lab]' >&2
+if [[ $# -gt 1 || ( $# -eq 1 && "$1" != --reclaim-caches && "$1" != --reclaim-local-lab && "$1" != --vm-summary && "$1" != --raw-hole-lab && "$1" != --nbd-api-probe && "$1" != --nbd-source-build-check && "$1" != --nbd-r2-metadata-prepare && "$1" != --nbd-r2-metadata-check && "$1" != --nbd-vz-lab && "$1" != --nbd-macos-config-check && "$1" != --nbd-r2-macos-config-check && "$1" != --nbd-macos-clone-test && "$1" != --nbd-clone-serve && "$1" != --guest-tree-probe && "$1" != --guest-tree-transport && "$1" != --guest-hex-smoke && "$1" != --guest-accessibility-open && "$1" != --intent-plan-compile && "$1" != --promote-debug-app && "$1" != --virtualization-api-inventory && "$1" != --cloud-disk-self-test && "$1" != --cloud-disk-checkpoint-self-test && "$1" != --cloud-disk-config-check && "$1" != --cloud-disk-lab-pack && "$1" != --cloud-disk-lab-serve && "$1" != --cloud-disk-r2-serve && "$1" != --cloud-disk-r2-boot-lab && "$1" != --cloud-disk-r2-checkpoint-lab ) ]]; then
+  echo 'Usage: ./tools/computer-space.sh [--display-diagnostics|--guest-ax-verify finder_window_present|--reclaim-operator-playwright-cache|--reclaim-operator-puppeteer-cache|--reclaim-operator-uv-cache|--reclaim-operator-go-cache|--reclaim-operator-build-cache|--reclaim-caches|--reclaim-local-lab|--vm-summary|--raw-hole-lab|--nbd-api-probe|--nbd-source-build-check|--nbd-r2-metadata-prepare|--nbd-r2-metadata-check|--nbd-vz-lab|--nbd-macos-config-check|--nbd-r2-macos-config-check|--nbd-macos-clone-test|--nbd-clone-serve|--guest-tree-probe|--guest-tree-transport|--guest-hex-smoke|--guest-accessibility-open|--guest-accessibility-authorize|--intent-plan-compile|--promote-debug-app|--virtualization-api-inventory|--cloud-disk-self-test|--cloud-disk-config-check|--cloud-disk-lab-pack|--cloud-disk-lab-serve|--cloud-disk-r2-serve|--cloud-disk-r2-upload-clone|--cloud-disk-r2-boot-lab|--cloud-disk-r2-checkpoint-lab]' >&2
   exit 2
 fi
 
@@ -909,6 +909,98 @@ if [[ "${1:-}" == --cloud-disk-r2-serve ]]; then
   }
   python3 "$script_dir/cloud_disk.py" r2-serve "$VOS_CLOUD_DISK_CONFIG" \
     "$VOS_CLOUD_DISK_MANIFEST_SHA256" "$VOS_CLOUD_DISK_PORT"
+  exit 0
+fi
+
+if [[ "${1:-}" == --cloud-disk-r2-checkpoint-lab ]]; then
+  script_dir="$(cd "$(dirname "$0")" && pwd)"
+  config="${VOS_CLOUD_DISK_CONFIG:-}"
+  [[ -r "$config" ]] || { echo 'r2_checkpoint_lab=refused: VOS_CLOUD_DISK_CONFIG required' >&2; exit 2; }
+  [[ -n "${AWS_ACCESS_KEY_ID:-}" && -n "${AWS_SECRET_ACCESS_KEY:-}" &&
+     -n "${CLOUDFLARE_ACCOUNT_ID:-}" && -n "${CLOUDFLARE_R2_ENDPOINT:-}" ]] || {
+    echo 'r2_checkpoint_lab=refused: pinned environment credentials required' >&2; exit 2; }
+  lab="$(mktemp -d /private/tmp/vos-r2-chk-lab.XXXXXX)"
+  trap 'rm -rf "$lab"' EXIT
+  python3 - "$script_dir" "$lab" "$config" <<'PY'
+import json, pathlib, sqlite3, sys
+sys.path.insert(0, sys.argv[1])
+from cloud_disk import BLOCK, digest, lab_path, pack, validate_config
+from cloud_disk_r2 import R2ReadOnly
+from cloud_disk_r2_upload import R2UploadStore
+from cloud_disk_checkpoint import (snapshot_overlay, upload_checkpoint,
+                                   restore_remote_checkpoint)
+
+lab = pathlib.Path(sys.argv[2])
+base_config = validate_config(sys.argv[3])
+
+# 1. A disposable 16 MiB base image -> an APFS-free packed dir we can serve the
+#    manifest from. Upload it to the configured bucket/prefix.
+source = lab / "source.raw"
+with source.open("wb") as image:
+    for index in range(4):
+        image.write(bytes(4 * 1024**2) if index == 2
+                    else (bytes([66 + index]) * 4096) * (4 * 1024**2 // 4096))
+packed = lab / "packed"
+pack(str(source), str(packed))
+manifest_bytes = (packed / "manifest.json").read_bytes()
+manifest_sha = digest(manifest_bytes)
+store = R2UploadStore(base_config)
+# Upload base objects + manifest (manifest last).
+manifest = json.loads(manifest_bytes)
+for entry in manifest["chunks"]:
+    if "key" not in entry:
+        continue
+    encoded = (packed / "objects" / (entry["key"] + ".z")).read_bytes()
+    store.put_if_absent("objects/" + entry["key"] + ".z", encoded)
+store.put_if_absent("manifest.json", manifest_bytes)
+
+# 2. A local overlay with two full written blocks against that base.
+base_dir = lab / "base"
+base_dir.mkdir()
+(base_dir / "manifest.json").write_bytes(manifest_bytes)
+overlay = lab / "overlay.sqlite"
+db = sqlite3.connect(str(overlay))
+db.execute("CREATE TABLE metadata (name TEXT PRIMARY KEY, value TEXT)")
+db.execute("CREATE TABLE blocks (idx INTEGER PRIMARY KEY, data BLOB)")
+db.execute("INSERT INTO metadata VALUES ('manifest_sha256', ?)", (manifest_sha,))
+db.execute("INSERT INTO blocks VALUES (0, ?)", (bytes([0x11]) * BLOCK,))
+db.execute("INSERT INTO blocks VALUES (3, ?)", (bytes([0x22]) * BLOCK,))
+db.commit()
+db.close()
+
+# 3. Snapshot + upload the overlay checkpoint to real R2 under /checkpoints/<sha>.
+snapshot = lab / "checkpoint"
+result = snapshot_overlay(str(base_dir), str(overlay), str(snapshot))
+checkpoint_sha = result["checkpoint_sha256"]
+checkpoint_config = dict(base_config)
+checkpoint_config["object_prefix"] = base_config["object_prefix"] + "/checkpoints/" + checkpoint_sha
+checkpoint_config_path = lab / "checkpoint-config.json"
+checkpoint_config_path.write_text(json.dumps(checkpoint_config))
+checkpoint_config = validate_config(str(checkpoint_config_path))
+upload = upload_checkpoint(str(snapshot), str(base_dir), R2UploadStore(checkpoint_config),
+                           checkpoint_sha)
+
+# 4. Restore from real R2 into a fresh overlay and verify byte-identical blocks.
+restored = lab / "restored.sqlite"
+restore_remote_checkpoint(str(base_dir), str(restored),
+                          R2ReadOnly(checkpoint_config, checkpoint_sha), checkpoint_sha)
+db = sqlite3.connect(str(restored))
+blocks = {index: len(data) for index, data in db.execute("SELECT idx,data FROM blocks ORDER BY idx")}
+identity = db.execute("SELECT value FROM metadata WHERE name='manifest_sha256'").fetchone()[0]
+db.close()
+if blocks != {0: BLOCK, 3: BLOCK} or identity != manifest_sha:
+    raise SystemExit("r2_checkpoint_lab=failed: restored overlay mismatch")
+print(json.dumps({
+    "r2_checkpoint_lab": "real_r2_verified",
+    "base_manifest_sha256": manifest_sha,
+    "checkpoint_sha256": checkpoint_sha,
+    "blocks": upload["blocks"],
+    "uploaded_bytes": upload["uploaded_bytes"],
+    "restored_blocks": len(blocks),
+    "identity_matches": identity == manifest_sha,
+    "manifest_last": upload["manifest_last"],
+}, sort_keys=True))
+PY
   exit 0
 fi
 
