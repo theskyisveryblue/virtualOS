@@ -75,15 +75,22 @@ curl --fail-with-body -sS -H "Authorization: Bearer $VOS_MODEL_API_TOKEN" \
   http://192.168.64.1:8765/v1/critique
 ```
 
-Guest-side verification is still open. On the Mini the guest repeatedly falls
-to a blank (12,415-byte) frame or a lock screen; `computer-wake.sh` (space) and
-`computer-unlock.sh` (configured password) both work when re-run against the
-Mini's own control server, but injected input then does not land in the guest
-Terminal: `/vm/exec` reports `ok` with the expected typed count, yet `echo`
-produces no prompt output in OCR. Until that input path is reliable and the
-token is provisioned into the guest through a trusted channel, the guest-side
-`/v1/route` call remains unverified. Host-side and self-test requests are
-confirmed. The swap guard gates background workers, not one manual guest exec.
+Guest-side verification is still open, and the blocker is input delivery, not
+the swap guard or the bridge. On the Mini the guest repeatedly falls to a blank
+(12,415-byte) frame or a lock screen. `computer-wake.sh` (space) and
+`computer-unlock.sh` (configured password) both changed the frame and unlocked
+the guest when re-run against the Mini's own control server, so single keys can
+reach the guest. But typing into the guest Terminal does not register: `/vm/exec`
+and repeated `/vm/key` calls all report `ok` with the expected counts, the
+virtualOS window was confirmed frontmost, yet a `pwd` typed as individual keys
+produced no text or output at the `~ %` prompt in OCR. Two concrete suspects:
+`sendText` maps unmapped punctuation to keycode 0 (`a`) rather than rejecting it
+(`VMCommandServer.swift:516-531`), and the synthetic events may not be consumed
+when the guest's Terminal is not the focused in-guest window. Until input
+delivery is reliable and the token is provisioned into the guest through a
+trusted channel, the guest-side `/v1/route` call remains unverified. Host-side
+and self-test requests are confirmed. The swap guard gates background workers,
+not one manual guest exec.
 
 If using SSH instead of direct bridge access, run the API on the Mini with its
 default loopback address, then open a tunnel from the guest to the Mini:
