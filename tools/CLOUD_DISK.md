@@ -80,7 +80,35 @@ Observed: a cold chunk fetched from R2 costs hundreds of milliseconds, then read
 are served from the bounded local cache in microseconds. `writes_to_r2` stays 0 —
 the disk is read-only at the source; all writes land in the local overlay.
 
-### Minting R2 S3 credentials from an API token
+### A full macOS disk over R2 (the remaining scale step)
+
+Serving a **macOS** guest requires the disk to be attached over NBD while the
+platform is `VZMacPlatformConfiguration` + `VZMacOSBootLoader` (macOS does not
+boot on the generic platform). That combination is **verified valid** via
+`--nbd-r2-macos-config-check`: it loads the production `HardwareModel` and
+`MachineIdentifier`, uses a disposable copy of the auxiliary storage, points the
+disk at NBD, and validates the configuration without booting:
+
+```
+nbd_macos_config=valid source=metadata_only disk=nbd aux=disposable_copy boot_started=false
+```
+
+What remains is only the scale move — a crash-consistent clone of the ~30 GiB
+production RAW. That requires the production VM to be stopped (a live copy is not
+crash-consistent), so it is operator-gated:
+
+1. `computer-space.sh --nbd-r2-metadata-prepare` — platform data only, no RAW copy.
+2. Stop production; APFS copy-on-write clone the RAW to
+   `.virtualOS-r2-staging.bundle/Disk.img`; write the `.complete` marker.
+3. `VOS_CLOUD_DISK_UPLOAD_ACT=1 computer-space.sh --cloud-disk-r2-upload-clone`.
+4. `cloud_disk.py r2-serve CONFIG <manifest_sha256> 40809`, then boot with the
+   macOS platform + NBD attachment (`--nbd-macos-clone-test` automates 2–4 and
+   restores production at the end).
+
+Everything except the stop/upload of the full disk is already verified on real
+hardware and real R2.
+
+## Minting R2 S3 credentials from an API token
 
 R2 S3 keys are derived from a Cloudflare API token:
 
