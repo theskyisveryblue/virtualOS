@@ -1,0 +1,23 @@
+{
+  "holdout": {
+    "chance_pair_accuracy": 0.5,
+    "design_groups": 22,
+    "pair_accuracy": 0.9074,
+    "pair_correct": 98,
+    "pairs": 108,
+    "top_variant_correct": 16
+  },
+  "kind": "whitespace",
+  "limits": "One design principle; human-rated source graphics, not full UI/UX.",
+  "regularization": 10000.0,
+  "schema": "virtualos.design-ranker-metrics/v1",
+  "train_groups": 72,
+  "validation": {
+    "chance_pair_accuracy": 0.5,
+    "design_groups": 6,
+    "pair_accuracy": 0.7778,
+    "pair_correct": 21,
+    "pairs": 27,
+    "top_variant_correct": 3
+  }
+}

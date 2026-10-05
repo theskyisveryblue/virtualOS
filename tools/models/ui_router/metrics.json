@@ -1,0 +1,34 @@
+{
+  "alpha": 0.25,
+  "leave_one_out_correct": 31,
+  "limitations": "Tool-mode routing only; no visual design judgment or Xcode navigation.",
+  "model_bytes": 46417,
+  "schema": "virtualos.hf-ui-router-metrics/v1",
+  "test": {
+    "accuracy": 0.7,
+    "correct": 7,
+    "correct_at_0_55": 7,
+    "count": 10,
+    "coverage_at_0_55": 10,
+    "errors": [
+      {
+        "expected": "structured_api",
+        "id": "h-012",
+        "predicted": "cli"
+      },
+      {
+        "expected": "structured_api",
+        "id": "h-018",
+        "predicted": "dom_click"
+      },
+      {
+        "expected": "structured_api",
+        "id": "h-048",
+        "predicted": "cli"
+      }
+    ],
+    "majority_baseline": 5
+  },
+  "test_rows": 10,
+  "train_rows": 50
+}

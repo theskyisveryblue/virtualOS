@@ -1,0 +1,34 @@
+{
+  "data_sha256": "148646535e0dc5c89a6bac44e050a60e209a258f638e90f4578724f77882d8ce",
+  "holdout": {
+    "mae": {
+      "aesthetics_rating": 0.6327,
+      "usability_rating": 0.6157
+    },
+    "mean_baseline_mae": {
+      "aesthetics_rating": 0.8138,
+      "usability_rating": 0.7813
+    },
+    "rows": 547
+  },
+  "input": "human critique text, not screenshots",
+  "license": "cc-by-4.0",
+  "penalty": 0.001,
+  "promotable": true,
+  "rate": 0.05,
+  "schema": "virtualos.uicrit-text-metrics/v1",
+  "source": "google-research-datasets/uicrit",
+  "train_rows": 2057,
+  "train_screens": 711,
+  "validation": {
+    "mae": {
+      "aesthetics_rating": 0.595,
+      "usability_rating": 0.6049
+    },
+    "mean_baseline_mae": {
+      "aesthetics_rating": 0.8488,
+      "usability_rating": 0.8265
+    },
+    "rows": 283
+  }
+}
