@@ -4,8 +4,22 @@ Goal: let a Mac boot its disk from **somewhere else** — content-addressed
 objects, a raw file, or Cloudflare R2 — with a bounded local cache and overlay,
 so the disk can outlive the machine and the machine can move between Macs.
 
+**Status: a full macOS guest boots and runs from a network disk.** With no local
+`Disk.img` at all, a `VZMacPlatformConfiguration` + `VZMacOSBootLoader` guest read
+its boot volume over loopback NBD and rendered a real desktop:
+
+```
+netboot=NBD_verified reads=47832 read_bytes=858846720 writes=3585 write_bytes=24772608 errors=0
+```
+
+Reproduce with `tools/fleet/runbook.sh netboot vm-clone vm-net` — it serves a
+bundle's RAW over NBD, prepares a disk-less bundle that points at it, boots under
+a GUI-session agent, captures the desktop, and tears down; the source RAW is
+never modified and every guest write lands in a `/private/tmp` overlay.
+
 This is experimental and does not change the shipping single-VM app. The
-executable interface is **`tools/computer-space.sh`**; this document explains it.
+executable interfaces are **`tools/computer-space.sh`** (storage plane) and
+**`tools/fleet/runbook.sh`** (fleet + netboot); this document explains them.
 
 ## The shape of a disk
 
@@ -31,6 +45,7 @@ Backends:
 | --- | --- | --- |
 | `objects` | packed local objects | `cloud_disk.py lab-serve ROOT OVERLAY PORT` |
 | `raw` | a raw file | `cloud_disk.py raw-lab-serve SOURCE OVERLAY PORT` |
+| `bundle` | a named fleet bundle's RAW | `cloud_disk.py bundle-serve ROOT NAME OVERLAY PORT` |
 | `r2-fake` | packed objects through the R2 read layer (fake HTTP) | `cloud_disk_vz_fake.py ROOT OVERLAY CACHE PORT` |
 | `r2` | real Cloudflare R2 | `cloud_disk.py r2-serve CONFIG MANIFEST_SHA256 40809` |
 

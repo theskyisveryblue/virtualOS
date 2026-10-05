@@ -150,6 +150,12 @@ These are the scars. Every one of them is a claim we paid for.
   cost hundreds of milliseconds, then the cache answered in microseconds; every
   write stayed in the local overlay and nothing wrote back to R2. The mechanism
   is real; carrying a full macOS disk at that scale is the next step.
+- **A machine can run with no local disk.** The scale step landed: a full macOS
+  guest — `VZMacPlatformConfiguration` + `VZMacOSBootLoader`, a real desktop —
+  booted with **no `Disk.img` at all**, reading its boot volume live over NBD
+  (48k reads, ~860 MB) while every write went to a bounded `/private/tmp` overlay
+  (3.6k writes, ~25 MB) and the source RAW was never touched. The disk is now a
+  service, not a fixture of the machine.
 - **Remote-backed disks must survive failure.** A temporary network loss must
   reconnect against the same overlay without losing or corrupting writes. A
   network disk without a reconnect story is a toy.

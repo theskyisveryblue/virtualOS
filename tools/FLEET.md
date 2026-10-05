@@ -156,7 +156,9 @@ The storage plane lives beside the fleet: a content-addressed, SHA-pinned disk
 served over NBD, with R2 as the remote store and a bounded local overlay/cache.
 The executable interface is `tools/computer-space.sh`; `tools/CLOUD_DISK.md`
 explains it. The real VZ client was verified booting from an NBD disk for the
-`objects`, `raw`, and `r2-fake` backends.
+`objects`, `raw`, and `r2-fake` backends, and a **full macOS guest** was booted
+with **no local disk** via `tools/fleet/runbook.sh netboot` (48k reads / ~860 MB
+over NBD, all writes overlay-only, source RAW untouched).
 
 ## Related understanding tools
 

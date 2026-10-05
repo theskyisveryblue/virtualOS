@@ -81,6 +81,7 @@ final class FleetInstance: NSObject {
     private var configuration: VZVirtualMachineConfiguration?
     private var state: String = "idle"
     private var lastError: String = ""
+    private var nbdURL: URL?
     private var startAttempts = 0
     private let maxStartAttempts = 40
     private var headlessView: VZVirtualMachineView?
@@ -126,6 +127,11 @@ final class FleetInstance: NSObject {
         return def
     }
 
+    private func stringParam(_ params: [String: Any], _ key: String) -> String? {
+        if let s = params[key] as? String, !s.isEmpty { return s }
+        return nil
+    }
+
     func status() -> [String: Any] {
         queue.sync {
             [
@@ -146,15 +152,20 @@ final class FleetInstance: NSObject {
             state = "starting"
             lastError = ""
 
-            guard FileManager.default.fileExists(atPath: bootDiskURL.path) else {
-                state = "failed"; lastError = "missing Disk.img"; log("\(name): \(lastError)"); return
+            let params = readParameters()
+            let nbdURLString = stringParam(params, "nbdURL")
+            self.nbdURL = nbdURLString.flatMap { URL(string: $0) }
+
+            if self.nbdURL == nil {
+                guard FileManager.default.fileExists(atPath: bootDiskURL.path) else {
+                    state = "failed"; lastError = "missing Disk.img"; log("\(name): \(lastError)"); return
+                }
             }
             guard FileManager.default.fileExists(atPath: hardwareModelURL.path),
                   FileManager.default.fileExists(atPath: machineIdentifierURL.path) else {
                 state = "failed"; lastError = "missing platform files"; log("\(name): \(lastError)"); return
             }
 
-            let params = readParameters()
             let cpuCount = max(1, intParam(params, "cpuCount", default: 2))
             let memoryGB = max(1, intParam(params, "memorySizeInGB", default: 4))
             let nested = boolParam(params, "nestedVirtualizationEnabled", default: false)
@@ -202,8 +213,19 @@ final class FleetInstance: NSObject {
             }
 
             do {
-                let diskAttachment = try VZDiskImageStorageDeviceAttachment(url: bootDiskURL, readOnly: false)
-                config.storageDevices = [VZVirtioBlockDeviceConfiguration(attachment: diskAttachment)]
+                if let nbdURL {
+                    // Network-booted disk: the RAW lives behind NBD; the block
+                    // layer keeps writes in a local overlay, so the source is
+                    // never mutated.
+                    let attachment = try VZNetworkBlockDeviceStorageDeviceAttachment(
+                        url: nbdURL, timeout: 30, isForcedReadOnly: false,
+                        synchronizationMode: .full)
+                    config.storageDevices = [VZVirtioBlockDeviceConfiguration(attachment: attachment)]
+                    log("\(name): storage = NBD \(nbdURL.absoluteString)")
+                } else {
+                    let diskAttachment = try VZDiskImageStorageDeviceAttachment(url: bootDiskURL, readOnly: false)
+                    config.storageDevices = [VZVirtioBlockDeviceConfiguration(attachment: diskAttachment)]
+                }
             } catch {
                 state = "failed"; lastError = "storage: \(error.localizedDescription)"
                 log("\(name): \(lastError)"); return

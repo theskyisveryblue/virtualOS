@@ -15,6 +15,7 @@
 #   runbook.sh frame <vm> [out.jpg]   # capture one frame
 #   runbook.sh desktop <vm> [timeout] # poll frames until non-blank, save it
 #   runbook.sh stream <vm> [relay]    # push status + a live frame to Cloudflare
+#   runbook.sh netboot [src] [name]   # boot a macOS bundle with its disk over NBD
 #   runbook.sh cloud [labs|r2|checkpoint] # storage plane: labs, real R2 boot, real R2 checkpoint
 #   runbook.sh stop                   # stop the launch agent / supervisor
 #   runbook.sh clean                  # remove clones + agent (never ~/VirtualOSMachines)
@@ -198,6 +199,112 @@ desktop() {
   die "no desktop frame for $vm within ${timeout}s"
 }
 
+# netboot: boot a macOS bundle whose disk is served over loopback NBD. The
+# source bundle is read-only; all guest writes land in a bounded overlay. This
+# proves a machine can run with no local disk at all.
+netboot() {
+  local src="${1:-vm-clone}" name="${2:-vm-net}" tmo="${3:-220}"
+  local http_port="${VOS_NETBOOT_HTTP_PORT:-9240}"
+  local cs
+  cs="$(cd "$(dirname "$0")/.." && pwd)/computer-space.sh"
+  [[ -f "$cs" ]] || die "computer-space.sh not found"
+  local srcdisk="$FLEET_HOME/$src.bundle/Disk.img"
+  [[ -f "$srcdisk" ]] || die "no source disk: $srcdisk"
+  [[ "$FLEET_HOME" != "$SRC_ROOT" ]] || die "refusing to serve the production store"
+  local overlay_dir="/private/tmp/vos-nbd-bundle-$name"
+  rm -rf "$overlay_dir"; mkdir -p "$overlay_dir"
+
+  # Choose a free loopback port so a stale server can never wedge the run.
+  local nbd_port="${VOS_NETBOOT_NBD_PORT:-0}" p
+  if [[ "$nbd_port" == 0 ]]; then
+    for p in $(seq 40900 40999); do
+      lsof -nP -iTCP:"$p" -sTCP:LISTEN >/dev/null 2>&1 || { nbd_port="$p"; break; }
+    done
+  fi
+  [[ "$nbd_port" != 0 ]] || die "no free NBD port in 40900-40999"
+
+  VOS_NBD_BUNDLE_ROOT="$FLEET_HOME" VOS_NBD_BUNDLE_NAME="$src" \
+    VOS_NBD_BUNDLE_OVERLAY="$overlay_dir/overlay.sqlite" VOS_NBD_BUNDLE_PORT="$nbd_port" \
+    bash "$cs" --nbd-bundle-serve > "$overlay_dir/server.log" 2>&1 &
+  local srv=$!
+  local i=0; while [[ $i -lt 60 ]]; do grep -q '"ready"' "$overlay_dir/server.log" 2>/dev/null && break; sleep 0.2; i=$((i+1)); done
+  grep -q '"ready"' "$overlay_dir/server.log" || { kill "$srv" 2>/dev/null; die "NBD server did not become ready"; }
+  log "NBD serving $src on 127.0.0.1:$nbd_port"
+
+  local dst="$FLEET_HOME/$name.bundle"
+  rm -rf "$dst"; mkdir -p "$dst"
+  local f
+  for f in HardwareModel MachineIdentifier AuxiliaryStorage; do
+    cp -c "$FLEET_HOME/$src.bundle/$f" "$dst/$f" 2>/dev/null || cp "$FLEET_HOME/$src.bundle/$f" "$dst/$f"
+  done
+  python3 - "$dst/Parameters.txt" "$nbd_port" <<'PY'
+import json, sys
+open(sys.argv[1], "w").write(json.dumps({
+    "cpuCount": 3, "memorySizeInGB": 4,
+    "screenWidth": 1500, "screenHeight": 900,
+    "nbdURL": "nbd://127.0.0.1:%s/virtualos-test" % sys.argv[2]}, indent=2))
+PY
+  mkdir -p "$MACHINES"; ln -sfn "$dst" "$MACHINES/$name.bundle"
+  log "prepared disk-less bundle $dst (no Disk.img)"
+
+  local label="com.virtualos.netboot.$name"
+  local plist="$HOME/Library/LaunchAgents/$label.plist"
+  cat > "$plist" <<PLIST
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+  <key>Label</key><string>$label</string>
+  <key>ProgramArguments</key><array>
+    <string>$SUPERVISOR</string>
+    <string>--root</string><string>$MACHINES</string>
+    <string>--names</string><string>$name</string>
+    <string>--http-port</string><string>$http_port</string>
+    <string>--base-port</string><string>9140</string>
+    <string>--start</string>
+  </array>
+  <key>RunAtLoad</key><true/>
+  <key>StandardOutPath</key><string>$overlay_dir/boot.log</string>
+  <key>StandardErrorPath</key><string>$overlay_dir/boot.log</string>
+</dict></plist>
+PLIST
+  launchctl unload "$plist" 2>/dev/null || true; sleep 1
+  launchctl load "$plist"
+  log "booting $name from NBD (see $overlay_dir/boot.log)"
+
+  local out="/tmp/vos-$name-desktop.jpg" waited=0 bytes=0
+  while [[ $waited -lt $tmo ]]; do
+    local code
+    code="$(curl -s -o "$out.tmp" -w '%{http_code}' "http://127.0.0.1:$http_port/fleet/frame/$name" || true)"
+    if [[ "$code" == "200" ]]; then
+      bytes="$(wc -c <"$out.tmp" | tr -d ' ')"
+      if [[ "$bytes" -gt 100000 ]]; then mv "$out.tmp" "$out"; log "desktop ready after ${waited}s: $out ($bytes bytes)"; break; fi
+    fi
+    rm -f "$out.tmp"; sleep 10; waited=$((waited + 10))
+  done
+  [[ -f "$out" ]] || log "no desktop yet; VM may still be booting"
+
+  launchctl unload "$plist" 2>/dev/null || true; rm -f "$plist"
+  # The server runs as a child python; kill by its command line so no listener
+  # is left holding the port after teardown.
+  kill "$srv" 2>/dev/null || true
+  pkill -f "cloud_disk.py bundle-serve $FLEET_HOME $src " 2>/dev/null || true
+  pkill -f "cloud_disk.py bundle-serve.*vos-nbd-bundle-$name" 2>/dev/null || true
+  sleep 2
+  python3 - "$overlay_dir/server.log" <<'PY'
+import json, sys
+rows = [json.loads(l) for l in open(sys.argv[1]) if l.strip().startswith('{')]
+conn = [r['bundle_nbd_connection'] for r in rows if 'bundle_nbd_connection' in r]
+if conn:
+    m = conn[-1]['metrics']
+    print("netboot=NBD_verified reads=%s read_bytes=%s writes=%s write_bytes=%s errors=%s" % (
+        conn[-1]['reads'], m['read']['request_bytes_total'], conn[-1]['writes'],
+        m['write']['request_bytes_total'], m['read']['errors'] + m['write']['errors']))
+else:
+    print("netboot=no_session_summary_yet (server ended before a full session closed)")
+PY
+  log "netboot teardown: source RAW never modified; guest writes were overlay-only"
+}
+
 stream() {
   local relay="${RELAY_URL:-}" token="${AUTH_TOKEN:-${VOS_AUTH_TOKEN:-}}"
   local env_file="$HOME/.config/virtualos/relay.env"
@@ -264,6 +371,7 @@ case "${1:-doctor}" in
   frame) shift; frame "${1:-}" "${2:-}" ;;
   desktop) shift; desktop "${1:-}" "${2:-}" "${3:-}" ;;
   stream) shift; stream "${1:-}" ;;
+  netboot) shift; netboot "${1:-}" "${2:-}" "${3:-}" ;;
   cloud) shift; cloud "${1:-labs}" ;;
   stop) stop ;;
   clean) clean ;;

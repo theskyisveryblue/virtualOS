@@ -1228,6 +1228,50 @@ def clone_serve(overlay):
                            event_name="clone_nbd_connection")
 
 
+def bundle_serve(root, name, overlay, port, overlay_limit_bytes=2 * 1024**3,
+                 min_host_free_bytes=10 * 1024**3):
+    """Serve one named bundle's RAW disk from a lab root over loopback NBD.
+
+    The production machine store is refused so this can never expose the live
+    disk; the only mutable state is a bounded overlay under /private/tmp.
+    """
+    root = Path(root).resolve()
+    production_root = (Path.home() / "VirtualOSMachines").resolve()
+    if root == production_root or str(root).startswith(str(production_root) + os.sep):
+        raise ValueError("refusing to serve the production machine store")
+    if not re.fullmatch(r"[A-Za-z0-9._-]+", name):
+        raise ValueError("invalid bundle name")
+    disk = (root / (name + ".bundle")).resolve() / "Disk.img"
+    if disk.is_symlink() or not disk.is_file():
+        raise ValueError("bundle disk must be a regular file")
+    production_disk = production_root / "virtualOS.bundle/Disk.img"
+    if production_disk.is_file() and os.path.samefile(disk, production_disk):
+        raise ValueError("refusing to serve the production RAW disk")
+    overlay = lab_path(overlay)
+    if overlay.name != "overlay.sqlite" or not re.fullmatch(
+            r"vos-nbd-bundle-[A-Za-z0-9._-]+", overlay.parent.name):
+        raise ValueError("bundle overlay must be a dedicated /private/tmp/vos-nbd-bundle-* dir")
+    if not 20000 <= port <= 60999:
+        raise ValueError("bundle NBD port must be between 20000 and 60999")
+    stat = os.statvfs(overlay.parent)
+    if stat.f_bavail * stat.f_frsize < min_host_free_bytes:
+        raise OSError(errno.ENOSPC, "bundle serve needs host reserve plus overlay budget")
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as listener:
+        listener.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        listener.bind(("127.0.0.1", port))
+        listener.listen(1)
+        print(json.dumps({"bundle_nbd_listener": "ready", "host": "127.0.0.1",
+                          "port": port, "bundle": name, "source": "named_bundle",
+                          "overlay_limit_bytes": overlay_limit_bytes,
+                          "writes_to_source": 0}), flush=True)
+        factory = lambda: RawDisk(disk, overlay, overlay_limit_bytes=overlay_limit_bytes,
+                                  min_host_free_bytes=min_host_free_bytes)
+        serve_nbd_sessions(listener, None, overlay, disk_factory=factory,
+                           max_connections=8, first_timeout=180,
+                           reconnect_timeout=45, idle_timeout=None,
+                           event_name="bundle_nbd_connection")
+
+
 if __name__ == "__main__":
     if sys.argv[1:] == ["self-test"]:
         self_test()
@@ -1248,6 +1292,8 @@ if __name__ == "__main__":
         raw_lab_serve(sys.argv[2], sys.argv[3], int(sys.argv[4]))
     elif len(sys.argv) == 3 and sys.argv[1] == "clone-serve":
         clone_serve(sys.argv[2])
+    elif len(sys.argv) == 6 and sys.argv[1] == "bundle-serve":
+        bundle_serve(sys.argv[2], sys.argv[3], sys.argv[4], int(sys.argv[5]))
     elif len(sys.argv) == 5 and sys.argv[1] == "r2-serve":
         r2_serve(sys.argv[2], sys.argv[3], int(sys.argv[4]))
     elif len(sys.argv) == 3 and sys.argv[1] == "r2-upload-clone":
@@ -1255,4 +1301,4 @@ if __name__ == "__main__":
         print(json.dumps({"r2_clone_upload": upload_staging_clone(sys.argv[2])},
                          sort_keys=True), flush=True)
     else:
-        raise SystemExit("usage: cloud_disk.py self-test|check-config PATH|lab-pack SOURCE DEST|lab-serve ROOT OVERLAY PORT|r2-serve CONFIG MANIFEST_SHA256 PORT (use computer-space.sh)")
+        raise SystemExit("usage: cloud_disk.py self-test|check-config PATH|lab-pack SOURCE DEST|lab-serve ROOT OVERLAY PORT|bundle-serve ROOT NAME OVERLAY PORT|r2-serve CONFIG MANIFEST_SHA256 PORT (use computer-space.sh)")
