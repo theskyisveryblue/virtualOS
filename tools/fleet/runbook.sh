@@ -15,6 +15,7 @@
 #   runbook.sh frame <vm> [out.jpg]   # capture one frame
 #   runbook.sh desktop <vm> [timeout] # poll frames until non-blank, save it
 #   runbook.sh stream <vm> [relay]    # push status + a live frame to Cloudflare
+#   runbook.sh cloud [labs|r2]        # storage plane: disposable labs or real R2 boot
 #   runbook.sh stop                   # stop the launch agent / supervisor
 #   runbook.sh clean                  # remove clones + agent (never ~/VirtualOSMachines)
 #
@@ -213,6 +214,32 @@ stream() {
 }
 
 stop() { agent_remove; pkill -f "$SUPERVISOR" 2>/dev/null || true; log "fleet stopped"; }
+
+# The storage plane lives in computer-space.sh. This fronts its disposable labs,
+# and, when credentials + a config are present, the real Cloudflare R2 boot.
+cloud() {
+  local cs="$FLEET_HOME/tools/computer-space.sh"
+  [[ -x "$cs" ]] || cs="$(cd "$(dirname "$0")/.." && pwd)/computer-space.sh"
+  [[ -f "$cs" ]] || die "computer-space.sh not found"
+  case "${1:-labs}" in
+    labs)
+      bash "$cs" --cloud-disk-self-test
+      bash "$cs" --cloud-disk-checkpoint-self-test
+      for backend in objects raw r2-fake; do
+        VOS_NBD_VZ_BACKEND="$backend" bash "$cs" --nbd-vz-lab | tail -1
+      done
+      bash "$cs" --raw-hole-lab | tail -1
+      ;;
+    r2)
+      local cfg="${VOS_CLOUD_DISK_CONFIG:-$HOME/.config/virtualos/r2-lab-config.json}"
+      local env_file="$HOME/.config/virtualos/r2.env"
+      [[ -r "$env_file" ]] && source "$env_file"
+      [[ -r "$cfg" ]] || die "no config: set VOS_CLOUD_DISK_CONFIG or write $cfg"
+      VOS_CLOUD_DISK_CONFIG="$cfg" bash "$cs" --cloud-disk-r2-boot-lab
+      ;;
+    *) die "cloud [labs|r2]";;
+  esac
+}
 clean() {
   agent_remove
   pkill -f "$SUPERVISOR" 2>/dev/null || true
@@ -230,6 +257,7 @@ case "${1:-doctor}" in
   frame) shift; frame "${1:-}" "${2:-}" ;;
   desktop) shift; desktop "${1:-}" "${2:-}" "${3:-}" ;;
   stream) shift; stream "${1:-}" ;;
+  cloud) shift; cloud "${1:-labs}" ;;
   stop) stop ;;
   clean) clean ;;
   *) sed -n '2,40p' "$0" | sed 's/^# \{0,1\}//'; exit 2 ;;
