@@ -320,6 +320,19 @@ three inference endpoints and HTTP 401 without a token. The Mini resource guard
 still pauses background guest work at high swap. See `tools/MODEL_API.md` for
 request formats and token handling.
 
+Headless auto-start was broken by two app bugs, both fixed in
+`MainViewController`: `attemptAutoStartIfNeeded` did not populate the selected
+bundle/parameters before starting, and it did not open the sandbox scope for the
+VM directory, so `Parameters.txt` was unreadable and the start silently aborted.
+The installed app must also keep the `com.apple.security.virtualization`
+entitlement: re-signing without it makes the VM refuse to start
+(`VZErrorDomain code=2`). A signed build that omits `app-sandbox` (keeping
+virtualization and network) starts the VM with the bundle under
+`~/VirtualOSMachines`, which is outside the app container. With sandbox enabled,
+macOS needs a user-granted security-scoped bookmark for that directory; a
+programmatically created one is not sufficient, so a headless launch still
+fails there.
+
 The VM archive has no verified receipt because `vm-backup` never finished:
 the local file `~/.config/virtualos/vm-r2-receipt.json` is written only after an
 upload is re-downloaded and SHA-256 checked (`tools/computer-r2-sync.sh:707-739`),

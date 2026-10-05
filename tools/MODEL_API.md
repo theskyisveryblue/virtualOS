@@ -75,22 +75,30 @@ curl --fail-with-body -sS -H "Authorization: Bearer $VOS_MODEL_API_TOKEN" \
   http://192.168.64.1:8765/v1/critique
 ```
 
-Guest-side verification is still open, and the blocker is input delivery, not
-the swap guard or the bridge. On the Mini the guest repeatedly falls to a blank
-(12,415-byte) frame or a lock screen. `computer-wake.sh` (space) and
-`computer-unlock.sh` (configured password) both changed the frame and unlocked
-the guest when re-run against the Mini's own control server, so single keys can
-reach the guest. But typing into the guest Terminal does not register: `/vm/exec`
-and repeated `/vm/key` calls all report `ok` with the expected counts, the
-virtualOS window was confirmed frontmost, yet a `pwd` typed as individual keys
-produced no text or output at the `~ %` prompt in OCR. Two concrete suspects:
-`sendText` maps unmapped punctuation to keycode 0 (`a`) rather than rejecting it
-(`VMCommandServer.swift:516-531`), and the synthetic events may not be consumed
-when the guest's Terminal is not the focused in-guest window. Until input
-delivery is reliable and the token is provisioned into the guest through a
-trusted channel, the guest-side `/v1/route` call remains unverified. Host-side
-and self-test requests are confirmed. The swap guard gates background workers,
-not one manual guest exec.
+Guest-side access is verified. From inside the VM, `curl` reached
+`http://192.168.64.1:8765/v1/route` with the bearer token and returned
+`{"choice":"dom_click","confidence":0.99973,"known_feature_ratio":0.7143,
+"known_features":5,"status":"advice_only"}`. An unauthenticated call from the
+guest returned HTTP 401, so both reachability and authorization hold across the
+VM bridge.
+
+Two useful details from that work:
+
+- Direct `/vm/exec` typing is unreliable for punctuation: pasted `:` arrived as
+  `;`, so a literal `http://host:port` command was corrupted. The reliable path
+  is the guest hex bootstrap (`run_guest_hex_script`, lowercase hex plus
+  `xxd -r -p`), which only uses unshifted keys and carries the token safely.
+- Two app bugs blocked a headless/background start, both now fixed in
+  `MainViewController`: `attemptAutoStartIfNeeded` did not populate the selected
+  bundle/parameters before auto-start, and it did not open the sandbox scope for
+  the VM directory, so `Parameters.txt` was unreadable and the start silently
+  aborted. The installed app must keep the
+  `com.apple.security.virtualization` entitlement; re-signing without it makes
+  the VM refuse to start.
+
+The Mini's guest is healthy and the model API self-test still returns HTTP 200
+from route, critique, and design and HTTP 401 without a token. The swap guard
+gates background workers, not one manual guest exec.
 
 If using SSH instead of direct bridge access, run the API on the Mini with its
 default loopback address, then open a tunnel from the guest to the Mini:

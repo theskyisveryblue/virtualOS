@@ -13,9 +13,23 @@ import OSLog
 #if arch(arm64)
 
 final class MainViewController: NSViewController {
+    fileprivate struct HostSnapshot {
+        let freeDiskGB: UInt64
+        let totalDiskGB: UInt64
+        let usedDiskPercent: Int
+    }
+
+    fileprivate struct StartSafetyResult {
+        let allowed: Bool
+        let didChange: Bool
+        let messageText: String?
+        let informativeText: String?
+    }
+
     @IBOutlet weak var tableView: NSTableView!
     @IBOutlet weak var vmNameTextField: NSTextField!
     @IBOutlet weak var parameterOutlineView: NSOutlineView!
+    @IBOutlet weak var installButton: NSButton!
     @IBOutlet weak var startButton: NSButton!
     @IBOutlet weak var sharedFolderButton: NSButton!
     @IBOutlet weak var deleteButton: NSButton!
@@ -27,6 +41,15 @@ final class MainViewController: NSViewController {
     fileprivate let mainStoryBoard = NSStoryboard(name: "Main", bundle: nil)
     fileprivate let viewModel = MainViewModel()
     fileprivate var diskImageSize = 1
+    fileprivate var didAttemptAutoStart = false
+    fileprivate var activeVMWindows: [String: NSWindow] = [:]
+    fileprivate var activeVMWindowObservers: [String: NSObjectProtocol] = [:]
+    fileprivate var shouldStartInBackground: Bool {
+        ProcessInfo.processInfo.arguments.contains("--background-vm")
+    }
+    fileprivate var shouldForceAutoStartOnLaunch: Bool {
+        shouldStartInBackground || ProcessInfo.processInfo.arguments.contains("--auto-start-vm")
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -51,28 +74,112 @@ final class MainViewController: NSViewController {
 
     deinit {
         NotificationCenter.default.removeObserver(self)
+        for (_, token) in activeVMWindowObservers {
+            NotificationCenter.default.removeObserver(token)
+        }
+        activeVMWindowObservers.removeAll()
     }
 
     override func viewWillAppear() {
         super.viewWillAppear()
         view.window?.delegate = self
         vmNameTextField.resignFirstResponder()
-        if let bookmarkURL = UserDefaults.standard.vmFilesDirectory,
-           let bookmarkData = UserDefaults.standard.vmFilesDirectoryBookmarkData
-        {
-            _ = Bookmark.startAccess(bookmarkData: bookmarkData, for: bookmarkURL)            
-        }
+        beginAccessToVMFilesDirectory()
         self.updateUI()
+        attemptAutoStartIfNeeded()
     }
     
+    // Opens the saved security-scoped access to the VM files directory. A
+    // headless/background launch skips viewWillAppear(), so the sandbox scope
+    // must be opened explicitly before reading Parameters.txt.
+    fileprivate func beginAccessToVMFilesDirectory() {
+        guard let bookmarkURL = UserDefaults.standard.vmFilesDirectory else {
+            return
+        }
+        if let bookmarkData = UserDefaults.standard.vmFilesDirectoryBookmarkData {
+            if Bookmark.startAccess(bookmarkData: bookmarkData, for: bookmarkURL) != nil {
+                return
+            }
+        }
+        // No usable bookmark yet: create one from the configured path so a
+        // headless launch can read Parameters.txt and the disk image.
+        if let fresh = Bookmark.createBookmarkData(fromUrl: URL(fileURLWithPath: bookmarkURL)) {
+            UserDefaults.standard.vmFilesDirectoryBookmarkData = fresh
+            _ = Bookmark.startAccess(bookmarkData: fresh, for: bookmarkURL)
+        }
+    }
+
     @IBAction func startButtonPressed(_ sender: NSButton) {
-        if let windowController = mainStoryBoard.instantiateController(withIdentifier: "NSWindowController") as? NSWindowController,
-           let vmViewController = mainStoryBoard.instantiateController(withIdentifier: "VMViewController") as? VMViewController
-        {
-            vmViewController.vmBundle = viewModel.vmBundle
-            vmViewController.vmParameters = viewModel.vmParameters
-            windowController.showWindow(self)
-            windowController.contentViewController = vmViewController
+        guard let vmBundle = viewModel.vmBundle,
+              var vmParameters = viewModel.vmParameters else {
+            return
+        }
+        let bundlePath = vmBundle.url.path
+        Logger.shared.log(level: .default, "Starting VM bundle: \(bundlePath, privacy: .public)")
+
+        if focusExistingVMWindowIfAvailable(bundlePath: bundlePath, bringToFront: !shouldStartInBackground) {
+            return
+        }
+
+        let safety = applyStartSafetyGuardrails(vmParameters: &vmParameters)
+        if !safety.allowed {
+            if let messageText = safety.messageText, let informativeText = safety.informativeText {
+                Logger.shared.error("VM start blocked: \(messageText, privacy: .public). \(informativeText, privacy: .public)")
+                if !shouldStartInBackground {
+                    let alert = NSAlert.okCancelAlert(messageText: messageText, informativeText: informativeText, showCancelButton: false)
+                    _ = alert.runModal()
+                }
+            }
+            return
+        }
+
+        if safety.didChange {
+            viewModel.vmParameters = vmParameters
+            viewModel.storeParametersToDisk()
+            updateCpuCount(vmParameters)
+            updateRam(vmParameters)
+            updateLabels(setZero: false)
+            updateOutlineView()
+            if let messageText = safety.messageText, let informativeText = safety.informativeText {
+                Logger.shared.log(level: .default, "\(messageText): \(informativeText)")
+            }
+        }
+
+        if let vmViewController = mainStoryBoard.instantiateController(withIdentifier: "VMViewController") as? VMViewController {
+            vmViewController.vmBundle = vmBundle
+            vmViewController.vmParameters = vmParameters
+            vmViewController.onStartResult = { [weak self] result in
+                guard let self else {
+                    return
+                }
+                if case .failure = result {
+                    self.unregisterVMWindow(bundlePath: bundlePath)
+                }
+            }
+            vmViewController.onStopped = { [weak self] in
+                self?.unregisterVMWindow(bundlePath: bundlePath)
+            }
+
+            // Create a dedicated VM display window instead of reusing the main window controller.
+            // Reusing the shared "NSWindowController" can open another copy of the control window.
+            let vmWindow = NSWindow(contentViewController: vmViewController)
+            vmWindow.title = vmBundle.name
+            vmWindow.styleMask = [.titled, .closable, .miniaturizable, .resizable]
+            vmWindow.setContentSize(NSSize(width: 980, height: 700))
+            vmWindow.minSize = NSSize(width: 640, height: 420)
+            vmWindow.isReleasedWhenClosed = true
+            if shouldStartInBackground {
+                // Virtualization stops producing display pixels for a fully off-screen window.
+                // Keep the window renderable and place it behind normal host applications.
+                vmWindow.center()
+                vmWindow.orderBack(self)
+            } else {
+                vmWindow.center()
+                vmWindow.makeKeyAndOrderFront(self)
+                NSApp.activate(ignoringOtherApps: true)
+            }
+            registerVMWindow(vmWindow, bundlePath: bundlePath)
+            vmViewController.beginSessionIfNeeded()
         } else {
             Logger.shared.log(level: .default, "show vm window failed")
         }
@@ -136,7 +243,12 @@ final class MainViewController: NSViewController {
         if let userInfo = notification.userInfo,
            let restoreImageName = userInfo[Constants.selectedRestoreImage] as? String
         {
-            if restoreImageName != Constants.restoreImageNameLatest {
+            var isDownload = false
+            if let url = URL(string: restoreImageName), (url.scheme == "http" || url.scheme == "https") {
+                isDownload = true
+            }
+            
+            if restoreImageName != Constants.restoreImageNameLatest && !isDownload {
                 let accessoryView = NSTextField(frame: NSRect(x: 0, y: 0, width: 200, height: 20))
                 accessoryView.stringValue = "\(UserDefaults.standard.diskSize)"
                 
@@ -219,6 +331,7 @@ final class MainViewController: NSViewController {
     // MARK: - Private
 
     fileprivate func updateButtons(enabled: Bool) {
+        installButton.isEnabled = true
         startButton.isEnabled = enabled
         sharedFolderButton.isEnabled = enabled
         deleteButton.isEnabled = enabled
@@ -265,6 +378,84 @@ final class MainViewController: NSViewController {
         updateLabels(setZero: false)
         updateOutlineView()
     }
+
+    fileprivate func hostSnapshot() -> HostSnapshot? {
+        let path = "/System/Volumes/Data"
+        guard let attributes = try? FileManager.default.attributesOfFileSystem(forPath: path),
+              let totalBytes = attributes[.systemSize] as? NSNumber,
+              let freeBytes = attributes[.systemFreeSize] as? NSNumber
+        else {
+            return nil
+        }
+
+        let totalGB = UInt64(totalBytes.uint64Value).bytesToGigabytes()
+        let freeGB = UInt64(freeBytes.uint64Value).bytesToGigabytes()
+        guard totalGB > 0 else {
+            return nil
+        }
+
+        let usedDiskPercent = Int(round((Double(totalGB - freeGB) / Double(totalGB)) * 100.0))
+        return HostSnapshot(freeDiskGB: freeGB, totalDiskGB: totalGB, usedDiskPercent: usedDiskPercent)
+    }
+
+    fileprivate func applyStartSafetyGuardrails(vmParameters: inout VMParameters) -> StartSafetyResult {
+        let hostCPUCount = max(1, ProcessInfo.processInfo.processorCount)
+        let hostMemoryGB = max(UInt64(1), ProcessInfo.processInfo.physicalMemory.bytesToGigabytes())
+
+        // Keep some host headroom while allowing meaningful tuning on capable machines.
+        var cpuCap = max(
+            vmParameters.cpuCountMin,
+            min(vmParameters.cpuCountMax, max(2, min(8, hostCPUCount / 2)))
+        )
+        var memoryCap = max(
+            vmParameters.memorySizeInGBMin,
+            min(vmParameters.memorySizeInGBMax, max(UInt64(6), min(UInt64(12), hostMemoryGB / 2)))
+        )
+
+        if let snapshot = hostSnapshot() {
+            if snapshot.freeDiskGB < 10 {
+                return StartSafetyResult(
+                    allowed: false,
+                    didChange: false,
+                    messageText: "Not enough disk space to safely run the VM",
+                    informativeText: "The host only has \(snapshot.freeDiskGB) GB free (\(snapshot.usedDiskPercent)% used). Free at least 20 GB before starting, otherwise the VM can crash due to host pressure."
+                )
+            }
+            if snapshot.freeDiskGB < 15 {
+                cpuCap = min(cpuCap, 3)
+                memoryCap = min(memoryCap, UInt64(6))
+            } else if snapshot.freeDiskGB < 20 {
+                cpuCap = min(cpuCap, 4)
+                memoryCap = min(memoryCap, UInt64(8))
+            }
+        }
+
+        let clampedCPU = max(vmParameters.cpuCountMin, min(vmParameters.cpuCount, cpuCap))
+        let clampedMemory = max(vmParameters.memorySizeInGBMin, min(vmParameters.memorySizeInGB, memoryCap))
+        let requestedCPU = vmParameters.cpuCount
+        let requestedMemory = vmParameters.memorySizeInGB
+
+        if let snapshot = hostSnapshot() {
+            Logger.shared.log(level: .default, "start safety host free=\(snapshot.freeDiskGB)GB used=\(snapshot.usedDiskPercent)% total=\(snapshot.totalDiskGB)GB hostCPU=\(hostCPUCount) hostRAM=\(hostMemoryGB)GB capCPU=\(cpuCap) capRAM=\(memoryCap) reqCPU=\(requestedCPU) reqRAM=\(requestedMemory) finalCPU=\(clampedCPU) finalRAM=\(clampedMemory)")
+        } else {
+            Logger.shared.log(level: .default, "start safety hostCPU=\(hostCPUCount) hostRAM=\(hostMemoryGB)GB capCPU=\(cpuCap) capRAM=\(memoryCap) reqCPU=\(requestedCPU) reqRAM=\(requestedMemory) finalCPU=\(clampedCPU) finalRAM=\(clampedMemory)")
+        }
+
+        let didChange = clampedCPU != vmParameters.cpuCount || clampedMemory != vmParameters.memorySizeInGB
+        vmParameters.cpuCount = clampedCPU
+        vmParameters.memorySizeInGB = clampedMemory
+
+        guard didChange else {
+            return StartSafetyResult(allowed: true, didChange: false, messageText: nil, informativeText: nil)
+        }
+
+        return StartSafetyResult(
+            allowed: true,
+            didChange: true,
+            messageText: "Applied a safer VM profile",
+            informativeText: "Adjusted this VM to \(clampedCPU) CPU and \(clampedMemory) GB RAM for better stability on the current host."
+        )
+    }
     
     fileprivate func updateButtonEnabledState() {
         var enabled = false
@@ -272,6 +463,7 @@ final class MainViewController: NSViewController {
             enabled = true
         }
         vmNameTextField.isEnabled    = enabled
+        installButton.isEnabled      = true
         startButton.isEnabled        = enabled
         sharedFolderButton.isEnabled = enabled
         deleteButton.isEnabled       = enabled
@@ -292,6 +484,114 @@ final class MainViewController: NSViewController {
         } else {
             Logger.shared.log(level: .default, "show modal failed")
         }
+    }
+
+    fileprivate func focusExistingVMWindowIfAvailable(bundlePath: String, bringToFront: Bool = true) -> Bool {
+        guard let existingWindow = activeVMWindows[bundlePath] else {
+            unregisterVMWindow(bundlePath: bundlePath)
+            return false
+        }
+
+        if let vmViewController = existingWindow.contentViewController as? VMViewController,
+           !vmViewController.hasActiveSession
+        {
+            Logger.shared.log(level: .default, "Found stale VM window for \(bundlePath). Closing it and starting a fresh session.")
+            existingWindow.close()
+            unregisterVMWindow(bundlePath: bundlePath)
+            return false
+        }
+
+        guard bringToFront else {
+            Logger.shared.log(level: .default, "VM for \(bundlePath) is already open in background")
+            return true
+        }
+
+        if existingWindow.isMiniaturized {
+            existingWindow.deminiaturize(self)
+        }
+        existingWindow.makeKeyAndOrderFront(self)
+        NSApp.activate(ignoringOtherApps: true)
+        Logger.shared.log(level: .default, "VM for \(bundlePath) is already open, focusing existing window")
+        return true
+    }
+
+    fileprivate func registerVMWindow(_ window: NSWindow, bundlePath: String) {
+        unregisterVMWindow(bundlePath: bundlePath)
+        activeVMWindows[bundlePath] = window
+        let token = NotificationCenter.default.addObserver(forName: NSWindow.willCloseNotification, object: window, queue: .main) { [weak self] _ in
+            self?.unregisterVMWindow(bundlePath: bundlePath)
+        }
+        activeVMWindowObservers[bundlePath] = token
+    }
+
+    fileprivate func unregisterVMWindow(bundlePath: String) {
+        activeVMWindows.removeValue(forKey: bundlePath)
+        if let token = activeVMWindowObservers.removeValue(forKey: bundlePath) {
+            NotificationCenter.default.removeObserver(token)
+        }
+    }
+
+    fileprivate func attemptAutoStartIfNeeded() {
+        guard !didAttemptAutoStart else {
+            return
+        }
+        didAttemptAutoStart = true
+
+        guard UserDefaults.standard.autoStartLastVMOnLaunch || shouldForceAutoStartOnLaunch else {
+            return
+        }
+
+        guard viewModel.tableViewDataSource.rows() > 0 else {
+            return
+        }
+
+        if viewModel.selectedRow == nil {
+            viewModel.selectedRow = 0
+        }
+
+        // A headless/background launch may never present the window, so
+        // viewWillAppear() cannot be relied on to open the sandbox scope or
+        // populate the selected bundle and its parameters. Do both here.
+        beginAccessToVMFilesDirectory()
+        updateUI()
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { [weak self] in
+            guard let self else {
+                return
+            }
+            guard self.startButton.isEnabled else {
+                return
+            }
+            Logger.shared.log(level: .default, "Auto-starting selected VM on app launch")
+            self.startButtonPressed(self.startButton)
+        }
+    }
+
+    func startSelectedVMFromLaunchIfNeeded() {
+        guard !didAttemptAutoStart else {
+            return
+        }
+        didAttemptAutoStart = true
+
+        guard viewModel.tableViewDataSource.rows() > 0 else {
+            return
+        }
+
+        if viewModel.selectedRow == nil {
+            viewModel.selectedRow = 0
+        }
+
+        // A headless launch may instantiate the controller without ever presenting
+        // the main window, so viewWillAppear() cannot be relied on to populate state.
+        updateUI()
+
+        guard startButton.isEnabled else {
+            Logger.shared.error("Direct launch could not start the selected VM because its configuration is unavailable")
+            return
+        }
+
+        Logger.shared.log(level: .default, "Direct launch auto-start requested")
+        startButtonPressed(startButton)
     }
 }
 
