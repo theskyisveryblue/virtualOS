@@ -1,0 +1,23 @@
+name = "virtualos-relay"
+main = "src/index.ts"
+account_id = "c24a3fb4bedba669785c18c834f51921"
+compatibility_date = "2026-04-14"
+workers_dev = true
+preview_urls = false
+
+# Auth token — set via `wrangler secret put AUTH_TOKEN`
+# [vars]
+# AUTH_TOKEN = ""  # don't put secrets here, use wrangler secret
+# WEB_TOKEN is a separate, browser-limited secret.
+
+[[r2_buckets]]
+binding = "SNAPSHOTS"
+bucket_name = "virtualos-remote-private"
+
+[[durable_objects.bindings]]
+name = "CONTROL"
+class_name = "ControlRelay"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["ControlRelay"]

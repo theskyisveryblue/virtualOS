@@ -1,3 +1,33 @@
 virtualOS.xcodeproj/xcuserdata
 *.xcuserdatad
 .DS_Store
+
+# Build artifacts
+build/
+DerivedData/
+*.xcuserdatad
+
+# Fleet compiled binaries (built from tools/fleet/*.swift; see runbook.sh)
+tools/fleet/fleet-supervisor
+tools/fleet/linux-guest
+
+# Secrets — never commit these
+.env
+.env.*
+!.env.example
+.wrangler/
+*.credentials.json
+
+# Node
+node_modules/
+
+# Python
+__pycache__/
+*.pyc
+
+# Logs
+*.log
+server.log
+
+# Local-only human preference features and personalized models
+tools/.private/

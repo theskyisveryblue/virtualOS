@@ -1,0 +1,235 @@
+#!/usr/bin/env python3
+"""virtualOS fleet manager (experimental).
+
+A thin, dependency-free CLI/orchestrator over the headless FleetSupervisor.
+The supervisor owns VM lifecycle; this tool talks to its local HTTP surface and,
+when a multiplexer is running, exposes every VM through one endpoint.
+
+    tools/fleet/fleet.py status
+    tools/fleet/fleet.py capability
+    tools/fleet/fleet.py up vm-a,vm-b
+    tools/fleet/fleet.py start vm-a
+    tools/fleet/fleet.py stop vm-a
+    tools/fleet/fleet.py serve --http-port 9300   # multiplexer
+
+The multiplexer is the "stream them all out of one pipe" piece: a single
+process that fans out to all VMs and can be fronted by the Cloudflare relay.
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import sys
+import urllib.error
+import urllib.request
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+
+DEFAULT_SUPERVISOR = os.environ.get("VOS_FLEET_SUPERVISOR", "http://127.0.0.1:9200")
+
+
+def _request(method: str, url: str, payload: dict | None = None, timeout: float = 10.0):
+    data = None
+    headers = {"Accept": "application/json"}
+    if payload is not None:
+        data = json.dumps(payload).encode("utf-8")
+        headers["Content-Type"] = "application/json"
+    req = urllib.request.Request(url, data=data, headers=headers, method=method)
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            body = resp.read().decode("utf-8")
+            return resp.status, (json.loads(body) if body else {})
+    except urllib.error.HTTPError as exc:
+        raw = exc.read().decode("utf-8") if exc.fp else ""
+        try:
+            parsed = json.loads(raw) if raw else {}
+        except ValueError:
+            parsed = {"error": raw}
+        return exc.code, parsed
+    except urllib.error.URLError as exc:
+        return 0, {"ok": False, "error": f"supervisor unreachable: {exc.reason}"}
+
+
+def supervisor_get(base: str, path: str):
+    return _request("GET", f"{base}{path}")
+
+
+def supervisor_post(base: str, path: str):
+    return _request("POST", f"{base}{path}")
+
+
+class MultiplexerHandler(BaseHTTPRequestHandler):
+    supervisor = DEFAULT_SUPERVISOR
+
+    def log_message(self, *_args):  # quiet by default
+        pass
+
+    def _json(self, code: int, obj: dict) -> None:
+        payload = json.dumps(obj).encode("utf-8")
+        self.send_response(code)
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Content-Length", str(len(payload)))
+        self.end_headers()
+        self.wfile.write(payload)
+
+    def _proxy_frame(self, vm: str) -> None:
+        url = f"{self.supervisor}/fleet/frame/{vm}"
+        try:
+            with urllib.request.urlopen(url, timeout=10.0) as resp:
+                data = resp.read()
+                ctype = resp.headers.get("Content-Type", "image/jpeg")
+                self.send_response(resp.status)
+                self.send_header("Content-Type", ctype)
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.send_header("Content-Length", str(len(data)))
+                self.end_headers()
+                self.wfile.write(data)
+        except urllib.error.HTTPError as exc:
+            data = exc.read() if exc.fp else b""
+            self.send_response(exc.code)
+            self.send_header("Content-Type", exc.headers.get("Content-Type", "application/json"))
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.send_header("Content-Length", str(len(data)))
+            self.end_headers()
+            self.wfile.write(data)
+        except urllib.error.URLError as exc:
+            self._json(502, {"ok": False, "error": f"supervisor unreachable: {exc.reason}"})
+
+    def do_OPTIONS(self):
+        self.send_response(204)
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Authorization, Content-Type, X-VOS-Token")
+        self.end_headers()
+
+    def do_GET(self):
+        if self.path.startswith("/health"):
+            return self._json(200, {"ok": True, "service": "virtualos-fleet-mux"})
+        if self.path.startswith("/fleet/frame/"):
+            vm = self.path.split("/fleet/frame/", 1)[1].split("?", 1)[0].strip("/")
+            if not vm:
+                return self._json(400, {"ok": False, "error": "missing vm name"})
+            return self._proxy_frame(vm)
+        if self.path.startswith("/fleet/status"):
+            code, body = supervisor_get(self.supervisor, "/fleet/status")
+            return self._json(code or 502, body)
+        if self.path.startswith("/fleet/capability"):
+            code, body = supervisor_get(self.supervisor, "/fleet/capability")
+            return self._json(code or 502, body)
+        return self._json(404, {"ok": False, "error": "not found"})
+
+    def do_POST(self):
+        if self.path.startswith("/fleet/start"):
+            code, body = supervisor_post(self.supervisor, "/fleet/start")
+            return self._json(code or 502, body)
+        if self.path.startswith("/fleet/stop/"):
+            name = self.path.split("/fleet/stop/", 1)[1].strip("/")
+            code, body = supervisor_post(self.supervisor, f"/fleet/stop/{name}")
+            return self._json(code or 502, body)
+        return self._json(404, {"ok": False, "error": "not found"})
+
+
+def cmd_status(args) -> int:
+    code, body = supervisor_get(args.supervisor, "/fleet/status")
+    if code == 0:
+        print(body.get("error", "unreachable"), file=sys.stderr)
+        return 1
+    if args.json:
+        print(json.dumps(body, indent=2))
+        return 0
+    cap = body.get("capability", {})
+    print(f"root={body.get('root')} count={body.get('count')} "
+          f"nested={cap.get('nestedVirtualizationSupported')}")
+    for inst in body.get("instances", []):
+        flag = "ready" if inst.get("ready") else inst.get("state", "?")
+        err = f" err={inst['error']}" if inst.get("error") else ""
+        print(f"  {inst.get('name'):<12} {flag:<10} port={inst.get('controlPort')}{err}")
+    return 0
+
+
+def cmd_capability(args) -> int:
+    code, body = supervisor_get(args.supervisor, "/fleet/capability")
+    print(json.dumps(body, indent=2))
+    return 0 if code else 1
+
+
+def cmd_up(args) -> int:
+    names = args.names
+    code, body = supervisor_post(args.supervisor, "/fleet/start")
+    if code == 0:
+        print(body.get("error"), file=sys.stderr)
+        return 1
+    print(json.dumps(body, indent=2) if args.json else f"requested start of {names or 'all'}")
+    return 0
+
+
+def cmd_start(args) -> int:
+    code, body = supervisor_post(args.supervisor, f"/fleet/start/{args.name}")
+    print(json.dumps(body, indent=2))
+    return 0 if body.get("ok") else 1
+
+
+def cmd_stop(args) -> int:
+    code, body = supervisor_post(args.supervisor, f"/fleet/stop/{args.name}")
+    print(json.dumps(body, indent=2))
+    return 0 if body.get("ok") else 1
+
+
+def cmd_serve(args) -> int:
+    MultiplexerHandler.supervisor = args.supervisor
+    server = ThreadingHTTPServer((args.host, args.port), MultiplexerHandler)
+    print(f"virtualos fleet mux on http://{args.host}:{args.port} -> {args.supervisor}")
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        pass
+    return 0
+
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(prog="fleet")
+    parser.add_argument("--supervisor", default=DEFAULT_SUPERVISOR,
+                        help="FleetSupervisor base URL")
+    sub = parser.add_subparsers(dest="command", required=True)
+
+    p = sub.add_parser("status", help="show fleet status")
+    p.add_argument("--json", action="store_true")
+    p.set_defaults(func=cmd_status)
+
+    p = sub.add_parser("capability", help="probe nested virtualization support")
+    p.set_defaults(func=cmd_capability)
+
+    p = sub.add_parser("up", help="start all (or named) VMs")
+    p.add_argument("names", nargs="?", default="")
+    p.add_argument("--json", action="store_true")
+    p.set_defaults(func=cmd_up)
+
+    p = sub.add_parser("start", help="start one VM")
+    p.add_argument("name")
+    p.set_defaults(func=cmd_start)
+
+    p = sub.add_parser("stop", help="stop one VM")
+    p.add_argument("name")
+    p.set_defaults(func=cmd_stop)
+
+    p = sub.add_parser("serve", help="run the fleet multiplexer")
+    p.add_argument("--host", default="127.0.0.1")
+    p.add_argument("--port", type=int, default=9300)
+    p.set_defaults(func=cmd_serve)
+
+    return parser
+
+
+def main(argv=None) -> int:
+    args = build_parser().parse_args(argv)
+    if args.command == "serve":
+        return args.func(args)
+    if getattr(args, "json", False) and not hasattr(args, "func"):
+        pass
+    return args.func(args)
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

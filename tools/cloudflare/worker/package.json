@@ -1,0 +1,12 @@
+{
+  "name": "virtualos-relay",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "setup": "wrangler r2 bucket create virtualos-remote-private && wrangler secret put AUTH_TOKEN"
+  },
+  "devDependencies": {
+    "wrangler": "^4.82.2"
+  }
+}

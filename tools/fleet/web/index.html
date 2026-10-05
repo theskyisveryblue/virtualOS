@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>virtualOS fleet — EXPERIMENTAL web view</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 16px;
+    font: 13px/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    background: #0b0d10; color: #d7dde3;
+  }
+  h1 { font-size: 15px; margin: 0 0 4px; letter-spacing: .04em; }
+  .warn {
+    display: inline-block; margin: 0 0 12px;
+    padding: 2px 8px; border-radius: 3px;
+    background: #4a1f1f; color: #ffb4b4; border: 1px solid #7a2f2f;
+    font-weight: 700; letter-spacing: .08em;
+  }
+  .panel {
+    border: 1px solid #232a31; border-radius: 6px;
+    background: #11151a; padding: 10px 12px; margin-bottom: 14px;
+  }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  label { color: #8b98a5; }
+  input[type=text], input[type=number] {
+    background: #0b0d10; color: #d7dde3; border: 1px solid #2c343d;
+    border-radius: 4px; padding: 4px 6px; font: inherit;
+  }
+  input[type=text] { min-width: 260px; }
+  input[type=number] { width: 84px; }
+  button {
+    background: #1d2730; color: #cfe3f5; border: 1px solid #33424f;
+    border-radius: 4px; padding: 4px 10px; font: inherit; cursor: pointer;
+  }
+  button:hover { background: #26333f; }
+  button:disabled { opacity: .45; cursor: default; }
+  .muted { color: #7c8894; }
+  .err { color: #ff9c9c; }
+  .ok { color: #8ce99a; }
+  #fleet { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
+  .card { border: 1px solid #232a31; border-radius: 6px; background: #11151a; overflow: hidden; }
+  .card-head {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 10px; border-bottom: 1px solid #232a31; gap: 8px;
+  }
+  .vm-name { font-weight: 700; color: #eaf1f7; }
+  .badge { padding: 1px 7px; border-radius: 3px; font-size: 11px; border: 1px solid #33424f; color: #9fb3c8; }
+  .badge.ready { color: #8ce99a; border-color: #2f6b3f; background: #14251a; }
+  .badge.bad { color: #ff9c9c; border-color: #7a2f2f; background: #2a1616; }
+  .frame-wrap {
+    position: relative; background: #000; aspect-ratio: 16 / 9;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .frame-wrap img { width: 100%; height: 100%; object-fit: contain; display: block; }
+  .frame-wrap .placeholder { position: absolute; color: #6b7682; padding: 8px; text-align: center; }
+  .card-body { padding: 8px 10px; }
+  .meta { color: #8b98a5; margin-bottom: 6px; word-break: break-all; }
+  .controls { display: flex; gap: 6px; }
+  #recommend { margin-top: 6px; }
+</style>
+</head>
+<body>
+
+<h1>virtualOS fleet — web view</h1>
+<div class="warn">EXPERIMENTAL</div>
+
+<p class="muted" style="margin-top:0">
+  Browser-side view of a multi-VM Mac. Polls <code>GET /fleet/status</code>,
+  streams <code>GET /fleet/frame/&lt;vm&gt;</code>, and drives
+  <code>POST /fleet/start|stop/&lt;vm&gt;</code>. Vanilla JS, no build, no CDN.
+</p>
+
+<div class="panel">
+  <div class="row">
+    <label for="sup">supervisor / mux base URL</label>
+    <input id="sup" type="text" placeholder="http://127.0.0.1:9300" autocomplete="off" spellcheck="false">
+    <button id="connect">connect</button>
+    <button id="refresh">refresh now</button>
+    <label for="interval">frame interval (ms)</label>
+    <input id="interval" type="number" min="200" step="100" value="1500">
+    <button id="useLocation">use page origin</button>
+  </div>
+  <div id="connstate" class="muted" style="margin-top:6px">not connected</div>
+</div>
+
+<div class="panel">
+  <div><label>nested virtualization capability</label></div>
+  <div id="capability" class="muted">unknown</div>
+  <div id="recommend" class="muted"></div>
+</div>
+
+<div id="fleet"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  var DEFAULT_INTERVAL = 1500;
+  var elements = {
+    sup: document.getElementById("sup"),
+    connect: document.getElementById("connect"),
+    refresh: document.getElementById("refresh"),
+    interval: document.getElementById("interval"),
+    useLocation: document.getElementById("useLocation"),
+    connstate: document.getElementById("connstate"),
+    capability: document.getElementById("capability"),
+    recommend: document.getElementById("recommend"),
+    fleet: document.getElementById("fleet")
+  };
+
+  var state = {
+    base: "",
+    connected: false,
+    timer: null,
+    statusTimer: null,
+    latest: null,
+    frames: {} // vm name -> { img, url, lastError }
+  };
+
+  function queryParam(name) {
+    try {
+      return new URLSearchParams(window.location.search).get(name);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function normalizeBase(raw) {
+    var s = (raw || "").trim();
+    if (!s) return "";
+    return s.replace(/\/+$/, "");
+  }
+
+  function setConn(text, cls) {
+    elements.connstate.textContent = text;
+    elements.connstate.className = cls || "muted";
+  }
+
+  function intervalMs() {
+    var n = parseInt(elements.interval.value, 10);
+    if (!isFinite(n) || n < 200) n = DEFAULT_INTERVAL;
+    return n;
+  }
+
+  function fetchJSON(path) {
+    return fetch(state.base + path, {
+      method: "GET",
+      headers: { "Accept": "application/json" },
+      cache: "no-store"
+    }).then(function (resp) {
+      return resp.json().then(function (body) {
+        return { ok: resp.ok, status: resp.status, body: body };
+      });
+    });
+  }
+
+  function postJSON(path) {
+    return fetch(state.base + path, {
+      method: "POST",
+      headers: { "Accept": "application/json" },
+      cache: "no-store"
+    }).then(function (resp) {
+      return resp.json().then(function (body) {
+        return { ok: resp.ok, status: resp.status, body: body };
+      });
+    });
+  }
+
+  function clearText(node) {
+    while (node.firstChild) node.removeChild(node.firstChild);
+  }
+
+  function renderCapability(capability) {
+    clearText(elements.capability);
+    clearText(elements.recommend);
+
+    if (!capability || typeof capability !== "object") {
+      elements.capability.textContent = "unavailable";
+      return;
+    }
+
+    var supported = capability.nestedVirtualizationSupported;
+    var reason = capability.nestedVirtualizationReason;
+    var platform = capability.platform;
+
+    elements.capability.textContent =
+      "supported=" + String(supported) +
+      (reason ? " (" + reason + ")" : "") +
+      (platform ? " on " + platform : "");
+    elements.capability.className = supported ? "ok" : "muted";
+
+    var rec = document.createElement("div");
+    if (supported) {
+      rec.textContent = "This host can expose a hypervisor to guests: VM-in-VM is possible.";
+    } else {
+      rec.textContent = "This host runs flat VMs only; nested guests will not get a hypervisor.";
+    }
+    elements.recommend.appendChild(rec);
+  }
+
+  function badge(stateName, ready) {
+    var span = document.createElement("span");
+    span.className = "badge";
+    if (ready) {
+      span.classList.add("ready");
+      span.textContent = "ready";
+    } else {
+      span.textContent = stateName || "unknown";
+      if (stateName === "failed") span.classList.add("bad");
+    }
+    return span;
+  }
+
+  function buildCard(instance) {
+    var name = String(instance.name || "(unnamed)");
+    var ready = !!instance.ready;
+    var stateName = String(instance.state || "");
+    var port = instance.controlPort;
+
+    var card = document.createElement("div");
+    card.className = "card";
+
+    var head = document.createElement("div");
+    head.className = "card-head";
+
+    var nameEl = document.createElement("span");
+    nameEl.className = "vm-name";
+    nameEl.textContent = name;
+    head.appendChild(nameEl);
+    head.appendChild(badge(stateName, ready));
+    card.appendChild(head);
+
+    var frameWrap = document.createElement("div");
+    frameWrap.className = "frame-wrap";
+
+    var placeholder = document.createElement("div");
+    placeholder.className = "placeholder";
+
+    var img = null;
+    if (ready && state.base) {
+      img = document.createElement("img");
+      img.alt = "frame of " + name;
+      img.decoding = "async";
+      img.addEventListener("load", function () {
+        placeholder.style.display = "none";
+      });
+      img.addEventListener("error", function () {
+        placeholder.style.display = "";
+        placeholder.textContent = "frame not available yet";
+      });
+      frameWrap.appendChild(placeholder);
+      frameWrap.appendChild(img);
+      state.frames[name] = { img: img, url: state.base + "/fleet/frame/" + encodeURIComponent(name) };
+    } else {
+      placeholder.textContent = ready ? "no supervisor base" : "VM not running";
+      frameWrap.appendChild(placeholder);
+      delete state.frames[name];
+    }
+    card.appendChild(frameWrap);
+
+    var body = document.createElement("div");
+    body.className = "card-body";
+
+    var meta = document.createElement("div");
+    meta.className = "meta";
+    meta.textContent = "state=" + (stateName || "?") + "  controlPort=" + (port != null ? port : "?");
+    if (instance.error) {
+      var err = document.createElement("div");
+      err.className = "err";
+      err.textContent = "error: " + instance.error;
+      meta.appendChild(err);
+    }
+    body.appendChild(meta);
+
+    var controls = document.createElement("div");
+    controls.className = "controls";
+
+    var startBtn = document.createElement("button");
+    startBtn.textContent = "start";
+    startBtn.addEventListener("click", function () {
+      control(name, "/fleet/start/", startBtn);
+    });
+
+    var stopBtn = document.createElement("button");
+    stopBtn.textContent = "stop";
+    stopBtn.disabled = !ready;
+    stopBtn.addEventListener("click", function () {
+      control(name, "/fleet/stop/", stopBtn);
+    });
+
+    controls.appendChild(startBtn);
+    controls.appendChild(stopBtn);
+    body.appendChild(controls);
+    card.appendChild(body);
+
+    return card;
+  }
+
+  function control(name, prefix, button) {
+    if (!state.base) return;
+    button.disabled = true;
+    var previous = button.textContent;
+    button.textContent = "...";
+    postJSON(prefix + encodeURIComponent(name))
+      .then(function () {
+        return refreshStatus();
+      })
+      .catch(function (err) {
+        setConn("control failed: " + err, "err");
+      })
+      .then(function () {
+        button.disabled = false;
+        button.textContent = previous;
+      });
+  }
+
+  function updateFrames() {
+    if (!state.base) return;
+    var stamp = Date.now();
+    Object.keys(state.frames).forEach(function (name) {
+      var entry = state.frames[name];
+      entry.img.src = entry.url + "?t=" + stamp;
+    });
+  }
+
+  function renderFleet(status) {
+    state.latest = status;
+    renderCapability(status.capability);
+
+    clearText(elements.fleet);
+    var instances = Array.isArray(status.instances) ? status.instances : [];
+    if (!instances.length) {
+      var empty = document.createElement("div");
+      empty.className = "muted";
+      empty.textContent = "no VMs reported by the supervisor";
+      elements.fleet.appendChild(empty);
+      return;
+    }
+    instances.forEach(function (instance) {
+      elements.fleet.appendChild(buildCard(instance));
+    });
+    updateFrames();
+  }
+
+  function refreshStatus() {
+    if (!state.base) return Promise.resolve();
+    return fetchJSON("/fleet/status")
+      .then(function (res) {
+        if (!res.ok || !res.body || res.body.ok === false) {
+          var msg = (res.body && res.body.error) ? res.body.error : ("HTTP " + res.status);
+          throw new Error(msg);
+        }
+        setConn("connected \u2192 " + state.base, "ok");
+        renderFleet(res.body);
+      })
+      .catch(function (err) {
+        setConn("status error: " + (err && err.message ? err.message : err), "err");
+      })
+      .then(function () {
+        return fetchJSON("/fleet/capability").then(function (res) {
+          if (res && res.ok && res.body) {
+            renderCapability(res.body.capability || res.body);
+          }
+        }).catch(function () { /* capability is best-effort */ });
+      });
+  }
+
+  function startStatusLoop() {
+    if (state.statusTimer) clearInterval(state.statusTimer);
+    state.statusTimer = setInterval(refreshStatus, Math.max(intervalMs(), 500));
+
+    if (state.timer) clearInterval(state.timer);
+    state.timer = setInterval(updateFrames, intervalMs());
+  }
+
+  function connect(rawBase) {
+    var base = normalizeBase(rawBase);
+    if (!base) {
+      setConn("no base URL set", "err");
+      return;
+    }
+    state.base = base;
+    state.connected = true;
+    elements.sup.value = base;
+
+    try {
+      var url = new URL(window.location.href);
+      url.searchParams.set("supervisor", base);
+      window.history.replaceState(null, "", url.toString());
+    } catch (e) { /* history is optional */ }
+
+    setConn("connecting \u2192 " + base, "muted");
+    refreshStatus();
+    startStatusLoop();
+  }
+
+  function initialBase() {
+    var fromQuery = queryParam("supervisor");
+    if (fromQuery) return fromQuery;
+    if (window.location && window.location.origin &&
+        window.location.origin !== "null" && window.location.protocol !== "file:") {
+      return window.location.origin;
+    }
+    return "";
+  }
+
+  elements.connect.addEventListener("click", function () {
+    connect(elements.sup.value);
+  });
+  elements.refresh.addEventListener("click", function () {
+    refreshStatus();
+  });
+  elements.interval.addEventListener("change", function () {
+    if (state.connected) startStatusLoop();
+  });
+  elements.useLocation.addEventListener("click", function () {
+    elements.sup.value = window.location.origin;
+  });
+  elements.sup.addEventListener("keydown", function (event) {
+    if (event.key === "Enter") connect(elements.sup.value);
+  });
+
+  elements.interval.value = String(DEFAULT_INTERVAL);
+  elements.sup.value = initialBase();
+  if (elements.sup.value) {
+    connect(elements.sup.value);
+  } else {
+    setConn("set a supervisor/mux URL and press connect", "muted");
+  }
+})();
+</script>
+</body>
+</html>
