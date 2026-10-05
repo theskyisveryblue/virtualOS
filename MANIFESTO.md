@@ -145,7 +145,11 @@ These are the scars. Every one of them is a claim we paid for.
 - **Object storage is not a disk.** R2 is an archive, not exhaustive random-access
   storage. A network boot over object storage is a research path — base image,
   bounded cache, durable overlay — and it is not done until it boots, restarts,
-  survives an outage, and restores.
+  survives an outage, and restores. We have now *booted* a real guest from real
+  R2 over NBD: the bytes were fetched by signed, SHA-pinned reads; a cold chunk
+  cost hundreds of milliseconds, then the cache answered in microseconds; every
+  write stayed in the local overlay and nothing wrote back to R2. The mechanism
+  is real; carrying a full macOS disk at that scale is the next step.
 - **Remote-backed disks must survive failure.** A temporary network loss must
   reconnect against the same overlay without losing or corrupting writes. A
   network disk without a reconnect story is a toy.
