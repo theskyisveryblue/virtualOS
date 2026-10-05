@@ -62,7 +62,51 @@ tools/computer-space.sh --raw-hole-lab
 NBD, attaches it to a generic-platform VM, and asserts that **Apple's client**
 negotiated NBD and performed real reads. All three backends pass.
 
-## Real R2 (the long pole)
+## Real R2 — verified
+
+`--cloud-disk-r2-boot-lab` does the same against **real Cloudflare R2**:
+
+```bash
+source ~/.config/virtualos/r2.env        # AWS keys + CLOUDFLARE_ACCOUNT_ID/ENDPOINT
+export VOS_CLOUD_DISK_CONFIG=~/.config/virtualos/r2-lab-config.json
+tools/computer-space.sh --cloud-disk-r2-boot-lab
+# r2_boot_lab=real_r2_verified reads=33 bytes=24576 cold_us_max=...
+```
+
+It builds a 16 MiB image (three patterned chunks + one zero chunk), uploads it as
+content-addressed objects, serves it over NBD via `cloud_disk.py r2-serve`, boots
+a generic EFI guest, and verifies the NBD connection negotiated and served reads.
+Observed: a cold chunk fetched from R2 costs hundreds of milliseconds, then reads
+are served from the bounded local cache in microseconds. `writes_to_r2` stays 0 —
+the disk is read-only at the source; all writes land in the local overlay.
+
+### Minting R2 S3 credentials from an API token
+
+R2 S3 keys are derived from a Cloudflare API token:
+
+- **Access Key ID** = the token `id`
+- **Secret Access Key** = hex SHA-256 of the token `value`
+
+Create a bucket-scoped token (read + write) with the R2 permission-group IDs:
+
+```
+permission group id (read):  6a018a9f2fc74eb6b293b0c548f38b39
+permission group id (write): 2efd5506f9c8494dacb1fa10a3e7d5b6
+resource: com.cloudflare.edge.r2.bucket.<ACCOUNT_ID>_default_virtualos-cloud-disks
+```
+
+```bash
+POST https://api.cloudflare.com/client/v4/accounts/<ACCOUNT_ID>/tokens
+Authorization: Bearer <broad-scoped-token>
+{"name":"virtualos-cloud-disk-lab","policies":[{"effect":"allow",
+ "resources":{"com.cloudflare.edge.r2.bucket.<ACCOUNT_ID>_default_virtualos-cloud-disks":"*"},
+ "permission_groups":[{"id":"<read>"},{"id":"<write>"}]}]}
+```
+
+The token `value` is shown once; the secret is `sha256(value)` hex. Store both in
+a 0600 file (e.g. `~/.config/virtualos/r2.env`) and never in the repo.
+
+## A full macOS disk over R2 (the remaining scale step)
 
 A real R2 boot is deliberately gated and not yet run end-to-end:
 

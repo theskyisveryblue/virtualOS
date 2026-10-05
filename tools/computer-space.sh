@@ -267,8 +267,8 @@ if [[ "${1:-}" == --cloud-disk-r2-upload-clone ]]; then
   exit 0
 fi
 
-if [[ $# -gt 1 || ( $# -eq 1 && "$1" != --reclaim-caches && "$1" != --reclaim-local-lab && "$1" != --vm-summary && "$1" != --raw-hole-lab && "$1" != --nbd-api-probe && "$1" != --nbd-source-build-check && "$1" != --nbd-r2-metadata-prepare && "$1" != --nbd-r2-metadata-check && "$1" != --nbd-vz-lab && "$1" != --nbd-macos-config-check && "$1" != --nbd-r2-macos-config-check && "$1" != --nbd-macos-clone-test && "$1" != --nbd-clone-serve && "$1" != --guest-tree-probe && "$1" != --guest-tree-transport && "$1" != --guest-hex-smoke && "$1" != --guest-accessibility-open && "$1" != --intent-plan-compile && "$1" != --promote-debug-app && "$1" != --virtualization-api-inventory && "$1" != --cloud-disk-self-test && "$1" != --cloud-disk-checkpoint-self-test && "$1" != --cloud-disk-config-check && "$1" != --cloud-disk-lab-pack && "$1" != --cloud-disk-lab-serve && "$1" != --cloud-disk-r2-serve ) ]]; then
-  echo 'Usage: ./tools/computer-space.sh [--display-diagnostics|--guest-ax-verify finder_window_present|--reclaim-operator-playwright-cache|--reclaim-operator-puppeteer-cache|--reclaim-operator-uv-cache|--reclaim-operator-go-cache|--reclaim-operator-build-cache|--reclaim-caches|--reclaim-local-lab|--vm-summary|--raw-hole-lab|--nbd-api-probe|--nbd-source-build-check|--nbd-r2-metadata-prepare|--nbd-r2-metadata-check|--nbd-vz-lab|--nbd-macos-config-check|--nbd-r2-macos-config-check|--nbd-macos-clone-test|--nbd-clone-serve|--guest-tree-probe|--guest-tree-transport|--guest-hex-smoke|--guest-accessibility-open|--guest-accessibility-authorize|--intent-plan-compile|--promote-debug-app|--virtualization-api-inventory|--cloud-disk-self-test|--cloud-disk-config-check|--cloud-disk-lab-pack|--cloud-disk-lab-serve|--cloud-disk-r2-serve|--cloud-disk-r2-upload-clone]' >&2
+if [[ $# -gt 1 || ( $# -eq 1 && "$1" != --reclaim-caches && "$1" != --reclaim-local-lab && "$1" != --vm-summary && "$1" != --raw-hole-lab && "$1" != --nbd-api-probe && "$1" != --nbd-source-build-check && "$1" != --nbd-r2-metadata-prepare && "$1" != --nbd-r2-metadata-check && "$1" != --nbd-vz-lab && "$1" != --nbd-macos-config-check && "$1" != --nbd-r2-macos-config-check && "$1" != --nbd-macos-clone-test && "$1" != --nbd-clone-serve && "$1" != --guest-tree-probe && "$1" != --guest-tree-transport && "$1" != --guest-hex-smoke && "$1" != --guest-accessibility-open && "$1" != --intent-plan-compile && "$1" != --promote-debug-app && "$1" != --virtualization-api-inventory && "$1" != --cloud-disk-self-test && "$1" != --cloud-disk-checkpoint-self-test && "$1" != --cloud-disk-config-check && "$1" != --cloud-disk-lab-pack && "$1" != --cloud-disk-lab-serve && "$1" != --cloud-disk-r2-serve && "$1" != --cloud-disk-r2-boot-lab ) ]]; then
+  echo 'Usage: ./tools/computer-space.sh [--display-diagnostics|--guest-ax-verify finder_window_present|--reclaim-operator-playwright-cache|--reclaim-operator-puppeteer-cache|--reclaim-operator-uv-cache|--reclaim-operator-go-cache|--reclaim-operator-build-cache|--reclaim-caches|--reclaim-local-lab|--vm-summary|--raw-hole-lab|--nbd-api-probe|--nbd-source-build-check|--nbd-r2-metadata-prepare|--nbd-r2-metadata-check|--nbd-vz-lab|--nbd-macos-config-check|--nbd-r2-macos-config-check|--nbd-macos-clone-test|--nbd-clone-serve|--guest-tree-probe|--guest-tree-transport|--guest-hex-smoke|--guest-accessibility-open|--guest-accessibility-authorize|--intent-plan-compile|--promote-debug-app|--virtualization-api-inventory|--cloud-disk-self-test|--cloud-disk-config-check|--cloud-disk-lab-pack|--cloud-disk-lab-serve|--cloud-disk-r2-serve|--cloud-disk-r2-upload-clone|--cloud-disk-r2-boot-lab]' >&2
   exit 2
 fi
 
@@ -754,6 +754,125 @@ if sys.argv[2] == 'r2-fake' and not any(row.get('fake_r2_vz_server') == 'passed'
 print('nbd_vz_lab=apple_client_verified ' + json.dumps(connections[-1], sort_keys=True))
 PY
   echo "nbd_vz_lab=finished: disposable EFI guest only backend=$backend"
+  exit 0
+fi
+
+if [[ "${1:-}" == --cloud-disk-r2-boot-lab ]]; then
+  script_dir="$(cd "$(dirname "$0")" && pwd)"
+  config="${VOS_CLOUD_DISK_CONFIG:-}"
+  [[ -r "$config" ]] || { echo 'r2_boot_lab=refused: VOS_CLOUD_DISK_CONFIG required' >&2; exit 2; }
+  [[ -n "${AWS_ACCESS_KEY_ID:-}" && -n "${AWS_SECRET_ACCESS_KEY:-}" &&
+     -n "${CLOUDFLARE_ACCOUNT_ID:-}" && -n "${CLOUDFLARE_R2_ENDPOINT:-}" ]] || {
+    echo 'r2_boot_lab=refused: pinned environment credentials required' >&2; exit 2; }
+  free_kib="$(df -Pk /System/Volumes/Data | awk 'NR==2 {print $4}')"
+  [[ "$free_kib" =~ ^[0-9]+$ ]] && (( free_kib >= 11534336 )) || {
+    echo 'r2_boot_lab=refused: less than 11 GiB host free' >&2; exit 1; }
+  lab="$(mktemp -d /private/tmp/vos-r2-boot-lab.XXXXXX)"
+  server_pid=''
+  cleanup_r2_boot() {
+    if [[ -n "$server_pid" ]]; then kill "$server_pid" >/dev/null 2>&1 || true; wait "$server_pid" 2>/dev/null || true; fi
+    rm -rf "$lab"
+  }
+  trap cleanup_r2_boot EXIT
+  # 16 MiB disposable image: three patterned chunks plus one zero chunk, so the
+  # upload exercises the chunk and zero-chunk paths against the real bucket.
+  python3 - "$lab/source.raw" <<'PY'
+import sys
+with open(sys.argv[1], 'wb') as image:
+    for index in range(4):
+        if index == 2:
+            image.write(bytes(4 * 1024**2))
+        else:
+            image.write((bytes([65 + index]) * 4096) * (4 * 1024**2 // 4096))
+PY
+  manifest="$(python3 - "$script_dir" "$lab/source.raw" "$config" <<'PY'
+import sys
+sys.path.insert(0, sys.argv[1])
+from cloud_disk import validate_config
+from cloud_disk_r2_upload import stream_pack_upload, R2UploadStore
+config = validate_config(sys.argv[3])
+print(stream_pack_upload(sys.argv[2], R2UploadStore(config))["manifest_sha256"])
+PY
+)"
+  [[ "$manifest" =~ ^[0-9a-f]{64}$ ]] || { echo 'r2_boot_lab=failed: upload returned no manifest' >&2; exit 1; }
+  port="$((30000 + RANDOM % 20000))"
+  python3 "$script_dir/cloud_disk.py" r2-serve "$config" "$manifest" "$port" > "$lab/server.log" 2>&1 &
+  server_pid=$!
+  for (( attempt=0; attempt<200; attempt++ )); do
+    if grep -q '"ready"' "$lab/server.log"; then break; fi
+    kill -0 "$server_pid" 2>/dev/null || { cat "$lab/server.log" >&2; echo 'r2_boot_lab=failed: server exited' >&2; exit 1; }
+    sleep 0.1
+  done
+  grep -q '"ready"' "$lab/server.log" || { echo 'r2_boot_lab=failed: server not ready' >&2; exit 1; }
+  cat > "$lab/probe.swift" <<'SWIFT'
+import Foundation
+import Virtualization
+
+let port = Int(CommandLine.arguments[1])!
+let url = URL(string: "nbd://127.0.0.1:\(port)/virtualos-test")!
+let attachment = try VZNetworkBlockDeviceStorageDeviceAttachment(
+    url: url, timeout: 15, isForcedReadOnly: false, synchronizationMode: .full)
+let config = VZVirtualMachineConfiguration()
+config.cpuCount = 2
+config.memorySize = 2 * 1024 * 1024 * 1024
+config.platform = VZGenericPlatformConfiguration()
+let boot = VZEFIBootLoader()
+boot.variableStore = try VZEFIVariableStore(
+    creatingVariableStoreAt: URL(fileURLWithPath: CommandLine.arguments[2]), options: [])
+config.bootLoader = boot
+config.storageDevices = [VZVirtioBlockDeviceConfiguration(attachment: attachment)]
+try config.validate()
+print("r2_boot_lab=config_valid")
+fflush(stdout)
+let queue = DispatchQueue(label: "virtualos.r2.boot.lab")
+let machine = VZVirtualMachine(configuration: config, queue: queue)
+let started = DispatchSemaphore(value: 0)
+var didStart = false
+queue.async {
+    machine.start { result in
+        switch result {
+        case .success: didStart = true; print("r2_boot_lab=started")
+        case .failure(let error): print("r2_boot_lab=start_failed \(error)")
+        }
+        fflush(stdout); started.signal()
+    }
+}
+guard started.wait(timeout: .now() + 30) == .success else {
+    fputs("r2_boot_lab=start_timeout\n", stderr); exit(1)
+}
+guard didStart else { exit(1) }
+Thread.sleep(forTimeInterval: 3)
+let stopped = DispatchSemaphore(value: 0)
+queue.async {
+    if machine.canStop {
+        machine.stop { error in
+            print(error == nil ? "r2_boot_lab=stopped" : "r2_boot_lab=stop_failed \(error!)")
+            fflush(stdout); stopped.signal()
+        }
+    } else { print("r2_boot_lab=already_stopped"); stopped.signal() }
+}
+guard stopped.wait(timeout: .now() + 20) == .success else {
+    fputs("r2_boot_lab=stop_timeout\n", stderr); exit(1)
+}
+SWIFT
+  swiftc -swift-version 5 "$lab/probe.swift" -o "$lab/probe"
+  cat > "$lab/entitlements.plist" <<'PLIST'
+<?xml version="1.0" encoding="UTF-8"?>
+<plist version="1.0"><dict><key>com.apple.security.virtualization</key><true/><key>com.apple.security.network.client</key><true/></dict></plist>
+PLIST
+  codesign --force --sign - --entitlements "$lab/entitlements.plist" "$lab/probe" >/dev/null 2>&1
+  "$lab/probe" "$port" "$lab/nvram"
+  python3 - "$lab/server.log" <<'PY'
+import json, sys
+rows = [json.loads(line) for line in open(sys.argv[1]) if line.strip().startswith('{')]
+connections = [row['r2_nbd_connection'] for row in rows if 'r2_nbd_connection' in row]
+if not connections or not connections[-1].get('negotiated') or connections[-1].get('requests', 0) < 1:
+    raise SystemExit('r2_boot_lab=failed: no verified NBD negotiation and read from real R2')
+row = connections[-1]
+print('r2_boot_lab=real_r2_verified reads=%s bytes=%s cold_us_max=%s' % (
+    row['reads'], row['metrics']['read']['request_bytes_total'], row['metrics']['read']['latency_us_max']))
+PY
+  echo 'r2_boot_lab=finished: guest booted from real R2, overlay local only'
   exit 0
 fi
 
