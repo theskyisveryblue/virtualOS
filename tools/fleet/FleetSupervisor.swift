@@ -81,6 +81,8 @@ final class FleetInstance: NSObject {
     private var configuration: VZVirtualMachineConfiguration?
     private var state: String = "idle"
     private var lastError: String = ""
+    private var startAttempts = 0
+    private let maxStartAttempts = 40
     private var headlessView: VZVirtualMachineView?
     private var headlessWindow: NSWindow?
     private var windowWidth: CGFloat = 1440
@@ -140,6 +142,7 @@ final class FleetInstance: NSObject {
     func start() {
         queue.async { [self] in
             guard state != "running" && state != "starting" else { return }
+            if state != "pending" { startAttempts = 0 }
             state = "starting"
             lastError = ""
 
@@ -239,13 +242,44 @@ final class FleetInstance: NSObject {
                 switch result {
                 case .success:
                     self.state = "running"
+                    self.startAttempts = 0
                     self.log("\(self.name): running (nested=\(nested))")
                 case .failure(let error):
-                    self.state = "failed"
-                    self.lastError = error.localizedDescription
-                    self.log("\(self.name): start failed: \(error.localizedDescription)")
+                    let message = error.localizedDescription
+                    if self.isCapacityError(message) {
+                        self.startAttempts += 1
+                        if self.startAttempts <= self.maxStartAttempts {
+                            self.state = "pending"
+                            self.lastError = "waiting for a free VM slot"
+                            self.vm = nil
+                            self.configuration = nil
+                            self.log("\(self.name): queued — host VM limit reached (attempt \(self.startAttempts)/\(self.maxStartAttempts))")
+                            self.scheduleRetry()
+                        } else {
+                            self.state = "failed"
+                            self.lastError = "no VM slot became available"
+                            self.log("\(self.name): gave up waiting for a VM slot")
+                        }
+                    } else {
+                        self.state = "failed"
+                        self.lastError = message
+                        self.log("\(self.name): start failed: \(message)")
+                    }
                 }
             }
+        }
+    }
+
+    /// Apple enforces a per-host cap on concurrently active VMs; treat that as a
+    /// queue signal rather than a hard failure.
+    private func isCapacityError(_ message: String) -> Bool {
+        message.contains("exceeds the limit") || message.contains("maximum supported number")
+    }
+
+    private func scheduleRetry() {
+        queue.asyncAfter(deadline: .now() + 15) { [weak self] in
+            guard let self, self.state == "pending" else { return }
+            self.start()
         }
     }
 

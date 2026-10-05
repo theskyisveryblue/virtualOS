@@ -39,6 +39,9 @@
 #      fleet_push.py sends a normal UA; anything else must do the same.
 #   7. Frames travel raw JPEG through the relay and land in R2; a push is only
 #      real when the SHA-256 of the fetched frame matches the one sent.
+#   8. When the active-VM cap is hit, the supervisor does NOT fail: it queues the
+#      VM as "pending" and retries every 15s, so a stopped VM's slot is promoted
+#      to a waiting one automatically. Boot more names than slots safely.
 set -euo pipefail
 
 FLEET_HOME="${VOS_FLEET_HOME:-$HOME/vos-fleet}"
