@@ -38,6 +38,7 @@ struct LinuxGuestConfig {
     var diskPath: String?
     var cpuCount: Int
     var memoryGB: Int
+    var nested: Bool
 
     init(
         kernelPath: String,
@@ -45,7 +46,8 @@ struct LinuxGuestConfig {
         cmdLine: String = "console=hvc0 root=/dev/vda rw",
         diskPath: String? = nil,
         cpuCount: Int = 2,
-        memoryGB: Int = 2
+        memoryGB: Int = 2,
+        nested: Bool = false
     ) {
         self.kernelPath = kernelPath
         self.initrdPath = initrdPath
@@ -53,6 +55,7 @@ struct LinuxGuestConfig {
         self.diskPath = diskPath
         self.cpuCount = cpuCount
         self.memoryGB = memoryGB
+        self.nested = nested
     }
 
     var kernelURL: URL { URL(fileURLWithPath: (kernelPath as NSString).expandingTildeInPath) }
@@ -156,6 +159,17 @@ final class LinuxGuest: NSObject {
         }
 
         let platform = VZGenericPlatformConfiguration()
+        if config.nested {
+            if #available(macOS 15.0, *) {
+                if VZGenericPlatformConfiguration.isNestedVirtualizationSupported {
+                    platform.isNestedVirtualizationEnabled = true
+                } else {
+                    FileHandle.standardError.write(
+                        Data("linux-guest: nested requested but unsupported on this host\n".utf8)
+                    )
+                }
+            }
+        }
 
         let vmConfig = VZVirtualMachineConfiguration()
         vmConfig.platform = platform
@@ -246,6 +260,7 @@ struct LinuxGuestArgs {
             case "--memory":
                 if let v = next(), let n = Int(v) { args.config.memoryGB = n }
                 else { args.parseError = "invalid --memory value" }
+            case "--nested": args.config.nested = true
             case "-h", "--help":
                 args.parseError = usage
             default:
@@ -259,9 +274,11 @@ struct LinuxGuestArgs {
 
 let usage = """
 usage: linux-guest (--check | run) --kernel PATH [--initrd PATH] [--disk PATH]
-                   [--cmdline "..."] [--cpu N] [--memory GB]
+                   [--cmdline "..."] [--cpu N] [--memory GB] [--nested]
 
   --check   validate config/paths and print what WOULD boot (no VM starts)
+  --nested  enable nested virtualization on the generic platform (macOS 15+),
+            so this Linux guest can itself host another VM where supported
   (default) --check when no boot is requested; use --kernel without --check to boot
 """
 

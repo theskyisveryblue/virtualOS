@@ -21,6 +21,7 @@ full command list.
 | Manager | `tools/fleet/fleet.py` | CLI + multiplexer (status, control, frame proxy) |
 | Push | `tools/fleet/fleet_push.py` | republish status + frames to the Cloudflare relay |
 | Wrapper | `tools/computer-fleet.sh` | build / up / down / status |
+| Runbook | `tools/fleet/runbook.sh` | executable record: doctor→clone→boot→stream |
 | Self-test | `tools/fleet/self_test.sh` | end-to-end validation (6 stages) |
 | Web view | `tools/fleet/web/` | single-file browser fleet viewer |
 | Linux guest | `tools/fleet/LinuxGuest.swift` + `tools/linux-guest.sh` | experimental `VZLinuxBootLoader` path |
@@ -74,9 +75,11 @@ a hypervisor to the guest:
 - Probe: `VZGenericPlatformConfiguration.isNestedVirtualizationSupported`
 - Enable: `platform.isNestedVirtualizationEnabled = true`
 
-The supervisor uses a **generic platform** for the fleet (uniform + only platform
-that advertises nested virt) and turns nested on when the bundle's
-`Parameters.txt` sets `nestedVirtualizationEnabled: true`.
+**But a macOS guest cannot use the generic platform.** macOS boots only through
+`VZMacPlatformConfiguration` + `VZMacOSBootLoader`; nested virtualization exists
+only on `VZGenericPlatformConfiguration`. The two are mutually exclusive today,
+so a nested *macOS* guest is not possible. Nesting is reachable only with a
+generic-platform guest (Linux), which has no macOS desktop.
 
 Set it interactively:
 
@@ -89,9 +92,12 @@ p.write_text(json.dumps(d, indent=2))
 PY
 ```
 
-A guest that boots a nested VM must run the guest-side `virtualOS.app`/fleet
-agent and then boot its own bundle; the outer host does not need nested support
-to run flat VMs — it only enables the inner hypervisor.
+**Capacity matters more than nesting for a fleet.** Apple caps the number of
+concurrently *active* VMs per host. On the M4 Mac mini used here the observed cap
+is two, including any VM already running; exceeding it fails with
+`The maximum supported number of active virtual machines has been reached.`
+Check with `tools/fleet/runbook.sh capacity`. A fleet is therefore many machines
+*stored* and a bounded number *live*, and the box must schedule, not just spawn.
 
 ## Multiplexer + Cloudflare
 
@@ -122,16 +128,35 @@ per-VM start/stop.
 
 ## Status
 
-- Supervisor, manager, wrapper, self-test: **working locally** (all 6 stages pass).
-- Per-instance frame capture: **implemented** (`GET /fleet/frame/<name>`), verified
-  returning `503` when no VM is running; a real guest frame requires a bootable
-  bundle and a GUI session.
-- Nested virt: **supported and enabled on this host** (macOS 15.7.3, M-series).
-- Multiplexer: **proxies frames** (`/fleet/frame/<vm>`) alongside status/control.
-- Cloudflare fleet routes: **worker builds clean** (`wrangler deploy --dry-run`);
-  not yet deployed. Push path: `tools/fleet/fleet_push.py --relay URL --token ...`.
+Verified on the operator Mac and on the M4 Mac mini:
+
+- Supervisor, manager, wrapper, self-test, runbook: **working** (6 stages pass).
+- Real frame capture: **proven end-to-end** — `GET /fleet/frame/<vm>` returned a
+  live 1500×900 macOS login-screen JPEG (~280 KB) from a fleet-supervised clone.
+  Early frames are black for ~90–120 s; `runbook.sh desktop` polls until real.
+- Entitlements: the virtualization entitlement survives an ad-hoc signature
+  **only** in the GUI (Aqua) launchd session, so the supervisor runs under a user
+  LaunchAgent (see `runbook.sh agent`), never `nohup` over SSH.
+- Concurrent VMs: **capped at 2 active per host** (production VM occupies one),
+  confirmed with `runbook.sh capacity`.
+- Cloudflare fleet routes: **deployed and live** at
+  `https://virtualos-relay.ai-c24.workers.dev` (`/fleet/status`,
+  `/fleet/frame/<vm>`); a real status + frame push from the Mini was verified,
+  with the fetched frame's SHA-256 matching the sent one.
+- `fleet_push.py` sends a normal `User-Agent`; Cloudflare returns error 1010 to
+  the default `python-urllib` agent.
 - Web viewer: `tools/fleet/web/index.html` (single file, no build).
-- Linux guest: `tools/fleet/LinuxGuest.swift` compiles; **no real Linux boot run**.
+- Linux guest: `LinuxGuest.swift` compiles and `--nested` was added; a generic
+  EFI guest **boots from an NBD-served disk** (all three backends verified — see
+  `tools/CLOUD_DISK.md`). A full Linux rootfs boot is not yet run.
+
+## Cloud disk (network-booted storage)
+
+The storage plane lives beside the fleet: a content-addressed, SHA-pinned disk
+served over NBD, with R2 as the remote store and a bounded local overlay/cache.
+The executable interface is `tools/computer-space.sh`; `tools/CLOUD_DISK.md`
+explains it. The real VZ client was verified booting from an NBD disk for the
+`objects`, `raw`, and `r2-fake` backends.
 
 ## Related understanding tools
 
