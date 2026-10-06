@@ -176,6 +176,16 @@ These are the scars. Every one of them is a claim we paid for.
   starts the VM but prints nothing, so it must be extracted first. This tiny
   guest is the cheap substrate for many computers and for nested VMs (generic
   platform + `VZLinuxBootLoader` is the only nested-capable boot path).
+- **The nested-VM boundary, measured.** We tried VM-in-VM for real instead of
+  trusting the API flag. On the M4 host,
+  `VZGenericPlatformConfiguration.isNestedVirtualizationSupported` returns
+  `true`, and an Alpine guest boots fine inside VZ. But when *that guest's own
+  kernel* probes its KVM subsystem, it logs `kvm [1]: HYP mode not available` and
+  there is no `/dev/kvm`; running QEMU inside the guest then trips a TCG
+  assertion (`regime_is_user: code should not be reached`) instead of booting.
+  So: the host *advertises* nested support, but does not yet hand EL2/HYP through
+  to the guest kernel on this platform — the second layer is blocked by Apple,
+  not by our code. `tools/nested-lab.sh` reproduces this boundary end to end.
 - **Remote-backed disks must survive failure.** A temporary network loss must
   reconnect against the same overlay without losing or corrupting writes. A
   network disk without a reconnect story is a toy.
