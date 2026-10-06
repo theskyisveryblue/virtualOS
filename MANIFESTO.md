@@ -156,6 +156,15 @@ These are the scars. Every one of them is a claim we paid for.
   (48k reads, ~860 MB) while every write went to a bounded `/private/tmp` overlay
   (3.6k writes, ~25 MB) and the source RAW was never touched. The disk is now a
   service, not a fixture of the machine.
+- **A fleet stores one base, not N disks.** Clones of a machine share almost
+  every block, so storing each machine's disk in the cloud is wasteful. Measured
+  on two real 30 GiB macOS clones: they collapse to 7,282 unique 4 MiB chunks
+  instead of 13,371 (~45% less), and the second machine differs from the base by
+  just **0.69% — 223 MB**. Booting a machine from the shared base plus that tiny
+  delta produced its real desktop. So the fleet keeps **one immutable base** and a
+  ~0.7% delta per machine, and every additional machine costs almost nothing.
+  This lives in `tools/experiments/`, deliberately separate from the stable disk
+  plane.
 - **Remote-backed disks must survive failure.** A temporary network loss must
   reconnect against the same overlay without losing or corrupting writes. A
   network disk without a reconnect story is a toy.
