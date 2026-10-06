@@ -11,6 +11,15 @@ DerivedData/
 tools/fleet/fleet-supervisor
 tools/fleet/linux-guest
 
+# Compiled helpers (built from the matching .swift / source)
+tools/virtualos_stream_server/inputctl
+
+# Editor / spec-build scratch output
+.oe-build/
+
+# Runtime audit output
+tools/data/
+
 # Secrets — never commit these
 .env
 .env.*

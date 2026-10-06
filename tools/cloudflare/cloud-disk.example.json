@@ -1,0 +1,14 @@
+{
+  "schema": "virtualos-cloud-disk-config/v1",
+  "account_id": "REPLACE_WITH_ACCOUNT_ID",
+  "bucket": "virtualos-cloud-disks",
+  "endpoint": "https://REPLACE_WITH_ACCOUNT_ID.r2.cloudflarestorage.com",
+  "object_prefix": "disks/virtualos-test-1",
+  "storage_class": "Standard",
+  "chunk_size_bytes": 4194304,
+  "block_size_bytes": 65536,
+  "local_cache_limit_bytes": 4294967296,
+  "local_overlay_limit_bytes": 4294967296,
+  "boot_cache_required": true,
+  "credentials": "environment_only"
+}

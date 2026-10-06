@@ -1,0 +1,9 @@
+{
+  "name": "virtualOS",
+  "type": "ios",
+  "port": 0,
+  "runCommand": "",
+  "routes": [
+    { "path": "/", "label": "Home" }
+  ]
+}

@@ -1,0 +1,704 @@
+#!/usr/bin/env bash
+# vosctl — unified CLI to control virtualOS
+#
+# Usage:
+#   vosctl start                  Build, launch, and start VM in background
+#   vosctl stop                   Quit virtualOS
+#   vosctl restart                Stop + start
+#   vosctl status                 Show VM state
+#   vosctl screenshot [file]      Capture screenshot
+#   vosctl type "hello world"     Type text into VM
+#   vosctl key enter              Press a key (enter/escape/tab/delete/up/down/left/right/space)
+#   vosctl shortcut v command     Keyboard shortcut (e.g. Cmd+V)
+#   vosctl terminal-open          Open Terminal inside the VM
+#   vosctl terminal "pwd"         Open Terminal in the VM and run a command
+#   vosctl guest-exec "pwd"       Type and run in the focused guest Terminal
+#   vosctl click 0.5 0.5          Click at normalized coordinates
+#   vosctl focus Terminal          Focus an app
+#   vosctl password [pw]          Unlock guest after login screen appears
+#   vosctl computer doctor        Check guest computer-use connection
+#   vosctl computer <provider> "task"  Run Foundry, Nova 2, Nova Act, or Fara
+#   vosctl computer-night          Bounded overnight guest observation with local vision model
+#   vosctl stream                 Start the streaming server
+#   vosctl relay                  Start the Cloudflare relay poller
+#   vosctl serve                  Start everything (VM + stream server + relay)
+#   vosctl shell                  Interactive control shell
+
+set -euo pipefail
+
+REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+STREAM_SERVER="http://127.0.0.1:8899"
+VM_COMMAND_SERVER="http://127.0.0.1:8845"
+APP_NAME="virtualOS"
+RELAY_ENV_FILE="$HOME/.config/virtualos/relay.env"
+load_saved_password() {
+  local env_file="$HOME/.config/virtualos/start.env"
+  if [[ -r "$env_file" ]]; then
+    local line
+    line=$(grep -E '^[[:space:]]*(export[[:space:]]+)?VOS_VM_PASSWORD=' "$env_file" | tail -1 || true)
+    line="${line#export }"
+    line="${line#VOS_VM_PASSWORD=}"
+    line="${line%\"}"
+    line="${line#\"}"
+    line="${line%\'}"
+    line="${line#\'}"
+    printf '%s' "$line"
+  fi
+}
+DEFAULT_PASSWORD="${VOS_VM_PASSWORD:-$(load_saved_password)}"
+
+load_relay_env() {
+  if [[ -r "$RELAY_ENV_FILE" ]]; then
+    # shellcheck disable=SC1090
+    source "$RELAY_ENV_FILE"
+  fi
+  if [[ -z "${AUTH_TOKEN:-}" ]] && [[ -n "${VOS_AUTH_TOKEN:-}" ]]; then
+    AUTH_TOKEN="$VOS_AUTH_TOKEN"
+  fi
+}
+
+load_relay_env
+
+# ── colors ────────────────────────────────────────────────────────────
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+CYAN='\033[0;36m'
+NC='\033[0m'
+
+log()  { echo -e "${CYAN}[vosctl]${NC} $*"; }
+ok()   { echo -e "${GREEN}[vosctl]${NC} $*"; }
+warn() { echo -e "${YELLOW}[vosctl]${NC} $*"; }
+err()  { echo -e "${RED}[vosctl]${NC} $*" >&2; }
+
+# ── helpers ───────────────────────────────────────────────────────────
+
+app_running() {
+  pgrep -x "$APP_NAME" >/dev/null 2>&1
+}
+
+vm_window_count() {
+  osascript -e "tell application \"System Events\" to tell process \"$APP_NAME\" to count of windows" 2>/dev/null || echo "0"
+}
+
+vm_running() {
+  app_running && (( $(vm_window_count) > 1 ))
+}
+
+vm_window_name() {
+  osascript -e '
+tell application "System Events"
+    tell process "virtualOS"
+        repeat with w in every window
+            if name of w is not "virtualOS" then
+                return name of w
+            end if
+        end repeat
+    end tell
+end tell' 2>/dev/null || echo ""
+}
+
+wait_for_vm_running() {
+  local attempts="${1:-30}"
+  while (( attempts > 0 )); do
+    if vm_command_server_running; then
+      return 0
+    fi
+    sleep 1
+    attempts=$((attempts - 1))
+  done
+  return 1
+}
+
+stream_server_running() {
+  curl -sf --max-time 1 "$STREAM_SERVER/health" >/dev/null 2>&1
+}
+
+vm_command_server_running() {
+  curl -sf --max-time 1 "$VM_COMMAND_SERVER/vm/health" >/dev/null 2>&1
+}
+
+guest_bridge_ip() {
+  python3 - "$HOME/VirtualOSMachines/virtualOS.bundle/Parameters.txt" <<'PY'
+import json, pathlib, re, subprocess, sys
+try:
+    params = json.loads(pathlib.Path(sys.argv[1]).read_text())
+    mac = params['macAddress'].lower()
+    if not re.fullmatch(r'(?:[0-9a-f]{2}:){5}[0-9a-f]{2}', mac):
+        raise ValueError('invalid guest MAC')
+    entries = subprocess.check_output(['arp', '-an', '-i', 'bridge100'],
+                                      text=True, timeout=2)
+    matches = re.findall(r'\((\d+\.\d+\.\d+\.\d+)\) at ' + re.escape(mac) + r'\b',
+                         entries.lower())
+    if len(matches) == 1:
+        print(matches[0])
+except (OSError, KeyError, ValueError, subprocess.SubprocessError):
+    pass
+PY
+}
+
+json_string() {
+  python3 -c 'import json,sys; print(json.dumps(sys.argv[1]))' "$1"
+}
+
+vm_command_post() {
+  local path="$1" payload="$2"
+  printf '%s' "$payload" | curl -sf --max-time 15 -X POST "$VM_COMMAND_SERVER$path" \
+    -H "Content-Type: application/json" \
+    --data-binary @-
+}
+
+require_vm_command_server() {
+  if ! vm_command_server_running; then
+    err "VM command server not ready on $VM_COMMAND_SERVER"
+    return 1
+  fi
+}
+
+vm_click_payload() {
+  python3 - "$1" "$2" <<'PY'
+import json
+import math
+import sys
+import urllib.request
+
+try:
+    nx, ny = map(float, sys.argv[1:3])
+except ValueError:
+    sys.exit("click coordinates must be numbers from 0 to 1")
+if not all(math.isfinite(v) and 0 <= v <= 1 for v in (nx, ny)):
+    sys.exit("click coordinates must be numbers from 0 to 1")
+with urllib.request.urlopen("http://127.0.0.1:8845/vm/screen", timeout=5) as resp:
+    width = int(resp.headers["X-Capture-Width"])
+    height = int(resp.headers["X-Capture-Height"])
+print(json.dumps({"x": round(nx * width), "y": round((1 - ny) * height)}))
+PY
+}
+
+# ── commands ──────────────────────────────────────────────────────────
+
+prompt_password() {
+  if [[ -n "$DEFAULT_PASSWORD" ]]; then
+    echo "$DEFAULT_PASSWORD"
+    return
+  fi
+  echo -n "VM password: " >&2
+  read -rs pw
+  echo "" >&2
+  echo "$pw"
+}
+
+cmd_start() {
+  if [[ $# -ne 0 ]]; then
+    err "start takes no password; use 'vosctl password' after guest login appears"
+    return 2
+  fi
+
+  if vm_command_server_running; then
+    ok "VM already running"
+    return 0
+  fi
+  "$REPO_DIR/start.sh"
+}
+
+cmd_stop() {
+  if ! app_running; then
+    warn "virtualOS is not running."
+    return 0
+  fi
+  log "Stopping..."
+  osascript -e "tell application \"$APP_NAME\" to quit" 2>/dev/null || true
+  ok "Stopped."
+}
+
+cmd_restart() {
+  cmd_stop
+  sleep 2
+  cmd_start "$@"
+}
+
+cmd_status() {
+  # App state
+  if ! app_running; then
+    echo "app:      not running"
+  else
+    echo "app:      running"
+  fi
+
+  # A guest may run without a second app window. Prefer the VM command
+  # server's own state over System Events window counts.
+  local vm_health wcount vm_ip ping_ok
+  vm_ip=$(guest_bridge_ip)
+  ping_ok=no
+  if [[ -n "$vm_ip" ]]; then
+    ping -c 1 -W 1 "$vm_ip" >/dev/null 2>&1 && ping_ok=yes
+  fi
+  vm_health="$(curl -fsS --connect-timeout 1 --max-time 3 "$VM_COMMAND_SERVER/vm/health" 2>/dev/null || true)"
+  if [[ -n "$vm_health" ]] && printf '%s' "$vm_health" | python3 -c \
+    'import json,sys; h=json.load(sys.stdin); sys.exit(0 if h.get("ready") and h.get("state")=="running" else 1)' 2>/dev/null; then
+    echo "vm:       running (guest command server ready)"
+  else
+    wcount=$(vm_window_count)
+    if (( wcount > 1 )); then
+      echo "vm:       running ($(vm_window_name))"
+    elif app_running && [[ "$ping_ok" == yes ]]; then
+      echo "vm:       guest network reachable (control unavailable)"
+    elif app_running; then
+      echo "vm:       state unknown (control unavailable)"
+    else
+      echo "vm:       idle"
+    fi
+  fi
+
+  # VM network
+  if [[ -n "$vm_ip" ]]; then
+    echo "vm ip:    $vm_ip (ping: $ping_ok)"
+  else
+    echo "vm ip:    not found"
+  fi
+
+  # Stream server
+  if stream_server_running; then
+    echo "stream:   running ($STREAM_SERVER)"
+    # Pull VM status from stream server
+    local vm_status
+    vm_status=$(curl -sf --connect-timeout 1 --max-time 3 "$STREAM_SERVER/api/vm/status" 2>/dev/null || true)
+    if [[ -n "$vm_status" ]]; then
+      local monitor disk_alloc disk_logical free_gb used_pct failures
+      monitor=$(echo "$vm_status" | python3 -c "import sys,json; print(json.load(sys.stdin).get('monitorStatus','?'))" 2>/dev/null)
+      disk_alloc=$(echo "$vm_status" | python3 -c "import sys,json; print(json.load(sys.stdin).get('vmBundle',{}).get('diskAllocatedGB',0))" 2>/dev/null)
+      disk_logical=$(echo "$vm_status" | python3 -c "import sys,json; print(json.load(sys.stdin).get('vmBundle',{}).get('diskLogicalGB',0))" 2>/dev/null)
+      free_gb=$(echo "$vm_status" | python3 -c "import sys,json; print(json.load(sys.stdin).get('hostDataVolume',{}).get('freeGB',0))" 2>/dev/null)
+      used_pct=$(echo "$vm_status" | python3 -c "import sys,json; print(json.load(sys.stdin).get('hostDataVolume',{}).get('usedPct',0))" 2>/dev/null)
+      failures=$(echo "$vm_status" | python3 -c "import sys,json; print(len(json.load(sys.stdin).get('recentFailureLines',[])))" 2>/dev/null)
+      echo "monitor:  $monitor"
+      echo "vm disk:  ${disk_alloc}G allocated / ${disk_logical}G logical"
+      echo "host:     ${free_gb}G free (${used_pct}% used)"
+      if [[ "$failures" != "0" ]]; then
+        echo "failures: $failures recent"
+      fi
+    fi
+  else
+    echo "stream:   not running"
+  fi
+
+  # Host metrics
+  local cpu_load mem_pressure
+  cpu_load=$(sysctl -n vm.loadavg 2>/dev/null | awk '{print $2}' || true)
+  mem_pressure=$(memory_pressure 2>/dev/null | tail -1 | awk '{print $NF}' || echo "?")
+  echo "cpu load: $cpu_load"
+
+  # Relay status (if configured)
+  if [[ -n "${RELAY_URL:-}" ]] && [[ -n "${AUTH_TOKEN:-}" ]]; then
+    local relay_status
+    relay_status=$(curl -sf --max-time 3 "$RELAY_URL/status/alerts" \
+      -H "Authorization: Bearer $AUTH_TOKEN" 2>/dev/null || true)
+    if [[ -n "$relay_status" ]]; then
+      local relay_ok alerts_text
+      relay_ok=$(echo "$relay_status" | python3 -c "import sys,json; print(json.load(sys.stdin).get('ok',False))" 2>/dev/null)
+      if [[ "$relay_ok" == "True" ]]; then
+        echo "relay:    healthy"
+      else
+        alerts_text=$(echo "$relay_status" | python3 -c "import sys,json; print(', '.join(json.load(sys.stdin).get('alerts',[])))" 2>/dev/null)
+        echo "relay:    ALERTS: $alerts_text"
+      fi
+    else
+      echo "relay:    unreachable"
+    fi
+  fi
+}
+
+cmd_screenshot() {
+  local outfile="${1:-/tmp/vos_screenshot.jpg}"
+  require_vm_command_server
+  curl -fsS --max-time 10 -o "$outfile" "$VM_COMMAND_SERVER/vm/screen"
+  ok "Guest screenshot saved to $outfile"
+}
+
+cmd_computer_night() {
+  local task="${VOS_CUA_OVERNIGHT_TASK:-}"
+  local practice_tasks=(
+    "Click the blue smiling Finder icon in the guest Dock"
+    "Click the black Terminal icon in the guest Dock"
+    "Click the blue Safari compass icon in the guest Dock"
+    "Click the multicolor Google Chrome icon in the guest Dock"
+  )
+  local round=0
+  local result=""
+  local hours="${VOS_CUA_OVERNIGHT_HOURS:-8}"
+  local interval="${VOS_CUA_OVERNIGHT_INTERVAL:-60}"
+  local floor_kb="${VOS_CUA_MIN_FREE_KB:-3145728}"
+  local stop_file="${HOME}/.config/virtualos/computer-stop"
+  local started="$(date +%s)"
+  local failures=0
+  local unlock_attempts=0
+  local free_kb now
+  [[ "$hours" =~ ^[1-9][0-9]*$ && "$interval" =~ ^[1-9][0-9]*$ && "$floor_kb" =~ ^[1-9][0-9]*$ ]] || {
+    err "Overnight hours, interval, and free-space floor must be positive integers"
+    return 2
+  }
+  local mode=()
+  if [[ "${VOS_CUA_OVERNIGHT_ACT:-0}" == "1" ]]; then
+    mode=(--act)
+    if [[ -n "$task" ]]; then
+      case "$task" in
+        'Click the blue smiling Finder icon in the guest Dock'|\
+        'Click the black Terminal icon in the guest Dock'|\
+        'Click the blue Safari compass icon in the guest Dock'|\
+        'Click the multicolor Google Chrome icon in the guest Dock') ;;
+        *) err 'Unattended act mode accepts only the four verified Dock tasks'; return 2 ;;
+      esac
+    fi
+  fi
+  log "Guest computer-use overnight loop: ${hours}h, ${interval}s interval, mode=$([[ ${#mode[@]} -gt 0 ]] && echo act || echo shadow)"
+  while true; do
+    now="$(date +%s)"
+    if (( now - started >= hours * 3600 )); then
+      log "Overnight time limit reached"
+      return 0
+    fi
+    if [[ -e "$stop_file" ]]; then
+      log "Computer-use stop file found: $stop_file"
+      return 0
+    fi
+    free_kb="$(df -Pk /System/Volumes/Data | awk 'NR == 2 { print $4 }')"
+    if [[ ! "$free_kb" =~ ^[0-9]+$ ]] || (( free_kb < floor_kb )); then
+      err "Stopping computer use: free disk below ${floor_kb} KiB"
+      return 1
+    fi
+    if [[ -z "${VOS_CUA_OVERNIGHT_TASK:-}" ]]; then
+      task="${practice_tasks[round % ${#practice_tasks[@]}]}"
+    fi
+    round=$((round + 1))
+    log "Computer-use round $round: $task"
+    if [[ ${#mode[@]} -gt 0 ]]; then
+      if ! "$REPO_DIR/tools/computer-wake.sh" || ! "$REPO_DIR/tools/computer-unlock.sh"; then
+        err "Guest display or unlock check failed; stopping computer use"
+        return 1
+      fi
+    fi
+    if ! curl -fsS --max-time 3 "$VM_COMMAND_SERVER/vm/health" | jq -e '.ready == true and .state == "running"' >/dev/null; then
+      failures=$((failures + 1))
+      warn "Guest unavailable ($failures/5)"
+      if (( failures >= 5 )); then
+        err "Stopping after repeated guest failures"
+        return 1
+      fi
+    elif ! curl -fsS --max-time 3 http://127.0.0.1:11434/api/tags >/dev/null; then
+      failures=$((failures + 1))
+      warn "Local model runtime unavailable ($failures/5)"
+      if (( failures >= 5 )); then
+        err "Stopping after repeated model runtime failures"
+        return 1
+      fi
+    elif result="$("$REPO_DIR/tools/vosctl" computer ollama "$task" --max-steps 1 "${mode[@]}" 2>&1)"; then
+      printf '%s\n' "$result"
+      if [[ ${#mode[@]} -gt 0 ]] && printf '%s\n' "$result" | jq -se 'any(.[]; .abstain_reason == "guest_locked")' >/dev/null; then
+        if (( unlock_attempts >= 2 )); then
+          err "Guest remains locked; stopping computer use"
+          return 1
+        fi
+        unlock_attempts=$((unlock_attempts + 1))
+        log "Guest lock screen detected; using configured local unlock ($unlock_attempts/2)"
+        if ! "$REPO_DIR/tools/computer-unlock.sh"; then
+          err "Guest unlock request failed"
+          return 1
+        fi
+        sleep 12
+        continue
+      fi
+      if printf '%s\n' "$result" | jq -se 'any(.[]; .active_app != null)' >/dev/null; then
+        unlock_attempts=0
+      fi
+      if printf '%s\n' "$result" | jq -se 'any(.[]; .status == "complete" and .verified == true)' >/dev/null; then
+        failures=0
+      else
+        failures=$((failures + 1))
+        warn "Computer-use round uncompleted ($failures/5)"
+        if (( failures >= 5 )); then
+          err "Stopping after repeated uncompleted rounds"
+          return 1
+        fi
+      fi
+      if [[ "${VOS_CUA_CLOUD_SYNC:-0}" == "1" && -n "${RELAY_URL:-}" && -n "${AUTH_TOKEN:-}" ]]; then
+        local event
+        event="$(printf '%s\n' "$result" | jq -sc --arg model "${VOS_OLLAMA_MODEL:-qwen3.5:0.8b}" '
+          [ .[] | select(has("action")) ] | last |
+          {source:"virtualos-guest",kind:"computer_use_step",action:.action,
+           metadata:{model:$model,status:.status,executed:.executed,changed:.changed,coordinates:.coordinates}}
+        ')"
+        if [[ "$event" != "null" ]]; then
+          curl -fsS --max-time 5 -X POST "${RELAY_URL%/}/usage" \
+            -H "Authorization: Bearer $AUTH_TOKEN" -H "Content-Type: application/json" \
+            -d "$event" >/dev/null || warn "Cloud trace upload failed; local trace remains available"
+        fi
+      fi
+    else
+      printf '%s\n' "$result" >&2
+      failures=$((failures + 1))
+      warn "Computer-use round failed ($failures/5)"
+      if (( failures >= 5 )); then
+        err "Stopping after repeated model failures"
+        return 1
+      fi
+    fi
+    sleep "$interval"
+  done
+}
+
+cmd_type() {
+  local text="$1"
+  require_vm_command_server
+  vm_command_post "/vm/paste" "{\"text\":$(json_string "$text")}" >/dev/null
+  ok "Text entered in guest"
+}
+
+cmd_key() {
+  local key="$1"
+  require_vm_command_server
+  vm_command_post "/vm/key" "{\"key\":$(json_string "$key")}" >/dev/null
+  ok "Key: $key"
+}
+
+cmd_shortcut() {
+  local key="$1"
+  shift
+  local mods=("$@")
+  require_vm_command_server
+  local mods_json
+  mods_json=$(python3 -c 'import json,sys; print(json.dumps(sys.argv[1:]))' "${mods[@]}")
+  vm_command_post "/vm/shortcut" "{\"key\":$(json_string "$key"),\"modifiers\":$mods_json}" >/dev/null
+  ok "Shortcut: ${mods[*]}+$key"
+}
+
+cmd_click() {
+  local nx="$1" ny="$2"
+  require_vm_command_server
+  local payload
+  payload=$(vm_click_payload "$nx" "$ny")
+  vm_command_post "/vm/click" "$payload" >/dev/null
+  ok "Clicked guest at ($nx, $ny)"
+}
+
+cmd_focus() {
+  local app="$1"
+  require_vm_command_server
+  vm_command_post "/vm/open" "{\"app\":$(json_string "$app")}" >/dev/null
+  ok "Opened guest app: $app"
+}
+
+cmd_password() {
+  local pw="${1:-$(prompt_password)}"
+  require_vm_command_server
+  vm_command_post "/vm/unlock" "{\"password\":$(json_string "$pw")}" >/dev/null
+  ok "Guest unlock input sent."
+}
+
+cmd_terminal_open() {
+  if vm_command_server_running; then
+    vm_command_post "/vm/terminal/open" '{}' >/dev/null
+    ok "Terminal open input sent; check the guest active app before typing."
+  else
+    err "VM command server not running on $VM_COMMAND_SERVER"
+    return 1
+  fi
+}
+
+cmd_terminal_exec() {
+  local command="$*"
+  if [[ -z "$command" ]]; then
+    err "Missing command. Usage: vosctl terminal \"pwd\""
+    return 1
+  fi
+  if vm_command_server_running; then
+    vm_command_post "/vm/terminal/exec" "{\"cmd\":$(json_string "$command"),\"newWindow\":true}" >/dev/null
+    ok "Terminal command input sent; confirm its result in the guest."
+  else
+    err "VM command server not running on $VM_COMMAND_SERVER"
+    return 1
+  fi
+}
+
+cmd_guest_exec() {
+  local command="$*"
+  [[ -n "$command" ]] || { err 'Missing guest command'; return 2; }
+  # The current virtual keyboard drops Shift in this guest. Block commands that
+  # would silently change meaning until a guest text transport is available.
+  if ! python3 -c 'import sys; s=sys.argv[1]; bad={33,34,35,36,37,38,40,41,42,43,58,60,62,63,64,94,95,123,124,125,126}; sys.exit(0 if all(ord(c)<128 and not c.isupper() and ord(c) not in bad for c in s) else 1)' "$command"; then
+    err 'Guest keyboard cannot reliably type Shift-required text; command not sent'
+    return 2
+  fi
+  require_vm_command_server
+  vm_command_post "/vm/exec" "{\"cmd\":$(json_string "$command"),\"paste\":false}" >/dev/null
+  ok 'Sent guest command with key events'
+}
+
+cmd_stream() {
+  log "Starting stream server..."
+  cd "$REPO_DIR"
+  python3 tools/virtualos_stream_server/server.py "$@"
+}
+
+cmd_relay() {
+  local action="${1:-start}"
+  exec "$REPO_DIR/tools/cloudflare/poller-session.sh" "$action"
+}
+
+cmd_serve() {
+  if [[ $# -ne 0 ]]; then
+    err "serve takes no password; use 'vosctl password' after guest login appears"
+    return 2
+  fi
+  log "Starting full stack..."
+
+  # 1) Start VM
+  cmd_start
+
+  # 2) Stream server in background
+  if ! stream_server_running; then
+    log "Starting stream server in background..."
+    python3 "$REPO_DIR/tools/virtualos_stream_server/server.py" &
+    local stream_pid=$!
+    sleep 2
+    if stream_server_running; then
+      ok "Stream server running (PID $stream_pid)"
+    else
+      warn "Stream server may have failed to start"
+    fi
+  else
+    ok "Stream server already running"
+  fi
+
+  # 3) Relay poller in background (if configured)
+  if [[ -n "${RELAY_URL:-}" ]] && [[ -n "${AUTH_TOKEN:-}" ]]; then
+    log "Starting relay poller in background..."
+    "$REPO_DIR/tools/cloudflare/poller-session.sh" start
+  else
+    warn "Skipping relay poller (RELAY_URL / AUTH_TOKEN not set)"
+  fi
+
+  ok "Full stack running. Press Ctrl+C to stop."
+  wait
+}
+
+cmd_shell() {
+  echo -e "${CYAN}virtualOS interactive control shell${NC}"
+  echo "Commands: type, key, shortcut, click, focus, screenshot, status, password, quit"
+  echo ""
+  while true; do
+    printf "${GREEN}vos> ${NC}"
+    read -r line || break
+    [[ -z "$line" ]] && continue
+
+    local cmd
+    cmd=$(echo "$line" | awk '{print $1}')
+    local rest
+    rest=$(echo "$line" | sed 's/^[^ ]* *//')
+
+    case "$cmd" in
+      type)       cmd_type "$rest" ;;
+      key)        cmd_key "$rest" ;;
+      shortcut)
+        local skey srest
+        skey=$(echo "$rest" | awk '{print $1}')
+        srest=$(echo "$rest" | sed 's/^[^ ]* *//')
+        cmd_shortcut "$skey" $srest
+        ;;
+      terminal-open) cmd_terminal_open ;;
+      terminal)   cmd_terminal_exec "$rest" ;;
+      guest-exec) cmd_guest_exec "$rest" ;;
+      click)
+        local cx cy
+        cx=$(echo "$rest" | awk '{print $1}')
+        cy=$(echo "$rest" | awk '{print $2}')
+        cmd_click "$cx" "$cy"
+        ;;
+      focus)      cmd_focus "$rest" ;;
+      screenshot) cmd_screenshot "$rest" ;;
+      status)     cmd_status ;;
+      password)   cmd_password "$rest" ;;
+      quit|exit)  break ;;
+      help)
+        echo "  type <text>              Type text"
+        echo "  key <name>               Press key (enter/escape/tab/etc)"
+        echo "  shortcut <key> <mods..>  Shortcut (e.g. shortcut v command)"
+        echo "  terminal-open            Open Terminal in the VM"
+        echo "  terminal <cmd>           Run a command in VM Terminal"
+        echo "  guest-exec <cmd>         Type and run in focused guest Terminal"
+        echo "  click <nx> <ny>          Click (0.0-1.0)"
+        echo "  focus <app>              Focus app"
+        echo "  screenshot [file]        Capture screenshot"
+        echo "  status                   Show status"
+        echo "  password [pw]            Enter password"
+        echo "  quit                     Exit shell"
+        ;;
+      *) err "Unknown: $cmd (try 'help')" ;;
+    esac
+  done
+}
+
+# ── main dispatch ─────────────────────────────────────────────────────
+
+if [[ $# -lt 1 ]]; then
+  echo "Usage: vosctl <command> [args...]"
+  echo ""
+  echo "Commands:"
+  echo "  start                  Build, launch, start VM in background"
+  echo "  stop                   Quit virtualOS"
+  echo "  restart                Stop + start"
+  echo "  status                 Show VM state"
+  echo "  screenshot [file]      Capture screenshot"
+  echo "  type <text>            Type text into VM"
+  echo "  key <name>             Press a key"
+  echo "  shortcut <key> <mods>  Keyboard shortcut"
+  echo "  terminal-open          Open Terminal in the VM"
+  echo "  terminal <cmd>         Run a command in VM Terminal"
+  echo "  guest-exec <cmd>       Type and run in focused guest Terminal"
+  echo "  click <nx> <ny>        Click at normalized coords"
+  echo "  focus <app>            Focus an app"
+  echo "  password [pw]          Type password + Enter"
+  echo "  computer <provider>    Guest computer use: doctor, foundry, nova2, nova-act, fara, ollama"
+  echo "  computer-night         Bounded overnight local-model guest learning loop"
+  echo "  stream                 Start streaming server"
+  echo "  relay                  Start Cloudflare relay poller"
+  echo "  serve                  Start everything (VM + stream + relay)"
+  echo "  watch                  Start AI watchdog (self-healing monitor)"
+  echo "  shell                  Interactive control shell"
+  exit 0
+fi
+
+command="$1"
+shift
+
+case "$command" in
+  start)      cmd_start "$@" ;;
+  stop)       cmd_stop ;;
+  restart)    cmd_restart "$@" ;;
+  status)     cmd_status ;;
+  screenshot) cmd_screenshot "$@" ;;
+  type)       cmd_type "$*" ;;
+  key)        cmd_key "$1" ;;
+  shortcut)   cmd_shortcut "$@" ;;
+  terminal-open) cmd_terminal_open ;;
+  terminal)   cmd_terminal_exec "$@" ;;
+  guest-exec) cmd_guest_exec "$@" ;;
+  click)      cmd_click "$1" "$2" ;;
+  focus)      cmd_focus "$*" ;;
+  password)   cmd_password "$@" ;;
+  computer)
+    computer_python="${VOS_CUA_PYTHON:-python3}"
+    case "${1:-}" in
+      fara) computer_python="${VOS_CUA_FARA_PYTHON:-$computer_python}" ;;
+      nova-act) computer_python="${VOS_CUA_NOVA_ACT_PYTHON:-$computer_python}" ;;
+    esac
+    exec "$computer_python" "$REPO_DIR/tools/computer_use.py" "$@"
+    ;;
+  computer-night) cmd_computer_night "$@" ;;
+  stream)     cmd_stream "$@" ;;
+  relay)      cmd_relay ;;
+  serve)      cmd_serve "$@" ;;
+  watch)      exec python3 "$REPO_DIR/tools/ai_watchdog.py" "$@" ;;
+  shell)      cmd_shell ;;
+  *)          err "Unknown command: $command"; exit 1 ;;
+esac

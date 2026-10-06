@@ -1,0 +1,32 @@
+{
+  "schema": "virtualos.playbook/v1",
+  "playbook_id": "chrome.dock.open",
+  "revision": 1,
+  "scope": {
+    "kind": "app",
+    "id": "com.google.Chrome",
+    "version": "dock.v1",
+    "profile_id": "chrome.dock.v1"
+  },
+  "goal": "app.frontmost",
+  "steps": [
+    {
+      "action": {"verb": "click", "target": "dock.chrome", "id": "dock_app_click"},
+      "expect": "app.frontmost",
+      "verify": {"kind": "ocr", "state": "app.frontmost"}
+    }
+  ],
+  "rights": {"ownership": "unknown", "training": "unknown", "consent_id": null},
+  "privacy": {"mode": "metadata-only", "cloud": "private-r2"},
+  "split": {
+    "role": "unassigned",
+    "group_id": "chrome.dock",
+    "policy": "goal-and-state-v1",
+    "review_id": null
+  },
+  "source": {
+    "kind": "declared-fixture",
+    "sha256": "8c8dd21d68392882763b908e14ca5c419fe232bcb5ac621463da7e2e5f107edb",
+    "evidence": "declared"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "name": "virtualOS",
+  "project": "virtualOS.xcodeproj",
+  "scheme": "virtualOS",
+  "simulator": "iPhone 16 Pro",
+  "views": [
+    {
+      "name": "MainViewController",
+      "file": "virtualOS/ViewController/MainViewController.swift",
+      "label": "Main"
+    },
+    {
+      "name": "VMViewController",
+      "file": "virtualOS/ViewController/VMViewController.swift",
+      "label": "VM Display"
+    },
+    {
+      "name": "SettingsViewController",
+      "file": "virtualOS/ViewController/SettingsViewController.swift",
+      "label": "Settings"
+    },
+    {
+      "name": "RestoreImageViewController",
+      "file": "virtualOS/ViewController/RestoreImageViewController.swift",
+      "label": "Restore Image"
+    },
+    {
+      "name": "ProgressViewController",
+      "file": "virtualOS/ViewController/ProgressViewController.swift",
+      "label": "Progress"
+    },
+    {
+      "name": "ContentView",
+      "file": "virtualOSRemoteiOS/App/ContentView.swift",
+      "label": "iOS Remote"
+    },
+    {
+      "name": "ContentView",
+      "file": "virtualOSRemoteMac/App/ContentView.swift",
+      "label": "Mac Remote"
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "schema": "virtualos.playbook/v1",
+  "playbook_id": "finder.sidebar.recents",
+  "revision": 1,
+  "scope": {
+    "kind": "app",
+    "id": "com.apple.finder",
+    "version": "sidebar.v1",
+    "profile_id": "finder.sidebar.v1"
+  },
+  "goal": "finder.sidebar.recents.visible",
+  "steps": [
+    {
+      "action": {
+        "verb": "click",
+        "target": "sidebar.recents",
+        "id": "finder_sidebar_click"
+      },
+      "expect": "finder.sidebar.recents.visible",
+      "verify": {
+        "kind": "ocr",
+        "state": "finder.sidebar.recents.visible"
+      }
+    }
+  ],
+  "rights": {
+    "ownership": "unknown",
+    "training": "unknown",
+    "consent_id": null
+  },
+  "privacy": {
+    "mode": "metadata-only",
+    "cloud": "private-r2"
+  },
+  "split": {
+    "role": "unassigned",
+    "group_id": "finder.sidebar",
+    "policy": "goal-and-state-v1",
+    "review_id": null
+  },
+  "source": {
+    "kind": "declared-fixture",
+    "sha256": "ffdec7b656a7e2ff27b8c3847a6c937e7e841624462c3c2354b481d944fcd5b4",
+    "evidence": "declared"
+  }
+}

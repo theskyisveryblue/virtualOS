@@ -1,0 +1,32 @@
+{
+  "schema": "virtualos.playbook/v1",
+  "playbook_id": "terminal.dock.open",
+  "revision": 1,
+  "scope": {
+    "kind": "app",
+    "id": "com.apple.Terminal",
+    "version": "dock.v1",
+    "profile_id": "terminal.dock.v1"
+  },
+  "goal": "app.frontmost",
+  "steps": [
+    {
+      "action": {"verb": "click", "target": "dock.terminal", "id": "dock_app_click"},
+      "expect": "app.frontmost",
+      "verify": {"kind": "ocr", "state": "app.frontmost"}
+    }
+  ],
+  "rights": {"ownership": "unknown", "training": "unknown", "consent_id": null},
+  "privacy": {"mode": "metadata-only", "cloud": "private-r2"},
+  "split": {
+    "role": "unassigned",
+    "group_id": "terminal.dock",
+    "policy": "goal-and-state-v1",
+    "review_id": null
+  },
+  "source": {
+    "kind": "declared-fixture",
+    "sha256": "3db746469c507ceb64227388bf6c543473fefaa172be7a0d162bbed6c6e809da",
+    "evidence": "declared"
+  }
+}
