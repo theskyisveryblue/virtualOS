@@ -19,7 +19,7 @@ if [[ -f "$ENV_FILE" ]]; then
   source "$ENV_FILE"
 fi
 
-HOST="${VOS_REMOTE_HOST:-0.0.0.0}"
+HOST="${VOS_REMOTE_HOST:-127.0.0.1}"
 PORT="${VOS_REMOTE_PORT:-8899}"
 AUTH_TOKEN="${VOS_AUTH_TOKEN:-}"
 

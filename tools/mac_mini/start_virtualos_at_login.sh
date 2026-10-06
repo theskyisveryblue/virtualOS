@@ -2,26 +2,23 @@
 
 set -euo pipefail
 
-REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-ENV_FILE="${HOME}/.config/virtualos/start.env"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LOG_FILE="${HOME}/Library/Logs/virtualos-startup.log"
 
-mkdir -p "$(dirname "$ENV_FILE")"
 mkdir -p "$(dirname "$LOG_FILE")"
 
 exec >>"$LOG_FILE" 2>&1
 
-echo "[$(date '+%Y-%m-%d %H:%M:%S')] starting virtualOS login hook"
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] starting virtualOS VM"
 
-if [[ -f "$ENV_FILE" ]]; then
-  # shellcheck disable=SC1090
-  source "$ENV_FILE"
-fi
+export VOS_INSTALLED_APP="${VOS_INSTALLED_APP:-/Applications/virtualOS.app}"
 
-if [[ -z "${VOS_VM_PASSWORD:-}" ]]; then
-  echo "VOS_VM_PASSWORD is not set. Refusing to run start.sh unattended."
-  exit 1
-fi
-
-cd "$REPO_DIR"
-exec "$REPO_DIR/start.sh"
+while true; do
+  if ! curl -fsS --max-time 2 http://127.0.0.1:8845/vm/health 2>/dev/null | jq -e '.ready == true and .state == "running"' >/dev/null; then
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] VM unhealthy; running start.sh"
+    if ! "$SCRIPT_DIR/start.sh"; then
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] start.sh failed; retrying in 30 seconds"
+    fi
+  fi
+  sleep 30
+done

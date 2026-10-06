@@ -193,6 +193,35 @@ def upload_staging_clone(config_path):
     return stream_pack_upload(source, R2UploadStore(config))
 
 
+def upload_bundle_clone(store_root, name, config_path):
+    """Upload one stopped fleet bundle's RAW to the pinned bucket.
+
+    Accepts any bundle under a lab root, but never the production machine store
+    and never a RAW that is currently open. The manifest is written last.
+    """
+    if not re.fullmatch(r"[A-Za-z0-9._-]+", name or ""):
+        raise ValueError("invalid bundle name")
+    root = Path(store_root).resolve()
+    production_root = (Path.home() / "VirtualOSMachines").resolve()
+    if root == production_root or str(root).startswith(str(production_root) + os.sep):
+        raise ValueError("refusing to upload from the production machine store")
+    source = (root / (name + ".bundle")).resolve() / "Disk.img"
+    if source.is_symlink() or not source.is_file():
+        raise ValueError("bundle disk must be a regular file")
+    production = production_root / "virtualOS.bundle/Disk.img"
+    if production.is_file() and os.path.samefile(source, production):
+        raise ValueError("refusing to upload the production RAW disk")
+    try:
+        probe = subprocess.run(["/usr/sbin/lsof", "-F", "p", "--", str(source)],
+                               capture_output=True, timeout=10, check=False)
+    except (OSError, subprocess.TimeoutExpired):
+        raise ValueError("cannot confirm that the RAW is stopped") from None
+    if probe.returncode != 1 or probe.stdout or probe.stderr:
+        raise ValueError("RAW must be closed before upload")
+    config = validate_config(config_path)
+    return stream_pack_upload(source, R2UploadStore(config))
+
+
 def self_test(root):
     """Local fake S3 PUT/GET with conditional writes and no credential output."""
     root = Path(root)

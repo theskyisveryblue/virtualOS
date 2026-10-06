@@ -14,6 +14,11 @@ if [[ ! -f "${SERVER_SCRIPT}" ]]; then
   exit 1
 fi
 
+if [[ "${HOST}" != "127.0.0.1" && "${HOST}" != "localhost" && "${HOST}" != "::1" && -z "${VOS_AUTH_TOKEN:-}" ]]; then
+  echo "Set VOS_AUTH_TOKEN before starting the LAN remote site." >&2
+  exit 1
+fi
+
 get_lan_ip() {
   local ip=""
   ip="$(ipconfig getifaddr en0 2>/dev/null || true)"

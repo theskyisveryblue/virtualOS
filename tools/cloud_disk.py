@@ -1300,5 +1300,9 @@ if __name__ == "__main__":
         from cloud_disk_r2_upload import upload_staging_clone
         print(json.dumps({"r2_clone_upload": upload_staging_clone(sys.argv[2])},
                          sort_keys=True), flush=True)
+    elif len(sys.argv) == 5 and sys.argv[1] == "r2-upload-bundle":
+        from cloud_disk_r2_upload import upload_bundle_clone
+        print(json.dumps({"r2_bundle_upload": upload_bundle_clone(
+            sys.argv[2], sys.argv[3], sys.argv[4])}, sort_keys=True), flush=True)
     else:
         raise SystemExit("usage: cloud_disk.py self-test|check-config PATH|lab-pack SOURCE DEST|lab-serve ROOT OVERLAY PORT|bundle-serve ROOT NAME OVERLAY PORT|r2-serve CONFIG MANIFEST_SHA256 PORT (use computer-space.sh)")

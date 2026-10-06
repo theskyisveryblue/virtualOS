@@ -51,7 +51,8 @@ If you want to trust a new SSH public key at the same time:
 
 ## Install Login Startup
 
-If you want `start.sh` to run automatically when the Mac mini user logs in:
+If you want the existing shell startup flow to start the VM at login and check
+its health every 30 seconds:
 
 ```bash
 chmod +x tools/mac_mini/install_launch_agent.sh
@@ -66,13 +67,26 @@ That installer creates:
 The LaunchAgent uses:
 
 - `tools/mac_mini/start_virtualos_at_login.sh`
-- `~/.config/virtualos/start.env`
+- `start.sh`
+- optional env: `~/.config/virtualos/start.env`
 
-Create the env file before loading the LaunchAgent if `start.sh` needs a VM password:
+The installer copies those existing scripts into
+`~/Library/Application Support/virtualOS/launch-agent/` and runs the installed
+`/Applications/virtualOS.app`. Re-run the installer after editing either script.
+macOS does not allow this LaunchAgent to execute scripts directly from the
+repo's Documents location.
+
+Set `VOS_VM_BUNDLE=/absolute/path/to/your.bundle` in that env file when the VM
+is outside the default Documents location. On the current Mac mini the VM lives
+at `/Users/ai/VirtualOSMachines/virtualOS.bundle`.
+
+The LaunchAgent starts the VM in the background. The app detects the guest
+password prompt and unlocks it when a saved password is configured. Create:
 
 ```bash
 mkdir -p ~/.config/virtualos
 cat > ~/.config/virtualos/start.env <<'EOF'
+VOS_VM_BUNDLE=/Users/ai/VirtualOSMachines/virtualOS.bundle
 VOS_VM_PASSWORD=replace-me
 EOF
 chmod 600 ~/.config/virtualos/start.env
@@ -100,6 +114,10 @@ The LaunchAgent uses:
 
 - `tools/mac_mini/start_remote_host_at_login.sh`
 - optional env: `~/.config/virtualos/remote_host.env`
+
+The remote host binds to loopback by default. To allow LAN connections, set
+`VOS_REMOTE_HOST=0.0.0.0` and a strong `VOS_AUTH_TOKEN` in that env file.
+`start_remote_site.command` also requires `VOS_AUTH_TOKEN` for its LAN bind.
 
 Default watched repos:
 

@@ -49,9 +49,9 @@ chmod +x "$WRAPPER_PATH"
 
 if [[ ! -f "$ENV_FILE" ]]; then
   cat > "${ENV_FILE}.example" <<'EOF'
-VOS_REMOTE_HOST=0.0.0.0
+VOS_REMOTE_HOST=127.0.0.1
 VOS_REMOTE_PORT=8899
-# Optional:
+# Required when VOS_REMOTE_HOST is not loopback:
 # VOS_AUTH_TOKEN=replace-me
 # VOS_WATCH_REPOS=/Users/ai/Documents/GitHub/virtualOS,/Users/ai/Documents/GitHub/ai-share
 EOF

@@ -267,8 +267,8 @@ if [[ "${1:-}" == --cloud-disk-r2-upload-clone ]]; then
   exit 0
 fi
 
-if [[ $# -gt 1 || ( $# -eq 1 && "$1" != --reclaim-caches && "$1" != --reclaim-local-lab && "$1" != --vm-summary && "$1" != --raw-hole-lab && "$1" != --nbd-api-probe && "$1" != --nbd-source-build-check && "$1" != --nbd-r2-metadata-prepare && "$1" != --nbd-r2-metadata-check && "$1" != --nbd-bundle-serve && "$1" != --nbd-vz-lab && "$1" != --nbd-macos-config-check && "$1" != --nbd-r2-macos-config-check && "$1" != --nbd-macos-clone-test && "$1" != --nbd-clone-serve && "$1" != --guest-tree-probe && "$1" != --guest-tree-transport && "$1" != --guest-hex-smoke && "$1" != --guest-accessibility-open && "$1" != --intent-plan-compile && "$1" != --promote-debug-app && "$1" != --virtualization-api-inventory && "$1" != --cloud-disk-self-test && "$1" != --cloud-disk-checkpoint-self-test && "$1" != --cloud-disk-config-check && "$1" != --cloud-disk-lab-pack && "$1" != --cloud-disk-lab-serve && "$1" != --cloud-disk-r2-serve && "$1" != --cloud-disk-r2-boot-lab && "$1" != --cloud-disk-r2-checkpoint-lab ) ]]; then
-  echo 'Usage: ./tools/computer-space.sh [--display-diagnostics|--guest-ax-verify finder_window_present|--reclaim-operator-playwright-cache|--reclaim-operator-puppeteer-cache|--reclaim-operator-uv-cache|--reclaim-operator-go-cache|--reclaim-operator-build-cache|--reclaim-caches|--reclaim-local-lab|--vm-summary|--raw-hole-lab|--nbd-api-probe|--nbd-source-build-check|--nbd-r2-metadata-prepare|--nbd-r2-metadata-check|--nbd-bundle-serve|--nbd-vz-lab|--nbd-macos-config-check|--nbd-r2-macos-config-check|--nbd-macos-clone-test|--nbd-clone-serve|--guest-tree-probe|--guest-tree-transport|--guest-hex-smoke|--guest-accessibility-open|--guest-accessibility-authorize|--intent-plan-compile|--promote-debug-app|--virtualization-api-inventory|--cloud-disk-self-test|--cloud-disk-config-check|--cloud-disk-lab-pack|--cloud-disk-lab-serve|--cloud-disk-r2-serve|--cloud-disk-r2-upload-clone|--cloud-disk-r2-boot-lab|--cloud-disk-r2-checkpoint-lab]' >&2
+if [[ $# -gt 1 || ( $# -eq 1 && "$1" != --reclaim-caches && "$1" != --reclaim-local-lab && "$1" != --vm-summary && "$1" != --raw-hole-lab && "$1" != --nbd-api-probe && "$1" != --nbd-source-build-check && "$1" != --nbd-r2-metadata-prepare && "$1" != --nbd-r2-metadata-check && "$1" != --nbd-bundle-serve && "$1" != --nbd-vz-lab && "$1" != --nbd-macos-config-check && "$1" != --nbd-r2-macos-config-check && "$1" != --nbd-macos-clone-test && "$1" != --nbd-clone-serve && "$1" != --guest-tree-probe && "$1" != --guest-tree-transport && "$1" != --guest-hex-smoke && "$1" != --guest-accessibility-open && "$1" != --intent-plan-compile && "$1" != --promote-debug-app && "$1" != --virtualization-api-inventory && "$1" != --cloud-disk-self-test && "$1" != --cloud-disk-checkpoint-self-test && "$1" != --cloud-disk-config-check && "$1" != --cloud-disk-lab-pack && "$1" != --cloud-disk-lab-serve && "$1" != --cloud-disk-r2-serve && "$1" != --cloud-disk-r2-boot-lab && "$1" != --cloud-disk-r2-checkpoint-lab && "$1" != --cloud-disk-r2-upload-bundle ) ]]; then
+  echo 'Usage: ./tools/computer-space.sh [--display-diagnostics|--guest-ax-verify finder_window_present|--reclaim-operator-playwright-cache|--reclaim-operator-puppeteer-cache|--reclaim-operator-uv-cache|--reclaim-operator-go-cache|--reclaim-operator-build-cache|--reclaim-caches|--reclaim-local-lab|--vm-summary|--raw-hole-lab|--nbd-api-probe|--nbd-source-build-check|--nbd-r2-metadata-prepare|--nbd-r2-metadata-check|--nbd-bundle-serve|--nbd-vz-lab|--nbd-macos-config-check|--nbd-r2-macos-config-check|--nbd-macos-clone-test|--nbd-clone-serve|--guest-tree-probe|--guest-tree-transport|--guest-hex-smoke|--guest-accessibility-open|--guest-accessibility-authorize|--intent-plan-compile|--promote-debug-app|--virtualization-api-inventory|--cloud-disk-self-test|--cloud-disk-config-check|--cloud-disk-lab-pack|--cloud-disk-lab-serve|--cloud-disk-r2-serve|--cloud-disk-r2-upload-clone|--cloud-disk-r2-boot-lab|--cloud-disk-r2-checkpoint-lab|--cloud-disk-r2-upload-bundle]' >&2
   exit 2
 fi
 
@@ -1012,6 +1012,19 @@ print(json.dumps({
     "manifest_last": upload["manifest_last"],
 }, sort_keys=True))
 PY
+  exit 0
+fi
+
+if [[ "${1:-}" == --cloud-disk-r2-upload-bundle ]]; then
+  script_dir="$(cd "$(dirname "$0")" && pwd)"
+  [[ -n "${VOS_R2_UPLOAD_ROOT:-}" && -n "${VOS_R2_UPLOAD_NAME:-}" &&
+     -n "${VOS_CLOUD_DISK_CONFIG:-}" && -r "$VOS_CLOUD_DISK_CONFIG" &&
+     -n "${AWS_ACCESS_KEY_ID:-}" && -n "${AWS_SECRET_ACCESS_KEY:-}" &&
+     -n "${CLOUDFLARE_ACCOUNT_ID:-}" && -n "${CLOUDFLARE_R2_ENDPOINT:-}" ]] || {
+    echo 'r2_upload_bundle=refused: root, name, config, and pinned credentials required' >&2; exit 2;
+  }
+  python3 "$script_dir/cloud_disk.py" r2-upload-bundle \
+    "$VOS_R2_UPLOAD_ROOT" "$VOS_R2_UPLOAD_NAME" "$VOS_CLOUD_DISK_CONFIG"
   exit 0
 fi
 
