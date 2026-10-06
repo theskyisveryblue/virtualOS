@@ -347,6 +347,8 @@ final class FleetInstance: NSObject {
                 window.isReleasedWhenClosed = false
                 window.setFrameOrigin(NSPoint(x: -10000, y: -10000))
                 window.orderFrontRegardless()
+                window.makeKeyAndOrderFront(nil)
+                window.makeFirstResponder(view)
                 headlessWindow = window
                 headlessView = view
             }
@@ -376,6 +378,138 @@ final class FleetInstance: NSObject {
             guard let jpeg = finalRep.representation(using: .jpeg, properties: [.compressionFactor: 0.75]) else { return nil }
             return (jpeg, imageW, imageH)
         }
+    }
+
+    // MARK: - Guest input
+    //
+    // The same headless `VZVirtualMachineView` used for frame capture also
+    // delivers host input to the guest. We synthesize NSEvents and send them to
+    // the view, so the guest OS sees a real user's keyboard and mouse — this is
+    // the "agent uses the VM's own input" path (no host Accessibility prompts).
+
+    /// Pixel size of the guest view, used to map normalized coords.
+    private func viewSize() -> (w: CGFloat, h: CGFloat) {
+        DispatchQueue.main.sync { [self] in
+            guard let view = headlessView, view.bounds.width > 0 else { return (windowWidth, windowHeight) }
+            return (view.bounds.width, view.bounds.height)
+        }
+    }
+
+    /// Move the guest pointer to a normalized (0..1, 0..1) location.
+    @discardableResult
+    func movePointer(nx: Double, ny: Double) -> Bool {
+        let size = viewSize()
+        return DispatchQueue.main.sync { [self] in
+            guard let view = headlessView, let window = headlessWindow, view.window === window else { return false }
+            // View coordinates are top-left origin; AppKit window coords are bottom-left.
+            let x = CGFloat(nx) * size.w
+            let y = (1.0 - CGFloat(ny)) * size.h
+            let point = NSPoint(x: x, y: y)
+            if let move = NSEvent.mouseEvent(
+                with: .mouseMoved, location: point, modifierFlags: [],
+                timestamp: ProcessInfo.processInfo.systemUptime,
+                windowNumber: window.windowNumber, context: nil,
+                eventNumber: 0, clickCount: 0, pressure: 0) {
+                view.mouseMoved(with: move)
+            }
+            return true
+        }
+    }
+
+    /// Click the guest pointer at normalized (0..1, 0..1).
+    @discardableResult
+    func click(nx: Double, ny: Double) -> Bool {
+        guard movePointer(nx: nx, ny: ny) else { return false }
+        let size = viewSize()
+        return DispatchQueue.main.sync { [self] in
+            guard let view = headlessView, let window = headlessWindow else { return false }
+            let x = CGFloat(nx) * size.w
+            let y = (1.0 - CGFloat(ny)) * size.h
+            let point = NSPoint(x: x, y: y)
+            for (type, count) in [(NSEvent.EventType.leftMouseDown, 1), (.leftMouseUp, 1)] {
+                if let ev = NSEvent.mouseEvent(
+                    with: type, location: point, modifierFlags: [],
+                    timestamp: ProcessInfo.processInfo.systemUptime,
+                    windowNumber: window.windowNumber, context: nil,
+                    eventNumber: 0, clickCount: count, pressure: type == .leftMouseDown ? 1 : 0) {
+                    if type == .leftMouseDown { view.mouseDown(with: ev) } else { view.mouseUp(with: ev) }
+                }
+            }
+            return true
+        }
+    }
+
+    /// Type a whole string into the guest, one character at a time.
+    @discardableResult
+    func typeText(_ text: String) -> Bool {
+        for ch in text {
+            _ = sendKey(keyCode(for: ch), characters: String(ch))
+            Thread.sleep(forTimeInterval: 0.02)
+        }
+        return true
+    }
+
+    /// Send a named or single-character key to the guest.
+    @discardableResult
+    func key(named name: String) -> Bool {
+        let lowered = name.lowercased()
+        if let code = specialKeyCodes[lowered] {
+            return sendKey(code, characters: keyCharacters(lowered, code: code))
+        }
+        if name.count == 1 {
+            return sendKey(keyCode(for: Character(name)), characters: name)
+        }
+        return false
+    }
+
+    private func keyCharacters(_ name: String, code: UInt16) -> String {
+        switch name {
+        case "return", "enter": return "\r"
+        case "tab": return "\t"
+        case "space": return " "
+        case "escape", "esc": return "\u{1b}"
+        case "delete", "backspace": return "\u{7f}"
+        default: return ""
+        }
+    }
+
+    private func sendKey(_ code: CGKeyCode, characters: String) -> Bool {
+        DispatchQueue.main.sync { [self] in
+            guard let view = headlessView, let window = headlessWindow else { return false }
+            for isDown in [true, false] {
+                if let ev = NSEvent.keyEvent(
+                    with: isDown ? .keyDown : .keyUp,
+                    location: .zero, modifierFlags: [],
+                    timestamp: ProcessInfo.processInfo.systemUptime,
+                    windowNumber: window.windowNumber, context: nil,
+                    characters: characters, charactersIgnoringModifiers: characters,
+                    isARepeat: false, keyCode: UInt16(code)) {
+                    if isDown { view.keyDown(with: ev) } else { view.keyUp(with: ev) }
+                }
+            }
+            return true
+        }
+    }
+
+    private var specialKeyCodes: [String: CGKeyCode] {
+        [
+            "return": 36, "enter": 36, "tab": 48, "space": 49, "escape": 53, "esc": 53,
+            "delete": 51, "backspace": 51, "left": 123, "right": 124, "down": 125, "up": 126,
+            "home": 115, "end": 119, "pageup": 116, "pagedown": 121,
+        ]
+    }
+
+    /// Map a printable character to a US-ANSI virtual key code.
+    private func keyCode(for ch: Character) -> CGKeyCode {
+        let map: [Character: CGKeyCode] = [
+            "a": 0, "s": 1, "d": 2, "f": 3, "h": 4, "g": 5, "z": 6, "x": 7, "c": 8, "v": 9,
+            "b": 11, "q": 12, "w": 13, "e": 14, "r": 15, "y": 16, "t": 17,
+            "1": 18, "2": 19, "3": 20, "4": 21, "6": 22, "5": 23, "=": 24, "9": 25, "7": 26,
+            "-": 27, "8": 28, "0": 29, "]": 30, "o": 31, "u": 32, "[": 33, "i": 34, "p": 35,
+            "l": 37, "j": 38, "'": 39, "k": 40, ";": 41, "\\": 42, ",": 43, "/": 44, "n": 45,
+            "m": 46, ".": 47, " ": 49, "`": 50,
+        ]
+        return map[ch] ?? 0
     }
 }
 
@@ -512,6 +646,25 @@ final class FleetHTTPServer {
         var buffer = [UInt8](repeating: 0, count: 4096)
         let n = Darwin.read(fd, &buffer, buffer.count)
         if n > 0 { request.append(contentsOf: buffer[0..<n]) }
+        let raw0 = String(decoding: request, as: UTF8.self)
+        // If a Content-Length header promises more body, drain it so JSON POSTs
+        // are complete before we parse.
+        if let clRange = raw0.range(of: "Content-Length:", options: .caseInsensitive) {
+            let after = raw0[clRange.upperBound...]
+            let lenStr = after.prefix(while: { $0.isNumber || $0 == " " }).trimmingCharacters(in: .whitespaces)
+            if let expected = Int(lenStr),
+               let headerEnd = raw0.range(of: "\r\n\r\n") {
+                let have = raw0.distance(from: raw0.startIndex, to: headerEnd.upperBound)
+                let bodyHave = request.count - have
+                var remaining = expected - bodyHave
+                while remaining > 0 {
+                    let got = Darwin.read(fd, &buffer, min(buffer.count, remaining))
+                    if got <= 0 { break }
+                    request.append(contentsOf: buffer[0..<got])
+                    remaining -= got
+                }
+            }
+        }
         let raw = String(decoding: request, as: UTF8.self)
         let requestLine = raw.components(separatedBy: "\r\n").first ?? ""
         let parts = requestLine.split(separator: " ")
@@ -564,7 +717,47 @@ final class FleetHTTPServer {
             let name = String(path.dropFirst("/fleet/stop/".count))
             return ("200 OK", jsonLine(supervisor.stop(name: name)))
         }
+        // Per-VM input: POST /fleet/input/<vm> with a JSON body
+        //   {"action":"click","nx":0.5,"ny":0.5}
+        //   {"action":"key","key":"return"}
+        //   {"action":"type","text":"hello"}
+        //   {"action":"move","nx":..,"ny":..}
+        if method == "POST" && path.hasPrefix("/fleet/input/") {
+            let name = String(path.dropFirst("/fleet/input/".count))
+            guard let instance = supervisor.instance(named: name) else {
+                return ("404 Not Found", jsonLine(["ok": false, "error": "unknown vm \(name)"]))
+            }
+            guard let bodyData = requestBody(raw),
+                  let args = try? JSONSerialization.jsonObject(with: bodyData) as? [String: Any],
+                  let action = args["action"] as? String else {
+                return ("400 Bad Request", jsonLine(["ok": false, "error": "expected JSON body with action"]))
+            }
+            let ok: Bool
+            switch action {
+            case "click":
+                ok = instance.click(nx: (args["nx"] as? NSNumber)?.doubleValue ?? 0.5,
+                                    ny: (args["ny"] as? NSNumber)?.doubleValue ?? 0.5)
+            case "move":
+                ok = instance.movePointer(nx: (args["nx"] as? NSNumber)?.doubleValue ?? 0.5,
+                                          ny: (args["ny"] as? NSNumber)?.doubleValue ?? 0.5)
+            case "key":
+                ok = instance.key(named: (args["key"] as? String) ?? "")
+            case "type":
+                ok = instance.typeText((args["text"] as? String) ?? "")
+            default:
+                return ("400 Bad Request", jsonLine(["ok": false, "error": "unknown action \(action)"]))
+            }
+            return (ok ? "200 OK" : "503 Service Unavailable",
+                    jsonLine(["ok": ok, "vm": name, "action": action]))
+        }
         return ("404 Not Found", jsonLine(["ok": false, "error": "not found", "path": path]))
+    }
+
+    /// Extract the JSON body from a raw HTTP request.
+    private func requestBody(_ raw: String) -> Data? {
+        guard let range = raw.range(of: "\r\n\r\n") else { return nil }
+        let body = String(raw[range.upperBound...])
+        return body.data(using: .utf8)
     }
 }
 
