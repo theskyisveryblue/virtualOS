@@ -186,6 +186,14 @@ These are the scars. Every one of them is a claim we paid for.
   So: the host *advertises* nested support, but does not yet hand EL2/HYP through
   to the guest kernel on this platform — the second layer is blocked by Apple,
   not by our code. `tools/nested-lab.sh` reproduces this boundary end to end.
+- **The cloud path outlives the LAN.** When the operator Mac left the Mini's
+  LAN mid-session (subnet change, ping and SSH both dead), the fleet never went
+  dark: the host kept pushing heartbeats to the Cloudflare relay and the relay
+  kept the fleet status and liveness fresh. So the scoreboard must be
+  relay-first — read the fleet from the relay and treat SSH as an optional
+  enhancement — or a roaming operator sees a false "DOWN". `plan-status.sh` now
+  does exactly that, and says "not reachable from here (Mini off-LAN)" for the
+  data that genuinely lives on the host.
 - **A browser can drive a guest with no host permission.** A remote client posts
   input to the relay (`POST /fleet/input/<vm>`), the host long-polls it
   (`GET /fleet/poll`), and the supervisor applies it to the guest's own
