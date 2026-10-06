@@ -167,6 +167,9 @@ def _ollama_action(frame: Frame, task: str, model: str, endpoint: str) -> dict:
         "Look at this macOS screenshot. Find the visible UI target for the task. "
         "Return ONE JSON object. To click use {\"type\":\"click\",\"point_2d\":[x,y],\"label\":name} "
         "where point_2d is a 0-1000 scale from the top left. "
+        "To press a key use {\"type\":\"key\",\"key\":\"return\"} (one of return, escape, tab, "
+        "space, delete, up, down, left, right). "
+        "To type text into a focused field use {\"type\":\"type\",\"text\":\"...\"}. "
         "If the target is not visible return {\"type\":\"abstain\"}. "
         "Only return {\"type\":\"done\"} if the task is visibly complete. Never guess a point."
     )
@@ -197,9 +200,19 @@ def _ollama_action(frame: Frame, task: str, model: str, endpoint: str) -> dict:
     if "point_2d" in action:
         point = action["point_2d"]
         if (not isinstance(point, list) or len(point) != 2
-                or not all(isinstance(v, (int, float)) for v in point)):
+                or not all(isinstance(v, (int, float)) and 0 <= v <= 1000 for v in point)):
             return {"type": "abstain", "reason": "bad_point"}
-        action = {"type": "click", "point_2d": point, "label": action.get("label")}
+        return {"type": "click", "point_2d": point, "label": action.get("label")}
+    if action.get("type") == "key":
+        key = action.get("key")
+        if not isinstance(key, str) or not key or len(key) > 24:
+            return {"type": "abstain", "reason": "bad_key"}
+        return {"type": "key", "key": key.lower()}
+    if action.get("type") == "type":
+        text = action.get("text")
+        if not isinstance(text, str) or not text or len(text) > 512:
+            return {"type": "abstain", "reason": "bad_text"}
+        return {"type": "type", "text": text}
     return action
 
 
@@ -257,13 +270,21 @@ def run_brain(vm: FleetVM, task: str, model: str, endpoint: str,
             result.steps = step
             _record(trace, vm.name, step, task, "abstain", None, before, before, None)
             return result
-        if kind != "click" or not act:
+        if kind not in ("click", "key", "type") or not act:
             result.status = "shadow" if not act else "unsupported"
             result.steps = step
             return result
-        px = round(action["point_2d"][0] * (frame.width - 1) / 1000)
-        py = round(action["point_2d"][1] * (frame.height - 1) / 1000)
-        status = vm.click(px, py)
+        if kind == "click":
+            px = round(action["point_2d"][0] * (frame.width - 1) / 1000)
+            py = round(action["point_2d"][1] * (frame.height - 1) / 1000)
+            status = vm.click(px, py)
+            detail = {"point": [px, py]}
+        elif kind == "key":
+            status = vm.key(action["key"])
+            detail = {"key": action["key"]}
+        else:
+            status = vm.type(action["text"])
+            detail = {"text_len": len(action["text"])}
         changed = None
         after_hash = before
         for delay in (0.4, 0.8, 1.6):
@@ -273,9 +294,10 @@ def run_brain(vm: FleetVM, task: str, model: str, endpoint: str,
             changed = after_hash != before
             if changed:
                 break
-        result.actions.append({"step": step, "action": "click",
-                               "point": [px, py], "http": status, "changed": changed})
-        _record(trace, vm.name, step, task, "click", [px, py], before, after_hash, changed)
+        result.actions.append({"step": step, "action": kind,
+                               **detail, "http": status, "changed": changed})
+        _record(trace, vm.name, step, task, kind, detail.get("point"),
+                before, after_hash, changed)
         if changed:
             result.status = "acted"
             result.steps = step

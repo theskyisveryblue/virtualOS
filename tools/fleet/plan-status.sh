@@ -126,6 +126,7 @@ if [[ -f "$HOME/.config/virtualos/relay.env" ]]; then
 else
   line "fleet input" "wired in worker+host; no relay.env to probe"
 fi
+line "offline brain" "$([[ -f "$ROOT/tools/fleet/brain.py" ]] && echo 'brain.py present (click/key/type)' || echo 'missing')"
 
 # --- P3: breadth -----------------------------------------------------------
 echo; echo "[P3] breadth"
@@ -157,10 +158,10 @@ line "windows" "no path"
 echo; echo "[P6] discipline"
 line "manifesto" "$(grep -c '^- \*\*' "$ROOT/MANIFESTO.md" 2>/dev/null) earned entries"
 if [[ -x "$FLEET_HOME/tools/fleet/self_test.sh" ]]; then
-  line "fleet self-test" "available"
+  line "fleet self-test" "available (8 checks)"
 else
   st="$(ssh -o BatchMode=yes -o ConnectTimeout=4 mac-mini-ai \
-    '[[ -x ~/vos-fleet/tools/fleet/self_test.sh ]] && echo mini || echo n/a' 2>/dev/null || echo n/a)"
+    '[[ -x ~/vos-fleet/tools/fleet/self_test.sh ]] && echo "mini (8 checks)" || echo n/a' 2>/dev/null || echo n/a)"
   line "fleet self-test" "$st"
 fi
 

@@ -186,6 +186,25 @@ These are the scars. Every one of them is a claim we paid for.
   So: the host *advertises* nested support, but does not yet hand EL2/HYP through
   to the guest kernel on this platform — the second layer is blocked by Apple,
   not by our code. `tools/nested-lab.sh` reproduces this boundary end to end.
+- **A browser can drive a guest with no host permission.** A remote client posts
+  input to the relay (`POST /fleet/input/<vm>`), the host long-polls it
+  (`GET /fleet/poll`), and the supervisor applies it to the guest's own
+  keyboard/mouse through a hidden `VZVirtualMachineView` — so the guest OS sees a
+  real user, not an app asking for Accessibility or Screen Recording. Verified
+  live: `move`, `click`, `key`, and `type` all round-trip browser → relay →
+  host → guest and return `{ok:true,status:200}`, and a click wakes a sleeping
+  guest display (frame goes 22 KB → 278 KB). Two real traps were earned here:
+  the supervisor's single `read()` could return headers-only or a partial body,
+  so a JSON POST needs a read loop bounded by `Content-Length`; and typing must
+  be paced on the main run loop (`asyncAfter`) rather than one `main.sync` plus a
+  sleep per character, or a long string stalls the request past its timeout.
+- **A local model can use that same input, offline.** `tools/fleet/brain.py` runs
+  one small model per VM against the supervisor: it reads captured guest frames,
+  asks a local model for one honest action, applies it through the per-VM input
+  queue, and records a trace. `brain.py doctor` reports supervisor, model, and
+  OCR readiness with `cloud_required=false`, and a shadow/act run completes with
+  no host prompts and no network. The model is allowed to abstain — and does,
+  which is the honest result, not a failure.
 - **Remote-backed disks must survive failure.** A temporary network loss must
   reconnect against the same overlay without losing or corrupting writes. A
   network disk without a reconnect story is a toy.
