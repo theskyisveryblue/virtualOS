@@ -17,6 +17,9 @@ tools/virtualos_stream_server/inputctl
 # Editor / spec-build scratch output
 .oe-build/
 
+# Packaged remote distributables
+virtualOSRemoteMac/dist/
+
 # Runtime audit output
 tools/data/
 

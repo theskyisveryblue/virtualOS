@@ -1,0 +1,27 @@
+name: virtualOSRemoteiOS
+options:
+  minimumXcodeGenVersion: 2.39.0
+settings:
+  base:
+    PRODUCT_BUNDLE_IDENTIFIER: com.github.yep.virtualOSRemoteiOS
+    IPHONEOS_DEPLOYMENT_TARGET: 17.0
+    SWIFT_VERSION: 5.0
+    DEVELOPMENT_TEAM: ""
+packages: {}
+targets:
+  virtualOSRemoteiOS:
+    type: application
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: App
+    resources:
+      - path: Resources
+    settings:
+      base:
+        INFOPLIST_FILE: App/Info.plist
+        PRODUCT_NAME: virtualOS Remote
+        CURRENT_PROJECT_VERSION: 1
+        MARKETING_VERSION: 0.1.0
+    scheme:
+      testTargets: []
