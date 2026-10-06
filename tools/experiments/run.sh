@@ -18,10 +18,10 @@ python3 "$HERE/shared_base.py" "${args[@]}"
 
 echo "== materialise per-machine delta vs base =="
 first_machine=$(echo $MACHINES | awk '{print $1}')
-python3 "$HERE/shared_base.py" diff "$BASE" "$first_machine" "$OUT/delta-$first_machine" \
-  ${LIMIT:+--limit-blocks "$LIMIT"} 2>/dev/null || \
-python3 "$HERE/shared_base.py" diff "$BASE" "$first_machine" "$OUT/delta" \
-  ${LIMIT:+--limit-blocks "$LIMIT"}
+machine_label="$(basename "$(dirname "$first_machine")")"
+args=(diff "$BASE" "$first_machine" "$OUT/delta-$machine_label")
+[[ -n "$LIMIT" ]] && args+=(--limit-blocks "$LIMIT")
+python3 "$HERE/shared_base.py" "${args[@]}"
 
 echo "== artefacts =="
 ls -la "$OUT" | sed -n '1,20p'
