@@ -27,6 +27,7 @@ struct VMParameters: Codable {
     var sharedFolderData: Data?
     var macAddress = VZMACAddress.randomLocallyAdministered().string
     var version = ""
+    var nestedVirtualizationEnabled = false
     
     init() {}
     
@@ -48,6 +49,7 @@ struct VMParameters: Codable {
         sharedFolderData  = try container.decodeIfPresent(Data.self, forKey: .sharedFolderData) ?? nil // optional
         macAddress        = try container.decodeIfPresent(String.self, forKey: .macAddress) ?? VZMACAddress.randomLocallyAdministered().string // optional
         version           = try container.decodeIfPresent(String.self, forKey: .version) ?? "" // optional
+        nestedVirtualizationEnabled = try container.decodeIfPresent(Bool.self, forKey: .nestedVirtualizationEnabled) ?? false // optional
 
     }
     

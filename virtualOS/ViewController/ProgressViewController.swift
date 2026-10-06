@@ -36,7 +36,15 @@ final class ProgressViewController: NSViewController {
     
     override func viewDidAppear() {
         super.viewDidAppear()
-        if restoreImageName == Constants.restoreImageNameLatest ||
+        
+        if let restoreImageName = restoreImageName,
+           let url = URL(string: restoreImageName),
+           (url.scheme == "http" || url.scheme == "https")
+        {
+            restoreImageDownload.delegate = self
+            restoreImageDownload.download(url: url)
+            mode = .download
+        } else if restoreImageName == Constants.restoreImageNameLatest ||
            mode == .download
         {
             restoreImageDownload.delegate = self

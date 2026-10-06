@@ -24,6 +24,38 @@ final class RestoreImageViewController: NSViewController {
         super.viewDidLoad()
         tableView.dataSource = self
         tableView.delegate = self
+        
+        let customDownloadButton = NSButton(title: "Download from URL...", target: self, action: #selector(downloadCustomURL))
+        customDownloadButton.bezelStyle = .rounded
+        view.addSubview(customDownloadButton)
+        customDownloadButton.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            customDownloadButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            customDownloadButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -20)
+        ])
+    }
+    
+    @objc func downloadCustomURL() {
+        let alert = NSAlert()
+        alert.messageText = "Download Restore Image"
+        alert.informativeText = "Enter the URL of the macOS Restore Image (.ipsw)."
+        alert.addButton(withTitle: "Download")
+        alert.addButton(withTitle: "Cancel")
+        
+        let inputTextField = NSTextField(frame: NSRect(x: 0, y: 0, width: 300, height: 24))
+        alert.accessoryView = inputTextField
+        alert.window.initialFirstResponder = inputTextField
+        
+        let response = alert.runModal()
+        if response == .alertFirstButtonReturn {
+            let urlString = inputTextField.stringValue
+            if let url = URL(string: urlString), (url.scheme == "http" || url.scheme == "https") {
+                let notification = Notification(name: Constants.restoreImageNameSelectedNotification, userInfo: [Constants.selectedRestoreImage: urlString])
+                NotificationCenter.default.post(notification)
+                view.window?.close()
+            }
+        }
     }
     
     override func viewWillAppear() {

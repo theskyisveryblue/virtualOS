@@ -256,12 +256,21 @@ final class StreamViewModel: ObservableObject {
         self.authToken = UserDefaults.standard.string(forKey: "stream.authToken") ?? ""
         self.cfAccessClientID = UserDefaults.standard.string(forKey: "stream.cfAccessClientID") ?? ""
         self.cfAccessClientSecret = UserDefaults.standard.string(forKey: "stream.cfAccessClientSecret") ?? ""
-        self.targetApp = UserDefaults.standard.string(forKey: "stream.targetApp") ?? "Codex"
+        let savedTargetApp = UserDefaults.standard.string(forKey: "stream.targetApp")?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        if savedTargetApp.isEmpty || savedTargetApp.caseInsensitiveCompare("codex") == .orderedSame {
+            self.targetApp = "virtualOS"
+        } else {
+            self.targetApp = savedTargetApp
+        }
         let savedSource = UserDefaults.standard.string(forKey: "stream.captureSource") ?? CaptureSource.window.rawValue
         self.captureSource = CaptureSource(rawValue: savedSource) ?? .window
 
-        if !remoteURL.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty, connectionMode != .remote {
+        let trimmedRemoteURL = remoteURL.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !trimmedRemoteURL.isEmpty, connectionMode != .remote {
             connectionMode = .remote
+        } else if trimmedRemoteURL.isEmpty, connectionMode == .remote {
+            // Avoid a dead state where Remote mode is selected but no tunnel URL exists.
+            connectionMode = .auto
         }
 
         discovery.$endpoints
@@ -1080,7 +1089,7 @@ struct ContentView: View {
             }
 
             HStack(spacing: 8) {
-                TextField("Target app (e.g. Codex)", text: $vm.targetApp)
+                TextField("Target app (e.g. virtualOS)", text: $vm.targetApp)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
                     .textFieldStyle(.roundedBorder)

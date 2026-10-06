@@ -12,13 +12,14 @@ extension UserDefaults {
     fileprivate static let diskSizeKey                  = "diskSize"
     fileprivate static let vmFilesDirectoryKey          = "vmFilesDirectoryKey"
     fileprivate static let vmFilesDirectoryBookmarkData = "vmFilesDirectoryBookmarkData"
+    fileprivate static let autoStartLastVMOnLaunchKey   = "autoStartLastVMOnLaunch"
 
     var diskSize: Int {
         get {
             if object(forKey: Self.diskSizeKey) != nil {
                 return integer(forKey: Self.diskSizeKey)
             }
-            return 30 // default value
+            return 80 // default value
         }
         set {
             set(newValue, forKey: Self.diskSizeKey)
@@ -42,6 +43,19 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Self.vmFilesDirectoryBookmarkData)
+            synchronize()
+        }
+    }
+
+    var autoStartLastVMOnLaunch: Bool {
+        get {
+            if object(forKey: Self.autoStartLastVMOnLaunchKey) == nil {
+                return true // default on
+            }
+            return bool(forKey: Self.autoStartLastVMOnLaunchKey)
+        }
+        set {
+            set(newValue, forKey: Self.autoStartLastVMOnLaunchKey)
             synchronize()
         }
     }

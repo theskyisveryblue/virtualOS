@@ -26,6 +26,36 @@ extension URL {
     var diskImageURL: URL {
         return self.appending(path: "Disk.img")
     }
+    var bootDiskImageURL: URL {
+        // The URL attachment API documents a local RAW disk image. An ASIF
+        // experiment must use an explicitly supported attachment initializer.
+        return diskImageURL
+    }
+    var isR2LabMetadataBundle: Bool {
+        let expected = FileManager.default.homeDirectoryForCurrentUser
+            .appendingPathComponent("VirtualOSMachines/.virtualOS-r2-metadata.bundle")
+            .standardizedFileURL
+        guard standardizedFileURL == expected,
+              let bundleValues = try? resourceValues(forKeys: [.isDirectoryKey, .isSymbolicLinkKey]),
+              bundleValues.isDirectory == true, bundleValues.isSymbolicLink != true else {
+            return false
+        }
+        for name in ["HardwareModel", "MachineIdentifier", "AuxiliaryStorage", "Parameters.txt", ".r2-lab"] {
+            let file = appendingPathComponent(name)
+            guard let values = try? file.resourceValues(forKeys: [.isRegularFileKey, .isSymbolicLinkKey]),
+                  values.isRegularFile == true, values.isSymbolicLink != true else {
+                return false
+            }
+        }
+        let disk = diskImageURL.path
+        guard !FileManager.default.fileExists(atPath: disk),
+              (try? FileManager.default.destinationOfSymbolicLink(atPath: disk)) == nil,
+              let marker = try? String(contentsOf: appendingPathComponent(".r2-lab"), encoding: .utf8),
+              marker == "virtualos-r2-metadata/v1\n" else {
+            return false
+        }
+        return true
+    }
     var machineIdentifierURL: URL {
         return self.appending(path: "MachineIdentifier")
     }
@@ -33,4 +63,3 @@ extension URL {
         return self.appending(path: "Parameters.txt")
     }
 }
-
