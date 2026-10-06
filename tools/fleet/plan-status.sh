@@ -185,10 +185,14 @@ line "windows" "no path"
 # --- P6: discipline --------------------------------------------------------
 echo; echo "[P6] discipline"
 line "manifesto" "$(grep -c '^- \*\*' "$ROOT/MANIFESTO.md" 2>/dev/null) earned entries"
-if [[ -x "$FLEET_HOME/tools/fleet/self_test.sh" ]]; then
-  line "fleet self-test" "available (8 checks)"
+# The check count comes from the script itself so the scoreboard never drifts.
+self_test="$FLEET_HOME/tools/fleet/self_test.sh"
+[[ -x "$self_test" ]] || self_test="$ROOT/tools/fleet/self_test.sh"
+if [[ -x "$self_test" ]]; then
+  checks="$(grep -cE '^echo "\[[0-9]+/[0-9]+\]' "$self_test" 2>/dev/null || echo '?')"
+  line "fleet self-test" "available (${checks} checks)"
 elif [[ "$MINI_UP" == "1" ]]; then
-  st="$(mini_run '[[ -x ~/vos-fleet/tools/fleet/self_test.sh ]] && echo "mini (8 checks)" || echo n/a' || echo n/a)"
+  st="$(mini_run '[[ -x ~/vos-fleet/tools/fleet/self_test.sh ]] && echo "mini" || echo n/a' || echo n/a)"
   line "fleet self-test" "$st"
 else
   line "fleet self-test" "not reachable from here (Mini off-LAN)"
