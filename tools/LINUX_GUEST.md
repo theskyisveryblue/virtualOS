@@ -1,9 +1,15 @@
-# Linux guests on Virtualization.framework (experimental / untested-boot)
+# Linux guests on Virtualization.framework
 
-> **Status: EXPERIMENTAL, NOT YET BOOTED.** No real Linux kernel or rootfs was
-> used while building this helper. `--check` compiles and runs; `run` has never
-> been executed against genuine artifacts in this repo. Treat any boot attempt
-> as unverified.
+> **Status: BOOTS a real Linux guest (verified).** An Alpine Linux aarch64
+> kernel + initramfs was booted on Virtualization.framework: the kernel hands off
+> to Alpine Init and the guest reaches an interactive emergency shell over the
+> serial console. Driving commands over that console returned
+> `Linux (none) 6.6.134-0-virt #1-Alpine SMP PREEMPT_DYNAMIC ... aarch64`.
+>
+> **Key gotcha:** `VZLinuxBootLoader` needs an **uncompressed kernel `Image`**. A
+> distro `vmlinuz` is a compressed EFI-stub PE; if you pass it directly the VM
+> starts but prints nothing. Extract first with
+> `tools/linux-extract-image.sh vmlinuz Image`.
 
 Theme: **"Linux, not only macOS."** The shipping `virtualOS.app` boots only
 macOS guests. This directory adds the Linux side of the story in a way that is

@@ -8,9 +8,15 @@
 //  around a VZLinuxBootLoader so a generic Linux kernel + initrd + rootfs image
 //  can be booted headlessly with a serial console on stdout.
 //
-//  This is EXPERIMENTAL and was authored without a real kernel/rootfs to boot
-//  against. `--check` validates config/paths and prints what *would* boot; only
-//  `run` actually starts a VM, and it blocks until the guest exits.
+//  This BOOTS a real Linux guest. Verified against an Alpine Linux aarch64
+//  kernel + initramfs: the kernel handoff to Alpine Init runs and the guest
+//  reaches an interactive emergency shell over the serial console. `--check`
+//  validates config/paths and prints what *would* boot; `run` starts a VM and
+//  blocks until the guest exits.
+//
+//  Important: VZLinuxBootLoader needs an *uncompressed* kernel `Image`. A distro
+//  `vmlinuz` is usually a compressed EFI-stub PE; extract the raw Image first
+//  (see tools/LINUX_GUEST.md), or the VM starts but produces no console output.
 //
 //  Build:
 //    swiftc -framework Virtualization -framework Foundation \
@@ -218,13 +224,15 @@ final class LinuxGuest: NSObject {
         let semaphore = DispatchSemaphore(value: 0)
         log("booting Linux guest (kernel=\(config.kernelURL.lastPathComponent))...")
 
-        machine.start { result in
-            switch result {
-            case .success:
-                self.log("guest started; streaming console (Ctrl-C to stop)")
-            case .failure(let error):
-                self.log("start failed: \(error.localizedDescription)")
-                semaphore.signal()
+        queue.async {
+            machine.start { result in
+                switch result {
+                case .success:
+                    self.log("guest started; streaming console (Ctrl-C to stop)")
+                case .failure(let error):
+                    self.log("start failed: \(error.localizedDescription)")
+                    semaphore.signal()
+                }
             }
         }
 
@@ -309,12 +317,12 @@ if args.check {
     exit(0)
 }
 
-// Boot path. Warn loudly; validate first so missing artifacts fail cleanly.
+// Boot path. Validate first so missing artifacts fail cleanly.
 FileHandle.standardError.write(Data("""
-WARNING: this will attempt a REAL Linux boot.
-  You need an actual Linux kernel, an optional initrd, and a rootfs image.
-  None are bundled with virtualOS. See tools/LINUX_GUEST.md.
-  This path is experimental and untested without those artifacts.
+linux-guest: booting a REAL Linux guest.
+  Needs an uncompressed kernel Image (VZLinuxBootLoader rejects compressed
+  EFI-stub vmlinuz), an optional initrd, and a rootfs disk for a full userland.
+  See tools/LINUX_GUEST.md for obtaining and extracting artifacts.
 
 """.utf8))
 
