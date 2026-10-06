@@ -165,6 +165,17 @@ These are the scars. Every one of them is a claim we paid for.
   ~0.7% delta per machine, and every additional machine costs almost nothing.
   This lives in `tools/experiments/`, deliberately separate from the stable disk
   plane.
+- **Linux, not only macOS.** The box now boots a real Linux guest, not just macOS
+  clones. An Alpine aarch64 kernel + 8.8 MB initramfs runs on
+  Virtualization.framework, hands off to Alpine Init, and reaches an interactive
+  shell; driving the serial console returned
+  `Linux (none) 6.6.134-0-virt #1-Alpine SMP PREEMPT_DYNAMIC ... aarch64`. Two
+  earned traps: `VZVirtualMachine.start` must run on the machine's own dispatch
+  queue (else a SIGTRAP dispatch assertion), and `VZLinuxBootLoader` needs an
+  **uncompressed** kernel `Image` — a distro `vmlinuz` (compressed EFI-stub PE)
+  starts the VM but prints nothing, so it must be extracted first. This tiny
+  guest is the cheap substrate for many computers and for nested VMs (generic
+  platform + `VZLinuxBootLoader` is the only nested-capable boot path).
 - **Remote-backed disks must survive failure.** A temporary network loss must
   reconnect against the same overlay without losing or corrupting writes. A
   network disk without a reconnect story is a toy.
