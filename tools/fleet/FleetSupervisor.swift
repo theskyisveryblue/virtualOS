@@ -440,11 +440,20 @@ final class FleetInstance: NSObject {
     }
 
     /// Type a whole string into the guest, one character at a time.
+    ///
+    /// Keystrokes are paced on the main run loop with `asyncAfter` rather than
+    /// blocked in a batch, so a long string neither stalls the HTTP handler
+    /// thread past the client's timeout nor freezes frame capture. Input is
+    /// fire-and-forget: the guest receives the keys just after the 200.
     @discardableResult
     func typeText(_ text: String) -> Bool {
-        for ch in text {
-            _ = sendKey(keyCode(for: ch), characters: String(ch))
-            Thread.sleep(forTimeInterval: 0.02)
+        let chars = Array(text.prefix(512))
+        guard !chars.isEmpty else { return true }
+        let codes = chars.map { (keyCode(for: $0), String($0)) }
+        for (i, pair) in codes.enumerated() {
+            DispatchQueue.main.asyncAfter(deadline: .now() + Double(i) * 0.02) { [self] in
+                _ = postKey(pair.0, characters: pair.1)
+            }
         }
         return true
     }
@@ -474,21 +483,25 @@ final class FleetInstance: NSObject {
     }
 
     private func sendKey(_ code: CGKeyCode, characters: String) -> Bool {
-        DispatchQueue.main.sync { [self] in
-            guard let view = headlessView, let window = headlessWindow else { return false }
-            for isDown in [true, false] {
-                if let ev = NSEvent.keyEvent(
-                    with: isDown ? .keyDown : .keyUp,
-                    location: .zero, modifierFlags: [],
-                    timestamp: ProcessInfo.processInfo.systemUptime,
-                    windowNumber: window.windowNumber, context: nil,
-                    characters: characters, charactersIgnoringModifiers: characters,
-                    isARepeat: false, keyCode: UInt16(code)) {
-                    if isDown { view.keyDown(with: ev) } else { view.keyUp(with: ev) }
-                }
+        DispatchQueue.main.sync { [self] in postKey(code, characters: characters) }
+    }
+
+    /// Post a key down/up pair to the headless view. Must run on the main thread.
+    @discardableResult
+    private func postKey(_ code: CGKeyCode, characters: String) -> Bool {
+        guard let view = headlessView, let window = headlessWindow else { return false }
+        for isDown in [true, false] {
+            if let ev = NSEvent.keyEvent(
+                with: isDown ? .keyDown : .keyUp,
+                location: .zero, modifierFlags: [],
+                timestamp: ProcessInfo.processInfo.systemUptime,
+                windowNumber: window.windowNumber, context: nil,
+                characters: characters, charactersIgnoringModifiers: characters,
+                isARepeat: false, keyCode: UInt16(code)) {
+                if isDown { view.keyDown(with: ev) } else { view.keyUp(with: ev) }
             }
-            return true
         }
+        return true
     }
 
     private var specialKeyCodes: [String: CGKeyCode] {
@@ -644,19 +657,31 @@ final class FleetHTTPServer {
         defer { Darwin.close(fd) }
         var request = Data()
         var buffer = [UInt8](repeating: 0, count: 4096)
-        let n = Darwin.read(fd, &buffer, buffer.count)
-        if n > 0 { request.append(contentsOf: buffer[0..<n]) }
+
+        // Read until the header terminator is present. A single read() may
+        // return only part of the headers (or headers split across segments),
+        // so loop rather than assuming one read gets them all.
+        func readMore() -> Int {
+            let got = Darwin.read(fd, &buffer, buffer.count)
+            if got > 0 { request.append(contentsOf: buffer[0..<got]) }
+            return got
+        }
+
+        var headerEnd: Range<Data.Index>?
+        while headerEnd == nil {
+            let got = readMore()
+            if got <= 0 { break }
+            headerEnd = request.range(of: Data("\r\n\r\n".utf8))
+        }
+
+        // Drain the body promised by Content-Length so JSON POSTs parse whole.
         let raw0 = String(decoding: request, as: UTF8.self)
-        // If a Content-Length header promises more body, drain it so JSON POSTs
-        // are complete before we parse.
         if let clRange = raw0.range(of: "Content-Length:", options: .caseInsensitive) {
             let after = raw0[clRange.upperBound...]
             let lenStr = after.prefix(while: { $0.isNumber || $0 == " " }).trimmingCharacters(in: .whitespaces)
-            if let expected = Int(lenStr),
-               let headerEnd = raw0.range(of: "\r\n\r\n") {
-                let have = raw0.distance(from: raw0.startIndex, to: headerEnd.upperBound)
-                let bodyHave = request.count - have
-                var remaining = expected - bodyHave
+            if let expected = Int(lenStr), let he = headerEnd {
+                let have = request.distance(from: request.startIndex, to: he.upperBound)
+                var remaining = expected - (request.count - have)
                 while remaining > 0 {
                     let got = Darwin.read(fd, &buffer, min(buffer.count, remaining))
                     if got <= 0 { break }

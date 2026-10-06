@@ -26,6 +26,10 @@
  *   GET  /fleet/status    — latest fleet status (client → worker)
  *   PUT  /fleet/frame/:vm  — upload a VM frame (mac → worker → R2)
  *   GET  /fleet/frame/:vm  — latest VM frame (client → worker → R2)
+ *   POST /fleet/input/:vm  — queue input for a VM (client → worker → DO)
+ *   GET  /fleet/poll       — long-poll for next fleet command  (mac → worker)
+ *   POST /fleet/input/:vm/result/:id — post input result  (mac → worker)
+ *   GET  /fleet/input/:vm/:id — read input result  (client → worker)
  *   GET  /health          — health check
  */
 
@@ -89,6 +93,19 @@ export default {
     if (role === "browser") {
       if (path === "/status" && request.method === "GET") return stub.fetch(request);
       if (/^\/cmd\/[0-9a-f-]{36}$/.test(path) && request.method === "GET") return stub.fetch(request);
+      if (path === "/fleet/status" && request.method === "GET") return stub.fetch(request);
+      if (path.startsWith("/fleet/frame/") && request.method === "GET") {
+        const vm = decodeURIComponent(path.slice("/fleet/frame/".length));
+        if (!/^[a-z0-9._-]{1,64}$/i.test(vm)) return json({ ok: false, error: "invalid vm name" }, 400);
+        return downloadFleetFrame(env, vm);
+      }
+      if (/^\/fleet\/input\/[a-z0-9._-]{1,64}(\/[0-9a-f-]{36})?$/i.test(path)) {
+        const body = request.method === "POST" ? await safeJson<FleetInputBody>(request.clone()) : null;
+        if (request.method === "POST" && !allowedFleetInput(body)) {
+          return json({ ok: false, error: "browser input refused" }, 403);
+        }
+        return stub.fetch(request);
+      }
       if (path === "/cmd" && request.method === "POST") {
         const body = await safeJson<{ action?: string; params?: Record<string, unknown> }>(request.clone());
         if (!allowedBrowserCommand(body)) return json({ ok: false, error: "browser command refused" }, 403);
@@ -132,6 +149,14 @@ export default {
       if (request.method === "GET") return downloadFleetFrame(env, vm);
     }
 
+    // ── fleet input (per-VM command queue in the DO) ──────────────
+    if (path === "/fleet/poll" && request.method === "GET") {
+      return stub.fetch(request); // host long-poll
+    }
+    if (path.startsWith("/fleet/input/")) {
+      return stub.fetch(request);
+    }
+
     // ── usage event ingestion / inspection ───────────────────────
     if (path === "/usage" && request.method === "POST") {
       if (env.ALLOW_USAGE_UPLOADS !== "1") return json({ ok: false, error: "usage uploads disabled" }, 403);
@@ -170,6 +195,31 @@ async function listSnapshots(env: Env): Promise<Response> {
     uploaded: o.uploaded.toISOString(),
   }));
   return json({ ok: true, snapshots: items });
+}
+
+interface FleetInputBody {
+  action?: string;
+  nx?: number;
+  ny?: number;
+  text?: string;
+  key?: string;
+}
+
+function allowedFleetInput(body: FleetInputBody | null): boolean {
+  if (!body || typeof body.action !== "string") return false;
+  if (body.action === "click" || body.action === "move") {
+    return typeof body.nx === "number" && Number.isFinite(body.nx) && body.nx >= 0 && body.nx <= 1
+      && typeof body.ny === "number" && Number.isFinite(body.ny) && body.ny >= 0 && body.ny <= 1;
+  }
+  if (body.action === "type") {
+    return typeof body.text === "string" && body.text.length <= 2000;
+  }
+  if (body.action === "key") {
+    return typeof body.key === "string" && body.key.length <= 24
+      && ["return", "enter", "escape", "esc", "tab", "delete", "backspace", "space",
+          "up", "down", "left", "right", "home", "end", "pageup", "pagedown"].includes(body.key);
+  }
+  return false;
 }
 
 function allowedBrowserCommand(body: { action?: string; params?: Record<string, unknown> } | null): boolean {
@@ -455,6 +505,16 @@ const STALE_THRESHOLD_MS = 90_000; // 3 missed heartbeats (30s interval)
 const HEARTBEAT_HISTORY_MAX = 60; // ~30 min of history
 const USAGE_EVENT_HISTORY_MAX = 200;
 
+interface FleetCommand {
+  id: string;
+  vm: string;
+  action: string;
+  params: Record<string, unknown>;
+  createdAt: number;
+  result?: unknown;
+  completedAt?: number;
+}
+
 export class ControlRelay implements DurableObject {
   private queue: Command[] = [];
   private results: Map<string, Command> = new Map();
@@ -467,8 +527,33 @@ export class ControlRelay implements DurableObject {
   private lastStateChange = 0;
   private previousState = "unknown";
   private waitingPollers: Array<{ resolve: (r: Response) => void; timer: number }> = [];
+  private fleetQueue: FleetCommand[] = [];
+  private fleetResults: Map<string, FleetCommand> = new Map();
 
-  constructor(private state: DurableObjectState) {}
+  constructor(private state: DurableObjectState) {
+    // Restore the fleet input queue so commands queued while the host poller
+    // is reconnecting are not lost across DO eviction or redeploys.
+    this.state.blockConcurrencyWhile(async () => {
+      const stored = await this.state.storage.get<FleetCommand[]>("fleetQueue");
+      if (stored && stored.length > 0) this.fleetQueue = stored;
+    });
+  }
+
+  private async persistFleetQueue() {
+    await this.state.storage.put("fleetQueue", this.fleetQueue);
+  }
+
+  private async persistFleetResult(cmd: FleetCommand) {
+    await this.state.storage.put(`fleetResult:${cmd.id}`, cmd);
+    // keep the persisted result set bounded
+    const list = await this.state.storage.list<FleetCommand>({ prefix: "fleetResult:", limit: 200 });
+    const keys = [...list.keys()];
+    if (keys.length > 100) {
+      for (const key of keys.slice(0, keys.length - 100)) {
+        await this.state.storage.delete(key);
+      }
+    }
+  }
 
   async fetch(request: Request): Promise<Response> {
     const url = new URL(request.url);
@@ -632,6 +717,66 @@ export class ControlRelay implements DurableObject {
           isStale: lastTs === 0 || (now - lastTs) > STALE_THRESHOLD_MS,
         },
       });
+    }
+
+    // GET /fleet/poll — mac polls for next fleet input command.
+    // Returns immediately so it can never block a concurrent /fleet/input POST
+    // (Durable Object input-gate serialization otherwise deadlocks the queue).
+    if (path === "/fleet/poll" && method === "GET") {
+      const next = this.fleetQueue.shift();
+      if (next) {
+        await this.persistFleetQueue();
+        return json({ ok: true, command: next });
+      }
+      return json({ ok: true, command: null });
+    }
+
+    // POST /fleet/input/:vm/result/:id — mac posts the applied result
+    if (path.startsWith("/fleet/input/") && path.includes("/result/") && method === "POST") {
+      const id = path.split("/")[5];
+      const body = await request.json();
+      const cmd = this.fleetResults.get(id)
+        ?? { id, vm: "unknown", action: "unknown", params: {}, createdAt: 0 };
+      cmd.result = body;
+      cmd.completedAt = Date.now();
+      this.fleetResults.set(id, cmd);
+      await this.persistFleetResult(cmd);
+      return json({ ok: true });
+    }
+
+    if (path.startsWith("/fleet/input/") && method === "POST") {
+      const vm = decodeURIComponent(path.slice("/fleet/input/".length));
+      if (!/^[a-z0-9._-]{1,64}$/i.test(vm)) {
+        return json({ ok: false, error: "invalid vm name" }, 400);
+      }
+      const body = (await request.json()) as FleetInputBody;
+      const cmd: FleetCommand = {
+        id: crypto.randomUUID(),
+        vm,
+        action: body.action ?? "unknown",
+        params: {
+          nx: body.nx, ny: body.ny, text: body.text, key: body.key,
+        },
+        createdAt: Date.now(),
+      };
+      this.fleetQueue.push(cmd);
+      this.fleetResults.set(cmd.id, cmd);
+      await this.persistFleetQueue();
+      await this.persistFleetResult(cmd);
+      return json({ ok: true, id: cmd.id, vm, action: cmd.action });
+    }
+
+    // GET /fleet/input/:vm/:id — client reads input result
+    if (path.startsWith("/fleet/input/") && method === "GET") {
+      const parts = path.split("/");
+      const id = parts[4];
+      let cmd = this.fleetResults.get(id);
+      if (!cmd) {
+        cmd = (await this.state.storage.get<FleetCommand>(`fleetResult:${id}`)) ?? undefined;
+      }
+      if (!cmd) return json({ ok: true, status: "pending" });
+      if (!cmd.completedAt) return json({ ok: true, status: "pending" });
+      return json({ ok: true, status: "completed", result: cmd.result });
     }
 
     // GET /status/history — full heartbeat history
