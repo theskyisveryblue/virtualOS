@@ -82,8 +82,12 @@ def _post_json(url: str, token: str, payload: dict) -> int:
     return _push("POST", url, token, json.dumps(payload).encode("utf-8"), "application/json")
 
 
-def control_once(relay: str, supervisor: str, token: str, verbose: bool) -> None:
-    """Long-poll the relay for one inbound input command and apply it."""
+def control_once(relay: str, supervisor: str, token: str, verbose: bool) -> bool:
+    """Long-poll the relay for one inbound input command and apply it.
+
+    Returns True when a command was applied, False when the poll came back empty
+    so the caller can pace itself instead of spinning.
+    """
     relay = relay.rstrip("/")
     supervisor = supervisor.rstrip("/")
     debug = os.environ.get("VOS_CONTROL_DEBUG") == "1"
@@ -91,7 +95,7 @@ def control_once(relay: str, supervisor: str, token: str, verbose: bool) -> None
     if debug:
         print(f"poll -> {polled}", flush=True)
     if not polled or not polled.get("command"):
-        return
+        return False
     cmd = polled["command"]
     vm = cmd.get("vm")
     action = cmd.get("action")
@@ -111,11 +115,29 @@ def control_once(relay: str, supervisor: str, token: str, verbose: bool) -> None
     _post_json(f"{relay}/fleet/input/{vm}/result/{cmd.get('id')}", token, result)
     if verbose:
         print(f"input {vm} {action} -> supervisor {status}")
+    return True
 
 
 def control_loop(relay: str, supervisor: str, token: str, verbose: bool) -> None:
+    """Long-poll for inbound input forever.
+
+    This runs on a daemon thread beside the push loop, so an unhandled exception
+    here would kill control silently while the heartbeat stays fresh — the exact
+    failure that leaves browser commands pending forever. Catch everything, back
+    off, and keep going.
+    """
+    backoff = 1.0
     while True:
-        control_once(relay, supervisor, token, verbose)
+        try:
+            worked = control_once(relay, supervisor, token, verbose)
+            backoff = 1.0
+            if not worked:
+                time.sleep(0.5)  # the poll returned empty; do not hot-spin
+        except Exception as exc:  # noqa: BLE001 - the loop must never die
+            print(f"control loop error: {exc!r}; retrying in {backoff:.0f}s",
+                  file=sys.stderr, flush=True)
+            time.sleep(backoff)
+            backoff = min(backoff * 2, 30.0)
 
 
 def push_once(relay: str, supervisor: str, token: str, verbose: bool) -> int:
