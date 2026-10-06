@@ -1122,6 +1122,20 @@ class Handler(BaseHTTPRequestHandler):
     cached_frame_at = 0.0
     frame_cache_ttl_seconds = 0.25
 
+    def end_headers(self):
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header(
+            "Access-Control-Allow-Headers",
+            "Authorization, Content-Type, X-VOS-Token, X-Remote-Token",
+        )
+        self.send_header("Access-Control-Max-Age", "86400")
+        super().end_headers()
+
+    def do_OPTIONS(self):
+        self.send_response(204)
+        self.end_headers()
+
     @classmethod
     def get_latest_frame(
         cls,
@@ -1245,7 +1259,7 @@ class Handler(BaseHTTPRequestHandler):
       <option value=\"screen\">screen</option>
     </select>
     <label>Interval (ms)</label>
-    <input id=\"interval\" type=\"number\" value=\"1000\" min=\"200\" step=\"100\" />
+    <input id=\"interval\" type=\"number\" value=\"1000\" min=\"500\" step=\"100\" />
     <button id=\"toggle\">Start</button>
     <button id=\"single\">Single Frame</button>
     <span id=\"status\">idle</span>
@@ -1294,8 +1308,18 @@ class Handler(BaseHTTPRequestHandler):
     const controlStatus = document.getElementById('controlStatus');
     const systemStatus = document.getElementById('systemStatus');
     let timer = null;
+    let running = false;
+    let pending = false;
+
+    function scheduleNext() {
+      if (!running || document.visibilityState !== 'visible') return;
+      const ms = Math.max(500, Number(intervalInput.value || 1000));
+      timer = setTimeout(pullOnce, ms);
+    }
 
     function pullOnce() {
+      if (pending || document.visibilityState !== 'visible') return;
+      pending = true;
       const ts = Date.now();
       const app = encodeURIComponent((captureApp.value || '').trim());
       const source = encodeURIComponent(captureSource.value || 'window');
@@ -1305,22 +1329,31 @@ class Handler(BaseHTTPRequestHandler):
 
     frame.onload = () => { statusEl.textContent = `ok ${new Date().toLocaleTimeString()}`; };
     frame.onerror = () => { statusEl.textContent = `error ${new Date().toLocaleTimeString()}`; };
+    frame.addEventListener('load', () => { pending = false; scheduleNext(); });
+    frame.addEventListener('error', () => { pending = false; scheduleNext(); });
     single.onclick = pullOnce;
 
     toggle.onclick = () => {
-      if (timer) {
-        clearInterval(timer);
+      if (running) {
+        running = false;
+        clearTimeout(timer);
         timer = null;
         toggle.textContent = 'Start';
         statusEl.textContent = 'stopped';
         return;
       }
-      const ms = Math.max(200, Number(intervalInput.value || 1000));
+      const ms = Math.max(500, Number(intervalInput.value || 1000));
+      running = true;
       pullOnce();
-      timer = setInterval(pullOnce, ms);
       toggle.textContent = 'Stop';
       statusEl.textContent = `running every ${ms}ms`;
     };
+    document.addEventListener('visibilitychange', () => {
+      clearTimeout(timer);
+      timer = null;
+      if (document.visibilityState === 'visible' && running && !pending) pullOnce();
+      else if (running) statusEl.textContent = 'paused while hidden';
+    });
 
     async function post(path, payload) {
       const res = await fetch(path, {
@@ -1776,12 +1809,14 @@ class Handler(BaseHTTPRequestHandler):
 def main():
     global REQUIRED_AUTH_TOKEN
     parser = argparse.ArgumentParser(description="Simple virtualOS stream + control server")
-    parser.add_argument("--host", default="0.0.0.0")
+    parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", default=8899, type=int)
     parser.add_argument("--no-bonjour", action="store_true", help="disable Bonjour advertisement")
     parser.add_argument("--auth-token", default=os.getenv("VOS_AUTH_TOKEN", ""), help="require this token for non-health endpoints")
     args = parser.parse_args()
     REQUIRED_AUTH_TOKEN = args.auth_token.strip()
+    if args.host not in ("127.0.0.1", "localhost", "::1") and not REQUIRED_AUTH_TOKEN:
+        parser.error("a VOS_AUTH_TOKEN or --auth-token is required for a network-wide bind")
 
     VM_LOG_MONITOR.start()
     atexit.register(VM_LOG_MONITOR.stop)
@@ -1790,7 +1825,7 @@ def main():
 
     server = ThreadingHTTPServer((args.host, args.port), Handler)
     advertiser: BonjourAdvertiser | None = None
-    if not args.no_bonjour:
+    if not args.no_bonjour and args.host not in ("127.0.0.1", "localhost", "::1"):
         advertiser = BonjourAdvertiser(args.port)
         ok, msg = advertiser.start()
         if ok:

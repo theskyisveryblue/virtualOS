@@ -6,10 +6,10 @@ Simple local HTTP server that exposes a JPEG frame endpoint.
 
 ```bash
 cd /Users/theone/Documents/GitHub/virtualOS
-python3 tools/virtualos_stream_server/server.py --host 0.0.0.0 --port 8899
+python3 tools/virtualos_stream_server/server.py --host 127.0.0.1 --port 8899
 ```
 
-Private mode with token (recommended):
+To serve the LAN, set a token:
 
 ```bash
 cd /Users/theone/Documents/GitHub/virtualOS
@@ -25,10 +25,11 @@ VOS_AUTH_TOKEN='replace-with-strong-token' \
 python3 tools/virtualos_stream_server/server.py --host 127.0.0.1 --port 8899 --no-bonjour
 ```
 
-By default the server advertises itself on LAN via Bonjour as `_virtualosremote._tcp`.
+When bound to a LAN address, the server advertises itself via Bonjour as `_virtualosremote._tcp`.
 Disable this with:
 
 ```bash
+VOS_AUTH_TOKEN='replace-with-strong-token' \
 python3 tools/virtualos_stream_server/server.py --host 0.0.0.0 --port 8899 --no-bonjour
 ```
 
@@ -66,7 +67,8 @@ tools/virtualos_stream_server/smoke_test.sh 127.0.0.1 8899
 ```
 
 ## Notes
-- macOS may prompt for **Screen Recording** permission. Allow it for Terminal.
+- Guest VM frames from the app's local `/vm/screen` endpoint do not use macOS Screen Recording. The app no longer starts a host-screen capture server at launch.
+- The separate host-window stream server may request **Screen Recording** permission for its launcher (for example, Terminal). Grant it only if you want host-window streaming.
 - If window capture fails, server falls back to full-screen capture.
 - For control endpoints, grant **Accessibility** permission to Terminal as well.
 - If the iOS app says `Live` but image is black, the captured `virtualOS` window is currently black. Click/focus the running VM window in `virtualOS` first, then pull a new frame.
