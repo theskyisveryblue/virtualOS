@@ -201,16 +201,32 @@ def main(argv=None) -> int:
     if args.control:
         import threading
 
-        thread = threading.Thread(
+        ctrl_thread = threading.Thread(
             target=control_loop,
             args=(args.relay, args.supervisor, args.token, args.verbose),
             daemon=True,
+            name="control",
         )
-        thread.start()
+        ctrl_thread.start()
 
     try:
         while True:
-            push_once(args.relay, args.supervisor, args.token, args.verbose)
+            # A control thread should never die (control_loop guards itself),
+            # but if it ever does, resurrect it so browser input keeps working
+            # while the heartbeat stays fresh.
+            if args.control and not ctrl_thread.is_alive():
+                print("control thread died; restarting", file=sys.stderr, flush=True)
+                ctrl_thread = threading.Thread(
+                    target=control_loop,
+                    args=(args.relay, args.supervisor, args.token, args.verbose),
+                    daemon=True,
+                    name="control",
+                )
+                ctrl_thread.start()
+            try:
+                push_once(args.relay, args.supervisor, args.token, args.verbose)
+            except Exception as exc:  # noqa: BLE001 - keep the pulse alive
+                print(f"push error: {exc!r}", file=sys.stderr, flush=True)
             time.sleep(max(0.5, args.interval))
     except KeyboardInterrupt:
         return 0

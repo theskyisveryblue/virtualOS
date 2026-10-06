@@ -10,6 +10,7 @@
 #   6. frame endpoints are routed (supervisor + mux)
 #   7. per-VM input verbs are routed and bad bodies rejected
 #   8. the brain action normalizer validates key/type/click offline
+#   9. the fleet_push control loop survives a transient failure
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
@@ -33,42 +34,42 @@ cleanup() {
 pass() { echo "  PASS  $1"; }
 fail() { echo "  FAIL  $1"; exit 1; }
 
-echo "[1/8] build supervisor"
+echo "[1/9] build supervisor"
 swiftc -O -framework Virtualization -framework AppKit "$FLEET_DIR/FleetSupervisor.swift" -o "$BIN" >/dev/null 2>&1
 [[ -x "$BIN" ]] && pass "compiled" || fail "compile"
 
 # Fake bundles so the supervisor has something to enumerate.
 mkdir -p "$TMP_ROOT/vm-a.bundle" "$TMP_ROOT/vm-b.bundle"
 
-echo "[2/8] launch supervisor"
+echo "[2/9] launch supervisor"
 "$BIN" --root "$TMP_ROOT" --names vm-a,vm-b --http-port "$HTTP_PORT" >/tmp/vos-fleet-selftest-sup.log 2>&1 &
 SP=$!
 sleep 1
 curl -sf "$SUP_URL/fleet/health" >/dev/null && pass "health" || fail "supervisor health"
 
-echo "[3/8] nested virtualization capability"
+echo "[3/9] nested virtualization capability"
 CAP="$(curl -sf "$SUP_URL/fleet/capability")"
 echo "    $CAP"
 echo "$CAP" | grep -q '"ok":true' && pass "capability reported" || fail "capability"
 
-echo "[4/8] multiplexer"
+echo "[4/9] multiplexer"
 python3 "$PY" --supervisor "$SUP_URL" serve --port "$MUX_PORT" >/tmp/vos-fleet-selftest-mux.log 2>&1 &
 MP=$!
 sleep 1
 curl -sf "$MUX_URL/health" >/dev/null && pass "mux health" || fail "mux health"
 curl -sf "$MUX_URL/fleet/status" | grep -Eq '"count": ?2' && pass "mux fans out status" || fail "mux status"
 
-echo "[5/8] per-VM control routes"
+echo "[5/9] per-VM control routes"
 python3 "$PY" --supervisor "$SUP_URL" start vm-a | grep -Eq '"ok": ?true' && pass "start vm-a accepted" || fail "start vm-a"
 python3 "$PY" --supervisor "$SUP_URL" stop vm-a | grep -Eq '"ok": ?true' && pass "stop vm-a accepted" || fail "stop vm-a"
 
-echo "[6/8] frame endpoint"
+echo "[6/9] frame endpoint"
 CODE_SUP="$(curl -s -o /dev/null -w '%{http_code}' "$SUP_URL/fleet/frame/vm-a")"
 [[ "$CODE_SUP" == "503" ]] && pass "supervisor frame route (503 no running vm)" || fail "supervisor frame route ($CODE_SUP)"
 CODE_MUX="$(curl -s -o /dev/null -w '%{http_code}' "$MUX_URL/fleet/frame/vm-a")"
 [[ "$CODE_MUX" == "503" ]] && pass "mux frame proxy (503 no running vm)" || fail "mux frame proxy ($CODE_MUX)"
 
-echo "[7/8] per-VM input route (accepts the whole verb surface)"
+echo "[7/9] per-VM input route (accepts the whole verb surface)"
 for body in \
   '{"action":"click","nx":0.5,"ny":0.5}' \
   '{"action":"move","nx":0.1,"ny":0.9}' \
@@ -83,7 +84,7 @@ CODE_BAD="$(curl -s -o /dev/null -w '%{http_code}' -X POST -H 'Content-Type: app
   -d 'not json' "$SUP_URL/fleet/input/vm-a")"
 [[ "$CODE_BAD" == "400" ]] && pass "input verbs routed, bad body rejected (400)" || fail "bad body returned $CODE_BAD"
 
-echo "[8/8] brain action normalizer (offline, no model)"
+echo "[8/9] brain action normalizer (offline, no model)"
 python3 - "$FLEET_DIR/brain.py" <<'PY' && pass "normalizer validates key/type/click" || fail "brain normalizer"
 import importlib.util, json, sys
 path = sys.argv[1]
@@ -120,6 +121,28 @@ for bad in ({"type": "key", "key": "x"*40}, {"type": "type", "text": ""},
             {"type": "click", "point_2d": [5000, 0]}):
     if make(bad).get("type") != "abstain":
         raise SystemExit("should have abstained: %s" % bad)
+PY
+
+echo "[9/9] fleet_push control loop survives a transient failure (offline)"
+python3 - "$FLEET_DIR/fleet_push.py" <<'PY' && pass "control loop is unkillable" || fail "control loop"
+import importlib.util, threading, sys, time
+path = sys.argv[1]
+spec = importlib.util.spec_from_file_location("fleet_push", path)
+fp = importlib.util.module_from_spec(spec)
+sys.modules["fleet_push"] = fp
+spec.loader.exec_module(fp)
+calls = {"n": 0}
+def boom(*a, **k):
+    calls["n"] += 1
+    raise RuntimeError("transient relay/proxy error")
+fp.control_once = boom
+thread = threading.Thread(target=fp.control_loop,
+                          args=("http://x", "http://y", "tok", False), daemon=True)
+thread.start()
+time.sleep(3.0)
+if not thread.is_alive() or calls["n"] < 2:
+    raise SystemExit("control_loop died or did not retry (alive=%s, tries=%d)"
+                     % (thread.is_alive(), calls["n"]))
 PY
 
 echo "ALL FLEET SELF-TESTS PASSED"
