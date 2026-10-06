@@ -15,6 +15,7 @@
 #   runbook.sh frame <vm> [out.jpg]   # capture one frame
 #   runbook.sh desktop <vm> [timeout] # poll frames until non-blank, save it
 #   runbook.sh stream <vm> [relay]    # push status + a live frame to Cloudflare
+#   runbook.sh live [vm]              # bring the whole live stack up (idempotent)
 #   runbook.sh netboot [src] [name]   # boot a macOS bundle with its disk over NBD
 #   runbook.sh cloud [labs|r2|checkpoint] # storage plane: labs, real R2 boot, real R2 checkpoint
 #   runbook.sh stop                   # stop the launch agent / supervisor
@@ -373,6 +374,7 @@ case "${1:-doctor}" in
   stream) shift; stream "${1:-}" ;;
   netboot) shift; netboot "${1:-}" "${2:-}" "${3:-}" ;;
   cloud) shift; cloud "${1:-labs}" ;;
+  live) shift; exec "$(cd "$(dirname "$0")" && pwd)/go-live.sh" "${1:-}" ;;
   stop) stop ;;
   clean) clean ;;
   *) sed -n '2,40p' "$0" | sed 's/^# \{0,1\}//'; exit 2 ;;
