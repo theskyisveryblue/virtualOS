@@ -29,9 +29,14 @@ These are measured results in this repo, not intentions:
 - **Remote, live, multi-host.** The fleet streams to a Cloudflare worker; a browser
   view shows status, live frames, and start/stop; heartbeats are verified fresh.
 - **Self-healing live stack.** One idempotent command (`runbook.sh live`) converges
-  supervisor + VM + stream loop + relay.
+  supervisor + VM + stream loop + relay, and a watchdog LaunchAgent converges it
+  automatically when the relay heartbeat goes stale (proven by breaking the stack
+  and watching it heal).
 - **Guest input works.** Single-guest `/console` drives the guest's own
   keyboard/mouse and returns live frames.
+- **A browser drives any VM.** The relay carries per-VM `move`/`click`/`key`/`type`
+  to the host poller and the result back; proven live from an operator holding
+  only the browser token, off the host's LAN.
 
 ## What is not true yet (the honest gap)
 
@@ -39,12 +44,13 @@ These are measured results in this repo, not intentions:
   but the guest kernel logs `kvm [1]: HYP mode not available` — **no EL2/HYP is
   handed through**. VM-in-VM is blocked by the platform today, not by our code.
 - **Windows.** No Windows path (VMPal uses its own engine; we have not built one).
-- **Fleet input parity.** The multi-VM web view streams frames but does not yet
-  drive per-VM keyboard/mouse the way the single-guest console does.
 - **Concurrency.** One host caps at 2 active VMs; we queue but do not yet *scale
   across Macs*.
 - **Speed of storage.** Full-disk cloud boot over the measured **0.44 MB/s** link
   is ~15 h — cloud boot must go through deltas, never brute force.
+- **Persistent Linux.** The Linux guest boots to a shell but its disk-rooted boot
+  fails: the Alpine initramfs ships no `ext4` module (see MANIFESTO). Bootable,
+  not yet durable.
 
 ## The one number that matters
 
@@ -112,8 +118,11 @@ result says the *incremental* machine is **~0.69% (~223 MB)**; a Linux machine i
 
 ## Phases
 
-**P0 — Stay live (now).** Keep the current stack converged; add a watchdog so the
-relay never goes stale. *Exit:* `plan-status.sh` shows live + heartbeats fresh.
+**P0 — Stay live (now).** Keep the current stack converged; the fleet watchdog
+(`tools/fleet/fleet-watchdog.sh`, installed as `com.virtualos.fleet-watchdog`)
+converges supervisor + VM + stream agent + heartbeat whenever the relay goes
+stale. *Exit met:* `plan-status.sh` shows live + heartbeats fresh, and the
+watchdog was proven to heal a deliberately broken stack.
 
 **P1 — Compact fleet.** Make shared base+delta the default disk; boot machine B
 from base+delta in the normal path; store deltas in R2; measure bytes/machine.
