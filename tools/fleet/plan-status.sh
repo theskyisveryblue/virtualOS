@@ -120,6 +120,13 @@ fi
 # --- P1: storage / compact fleet ------------------------------------------
 echo; echo "[P1] storage"
 [[ -f "$ROOT/tools/cloud_disk.py" ]] && line "disk plane" "present (cloud_disk.py)"
+# Run the real storage self-test so this pillar prints a number, not a claim.
+# Skipped under --quick because it does disk I/O.
+if [[ "$QUICK" != "--quick" && -x "$ROOT/tools/computer-space.sh" ]]; then
+  cd_json="$(bash "$ROOT/tools/computer-space.sh" --cloud-disk-self-test 2>/dev/null || true)"
+  st="$(printf '%s' "$cd_json" | python3 -c 'import sys,json;d=json.load(sys.stdin);print(d.get("cloud_disk_self_test","?"))' 2>/dev/null || echo "?")"
+  line "storage self-test" "${st} (checksum+overlay+reconnect)"
+fi
 r2cfg="$HOME/.config/virtualos/r2-mac-config.json"
 if [[ -f "$r2cfg" ]]; then
   line "r2 config" "$(python3 -c 'import json,sys;print(json.load(open(sys.argv[1]))["object_prefix"])' "$r2cfg" 2>/dev/null)"
