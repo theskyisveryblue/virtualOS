@@ -15,13 +15,16 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 FLEET_DIR="$ROOT/tools/fleet"
-BIN="$FLEET_DIR/fleet-supervisor"
 PY="$FLEET_DIR/fleet.py"
 HTTP_PORT="${VOS_FLEET_HTTP_PORT:-9210}"
 MUX_PORT="${VOS_FLEET_MUX_PORT:-9310}"
 SUP_URL="http://127.0.0.1:${HTTP_PORT}"
 MUX_URL="http://127.0.0.1:${MUX_PORT}"
 TMP_ROOT="$(mktemp -d)"
+# Build a SCRATCH supervisor. Never the production binary: overwriting the
+# signed supervisor with an unsigned build strips its virtualization entitlement
+# and the live stack fails to restart.
+BIN="$TMP_ROOT/fleet-supervisor-selftest"
 trap 'cleanup' EXIT
 
 cleanup() {
