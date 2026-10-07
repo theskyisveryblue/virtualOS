@@ -176,6 +176,18 @@ These are the scars. Every one of them is a claim we paid for.
   starts the VM but prints nothing, so it must be extracted first. This tiny
   guest is the cheap substrate for many computers and for nested VMs (generic
   platform + `VZLinuxBootLoader` is the only nested-capable boot path).
+- **A boot-only Linux guest is not yet a persistent one.** Booting to a shell is
+  not the same as a machine that keeps anything. `linux-persist-lab.sh` tried the
+  real thing: format the attached disk, lay down an Alpine rootfs, boot FROM the
+  disk (`root=/dev/vda`), write a marker, reboot, and check it survived. The
+  rootfs gets written and an init is installed, but the disk-rooted boot fails
+  with `mount /dev/vda failed: No such device`: this Alpine initramfs ships only
+  `squashfs` and `loop` as boot drivers and carries no `ext4`/`jbd2` module
+  (the kernel has ext4 as a module; the initramfs does not package it). So the
+  persistence gap is a specific, documented artifact problem — ship a matching
+  module or install a self-hosting kernel — not a Virtualization.framework limit.
+  The lab prints `persistent: false` and says exactly why, rather than claiming a
+  persistent guest.
 - **The nested-VM boundary, measured.** We tried VM-in-VM for real instead of
   trusting the API flag. On the M4 host,
   `VZGenericPlatformConfiguration.isNestedVirtualizationSupported` returns
