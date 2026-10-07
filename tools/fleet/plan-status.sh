@@ -116,6 +116,11 @@ elif [[ -f "$HOME/.config/virtualos/relay.env" ]]; then
 else
   line "relay" "no relay.env"
 fi
+# The watchdog that keeps it live. It runs on the host, so probe there.
+if [[ "$MINI_UP" == "1" ]]; then
+  wd="$(mini_run 'launchctl list 2>/dev/null | grep -q com.virtualos.fleet-watchdog && echo "on (mini)" || echo "off"' || echo "off")"
+  line "watchdog" "$wd"
+fi
 
 # --- P1: storage / compact fleet ------------------------------------------
 echo; echo "[P1] storage"
