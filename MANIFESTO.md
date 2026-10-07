@@ -194,6 +194,17 @@ These are the scars. Every one of them is a claim we paid for.
   enhancement — or a roaming operator sees a false "DOWN". `plan-status.sh` now
   does exactly that, and says "not reachable from here (Mini off-LAN)" for the
   data that genuinely lives on the host.
+- **A heartbeat is not a control channel.** The host's push loop and its control
+  loop share one process (push on the main thread, control on a daemon). We hit
+  the exact failure this invites: the control thread died while the heartbeat
+  kept flowing, so browser input hung as `pending` forever though the fleet
+  looked perfectly live. Two fixes, both earned against the live stack: the host
+  now guards the control loop (catch everything, exponential backoff, and
+  resurrect the thread if it ever dies) and the relay expires a never-completed
+  input after 60s with an explicit `expired` result. Proven end to end: with the
+  operator off the Mini's LAN and holding only the browser token, `move`, `click`,
+  `key`, and `type` all round-trip through the relay to the guest and return
+  `{ok:true,status:200}`.
 - **A browser can drive a guest with no host permission.** A remote client posts
   input to the relay (`POST /fleet/input/<vm>`), the host long-polls it
   (`GET /fleet/poll`), and the supervisor applies it to the guest's own
