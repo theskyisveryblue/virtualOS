@@ -504,6 +504,10 @@ interface HeartbeatEntry {
 const STALE_THRESHOLD_MS = 90_000; // 3 missed heartbeats (30s interval)
 const HEARTBEAT_HISTORY_MAX = 60; // ~30 min of history
 const USAGE_EVENT_HISTORY_MAX = 200;
+// A queued input that is polled by the host but never completed (the host died,
+// the poller's control thread stalled) must not hang "pending" forever. After
+// this long, report it as expired so a client is not misled into waiting.
+const INPUT_TTL_MS = 60_000;
 
 interface FleetCommand {
   id: string;
@@ -629,9 +633,17 @@ export class ControlRelay implements DurableObject {
       const id = path.split("/")[2];
       const cmd = this.results.get(id);
       if (!cmd) return json({ ok: true, status: "pending" });
-      if (!cmd.completedAt) return json({ ok: true, status: "pending" });
-      if (cmd.action === "frame") this.results.delete(id);
-      return json({ ok: true, status: "completed", result: cmd.result });
+      if (cmd.completedAt) {
+        if (cmd.action === "frame") this.results.delete(id);
+        return json({ ok: true, status: "completed", result: cmd.result });
+      }
+      if (Date.now() - cmd.createdAt > INPUT_TTL_MS) {
+        cmd.completedAt = Date.now();
+        cmd.result = { ok: false, status: "expired", reason: "host did not complete command in time" };
+        this.results.set(id, cmd);
+        return json({ ok: true, status: "completed", result: cmd.result });
+      }
+      return json({ ok: true, status: "pending" });
     }
 
     // POST /status — mac pushes heartbeat
@@ -775,8 +787,18 @@ export class ControlRelay implements DurableObject {
         cmd = (await this.state.storage.get<FleetCommand>(`fleetResult:${id}`)) ?? undefined;
       }
       if (!cmd) return json({ ok: true, status: "pending" });
-      if (!cmd.completedAt) return json({ ok: true, status: "pending" });
-      return json({ ok: true, status: "completed", result: cmd.result });
+      if (cmd.completedAt) {
+        return json({ ok: true, status: "completed", result: cmd.result });
+      }
+      // Never completed: expire it after the TTL so clients stop waiting.
+      if (Date.now() - cmd.createdAt > INPUT_TTL_MS) {
+        cmd.completedAt = Date.now();
+        cmd.result = { ok: false, status: "expired", reason: "host did not complete input in time" };
+        this.fleetResults.set(id, cmd);
+        await this.persistFleetResult(cmd);
+        return json({ ok: true, status: "completed", result: cmd.result });
+      }
+      return json({ ok: true, status: "pending" });
     }
 
     // GET /status/history — full heartbeat history
