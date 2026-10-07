@@ -14,7 +14,7 @@
 #   3. stream/control LaunchAgent alive     -> else kickstart it
 #   4. one push, then confirm freshness
 #
-# It refuses to thrash: a cooldown and a per-hour cap bound how often it acts.
+# It refuses to thrash: a per-hour cap bounds how often it acts.
 set -uo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
@@ -27,9 +27,7 @@ ONCE=0
 [[ "${1:-}" == "--once" ]] && ONCE=1
 
 CHECK_INTERVAL="${VOS_WD_INTERVAL:-30}"
-COOLDOWN="${VOS_WD_COOLDOWN:-120}"
 MAX_ACTIONS_PER_HOUR="${VOS_WD_MAX_ACTIONS:-10}"
-hot="${VOS_WD_STALE_SEC:-120}"   # treat as stale past this heartbeat age
 
 state_file="/tmp/vos-fleet-watchdog.state"
 log()  { printf '[%s] %s\n' "$(date '+%H:%M:%S')" "$*"; }
@@ -95,7 +93,7 @@ converge() {
       --token "$AUTH_TOKEN" >/dev/null 2>&1 ) || true
 }
 
-log "fleet-watchdog starting (interval ${CHECK_INTERVAL}s, stale>${hot}s, max ${MAX_ACTIONS_PER_HOUR}/hr)"
+log "fleet-watchdog starting (interval ${CHECK_INTERVAL}s, max ${MAX_ACTIONS_PER_HOUR} actions/hr)"
 while true; do
   load_relay || { log "no relay.env; nothing to watch"; exit 1; }
   state="$(heartbeat_state)"
