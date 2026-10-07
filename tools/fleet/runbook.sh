@@ -82,9 +82,28 @@ doctor() {
 
 capacity() {
   log "== capacity =="
-  local active
-  active="$(pgrep -f 'com.apple.Virtualization.VirtualMachine' | wc -l | tr -d ' ')"
-  log "active VM XPC processes: $active"
+  local xpc running
+  xpc="$(pgrep -f 'com.apple.Virtualization.VirtualMachine' | wc -l | tr -d ' ')"
+  # The honest VM count is the supervisor's, not the raw process count: each VM
+  # spawns one or more Virtualization XPC services, and stale ones linger.
+  running="$(curl -s -m 3 "http://127.0.0.1:$HTTP_PORT/fleet/status" 2>/dev/null \
+    | python3 -c 'import sys,json
+try:
+    d=json.load(sys.stdin)
+    print(sum(1 for i in d.get("instances",[]) if i.get("state")=="running"))
+except Exception:
+    print("")' 2>/dev/null)"
+  if [[ -n "$running" ]]; then
+    log "VMs running (supervisor): $running"
+  else
+    log "VMs running (supervisor): unknown (supervisor not responding)"
+  fi
+  log "Virtualization XPC services seen: $xpc"
+  if [[ -n "$running" ]] && (( xpc > running )); then
+    log "WARN: $((xpc - running)) XPC service(s) beyond the $running running VM(s);"
+    log "      these may be orphaned and still hold the host's VM cap. Inspect with:"
+    log "      pgrep -fl com.apple.Virtualization.VirtualMachine"
+  fi
   log "note: Apple caps concurrent active VMs per host. On this host the observed"
   log "      limit is 2 (including any already-running VM). Boot a clone only when"
   log "      the count is below the limit."
