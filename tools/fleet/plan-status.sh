@@ -77,6 +77,25 @@ mini_reachable() {
 }
 MINI_UP=0; mini_reachable && MINI_UP=1
 mini_run() { [[ "$MINI_UP" == "1" ]] || return 1; ssh -o BatchMode=yes -o ConnectTimeout=4 "$MINI" "$1" 2>/dev/null; }
+# True when this host IS the fleet host (the Mini), so files we normally fetch
+# over SSH are read locally instead. Detected a few ways because the Mini's
+# hostname (e.g. ais-Mac-mini) does not equal its SSH alias (mac-mini-ai): a
+# 'mini' in the hostname, the fleet home present locally, or the supervisor
+# already running here all mean "we are the host".
+ON_MINI=0
+case "${HOST,,}" in *mini*) ON_MINI=1 ;; esac
+[[ -d "$FLEET_HOME/tools/fleet" ]] && ON_MINI=1
+# Match the actual supervisor binary, not any process with "fleet-supervisor"
+# in its command line (e.g. an unrelated clone-fleet-supervisors.py).
+pgrep -f "[f]leet-supervisor --root" >/dev/null 2>&1 && ON_MINI=1
+read_host() { # read a file that lives on the fleet host, local or remote
+  if [[ "$ON_MINI" == "1" ]]; then
+    local path="${1/#\~/$HOME}"   # expand a leading ~ for the local read
+    [[ -f "$path" ]] && cat "$path" 2>/dev/null || true
+  else
+    mini_run "cat $1 2>/dev/null" || true
+  fi
+}
 
 echo "virtualOS plan-status  host=$HOST  $(date '+%Y-%m-%d %H:%M:%S')"
 sep
@@ -137,11 +156,8 @@ if [[ -f "$r2cfg" ]]; then
   line "r2 config" "$(python3 -c 'import json,sys;print(json.load(open(sys.argv[1]))["object_prefix"])' "$r2cfg" 2>/dev/null)"
 fi
 # The headline experiment result is produced where the clones live (the Mini).
-delta_json="/private/tmp/vos-exp-shared-base/delta/delta.json"
-if [[ ! -f "$delta_json" ]]; then
-  delta_json="$(mini_run "cat $delta_json 2>/dev/null" || true)"
-  delta_src=" [mini]"
-fi
+delta_json="$(read_host /private/tmp/vos-exp-shared-base/delta/delta.json)"
+if [[ "$ON_MINI" == "1" ]]; then delta_src=""; else delta_src=" [mini]"; fi
 if [[ -n "$delta_json" ]]; then
   python3 - "$delta_json" "$delta_src" <<'PY' 2>/dev/null || line "shared base+delta" "unparseable"
 import json, sys
@@ -155,8 +171,11 @@ else
 fi
 # The round-trip receipt: proves base + delta reconstructs a machine, not just
 # that the delta is small. Written by experiments/shared_base.py verify.
-receipt="$ROOT/tools/experiments/shared-base-receipt.json"
-[[ -f "$receipt" ]] || receipt="$(mini_run "cat ~/vos-fleet/experiments/shared-base-receipt.json 2>/dev/null" || true)"
+receipt=""
+[[ -f "$ROOT/tools/experiments/shared-base-receipt.json" ]] && receipt="$(cat "$ROOT/tools/experiments/shared-base-receipt.json")"
+# On the Mini the receipt is local (read above if committed); on the operator Mac
+# fetch it from the Mini's fleet home, using a literal path (not the Mac's $HOME).
+[[ -n "$receipt" ]] || receipt="$(read_host '~/vos-fleet/experiments/shared-base-receipt.json')"
 if [[ -n "$receipt" ]]; then
   python3 - "$receipt" <<'PY' 2>/dev/null || line "base+delta round-trip" "unparseable receipt"
 import json, sys
