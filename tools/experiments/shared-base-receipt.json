@@ -1,0 +1,12 @@
+{
+  "base": "prod-copy.img",
+  "blocks_checked": 491520,
+  "delta_blocks": 20343,
+  "delta_bytes": 1333198848,
+  "logical_bytes": 32212254720,
+  "machine": "vma-copy.img",
+  "mismatches": 0,
+  "note": "base + delta reconstructed and compared against the machine block-by-block",
+  "round_trip_ok": true,
+  "stray_delta_blocks": 0
+}
