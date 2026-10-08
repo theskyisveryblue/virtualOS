@@ -83,7 +83,8 @@ mini_run() { [[ "$MINI_UP" == "1" ]] || return 1; ssh -o BatchMode=yes -o Connec
 # 'mini' in the hostname, the fleet home present locally, or the supervisor
 # already running here all mean "we are the host".
 ON_MINI=0
-case "${HOST,,}" in *mini*) ON_MINI=1 ;; esac
+# macOS ships bash 3.2, which has no ${var,,} lowercase expansion; use tr.
+case "$(printf '%s' "$HOST" | tr '[:upper:]' '[:lower:]')" in *mini*) ON_MINI=1 ;; esac
 [[ -d "$FLEET_HOME/tools/fleet" ]] && ON_MINI=1
 # Match the actual supervisor binary, not any process with "fleet-supervisor"
 # in its command line (e.g. an unrelated clone-fleet-supervisors.py).
