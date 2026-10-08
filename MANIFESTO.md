@@ -245,6 +245,19 @@ These are the scars. Every one of them is a claim we paid for.
 - **Our knowledge must be reversible.** Every private API, binary, or protocol we
   lean on is paired with a way to inspect it and a note that it is unsupported.
   What we understand, we can rebuild; what we cannot inspect, we do not depend on.
+- **A test must never break the machine it protects.** Our fleet self-test built
+  the supervisor to the *production* path, overwriting the signed, entitled
+  binary with an unsigned one. The running process kept its entitlement, so
+  nothing failed until the next restart would have — and `runbook doctor` went
+  from `virtualization present` to `MISSING` after a test run. A self-test builds
+  to a scratch path, always. Found live, fixed, and re-signed.
+- **If you cannot deploy it, run it where it is.** The relay's input-expiry fix
+  was blocked from deploy (invalid Cloudflare token, no egress) — but
+  `wrangler dev --local` runs the Worker in miniflare with no network, so the
+  whole input lifecycle (auth roles, queue → poll → result, TTL expiry) is
+  asserted offline. A change you cannot ship you can still prove. Testing it also
+  surfaced that miniflare persists Durable Object state across restarts, so the
+  test drains the restored queue first — that durability is the feature, not a bug.
 
 ## How we work
 

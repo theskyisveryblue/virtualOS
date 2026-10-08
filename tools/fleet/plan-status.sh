@@ -197,11 +197,12 @@ line "windows" "no path"
 # --- P6: discipline --------------------------------------------------------
 echo; echo "[P6] discipline"
 line "manifesto" "$(grep -c '^- \*\*' "$ROOT/MANIFESTO.md" 2>/dev/null) earned entries"
-# The check count comes from the script itself so the scoreboard never drifts.
+# Count assertions (pass "..." call sites), not groups, so the scoreboard shows
+# the real check count and never drifts from the script.
 self_test="$FLEET_HOME/tools/fleet/self_test.sh"
 [[ -x "$self_test" ]] || self_test="$ROOT/tools/fleet/self_test.sh"
 if [[ -x "$self_test" ]]; then
-  checks="$(grep -cE '^echo "\[[0-9]+/[0-9]+\]' "$self_test" 2>/dev/null || echo '?')"
+  checks="$(grep -cE 'pass "' "$self_test" 2>/dev/null || echo '?')"
   line "fleet self-test" "available (${checks} checks)"
 elif [[ "$MINI_UP" == "1" ]]; then
   st="$(mini_run '[[ -x ~/vos-fleet/tools/fleet/self_test.sh ]] && echo "mini" || echo n/a' || echo n/a)"
@@ -209,6 +210,8 @@ elif [[ "$MINI_UP" == "1" ]]; then
 else
   line "fleet self-test" "not reachable from here (Mini off-LAN)"
 fi
+relay_test="$ROOT/tools/cloudflare/worker/test_relay_local.sh"
+[[ -f "$relay_test" ]] && line "relay test" "offline (wrangler dev --local)" || line "relay test" "missing"
 
 sep
 echo "verdict: a blocked hard truth is a result. drive the next number down."
