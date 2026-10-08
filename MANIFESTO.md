@@ -175,6 +175,14 @@ These are the scars. Every one of them is a claim we paid for.
   not one: a *fresh* clone differs from its base by ~0.7%, but a machine that has
   lived accumulates real changes (~4%). The method is the same; the freshness is
   the variable. `verify` is now a check in the fleet self-test.
+- **A proof is worth more when a guest can boot on it.** Showing that base+delta
+  *equals* a machine in a file comparison is half the job; the other half is that
+  a machine can *run* from it. So the disk plane now has a first-class
+  `base-delta-serve` backend: it serves a shared base's RAW and seeds the machine's
+  delta into the overlay before the guest attaches. A real NBD client — negotiate
+  `NBD_OPT_GO`, read a block the machine changed — gets the machine's bytes back,
+  not the base's, and the base is never written. `writes_to_base: 0`. The estimate,
+  the byte-for-byte proof, and the live socket now agree.
 - **Linux, not only macOS.** The box now boots a real Linux guest, not just macOS
   clones. An Alpine aarch64 kernel + 8.8 MB initramfs runs on
   Virtualization.framework, hands off to Alpine Init, and reaches an interactive

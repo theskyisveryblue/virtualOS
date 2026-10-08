@@ -46,6 +46,7 @@ Backends:
 | `objects` | packed local objects | `cloud_disk.py lab-serve ROOT OVERLAY PORT` |
 | `raw` | a raw file | `cloud_disk.py raw-lab-serve SOURCE OVERLAY PORT` |
 | `bundle` | a named fleet bundle's RAW | `cloud_disk.py bundle-serve ROOT NAME OVERLAY PORT` |
+| `base+delta` | a shared base bundle's RAW **plus a seeded per-machine delta** | `cloud_disk.py base-delta-serve ROOT BASE OVERLAY PORT DELTA_SQLITE` |
 | `r2-fake` | packed objects through the R2 read layer (fake HTTP) | `cloud_disk_vz_fake.py ROOT OVERLAY CACHE PORT` |
 | `r2` | real Cloudflare R2 | `cloud_disk.py r2-serve CONFIG MANIFEST_SHA256 40809` |
 
@@ -187,6 +188,37 @@ A macOS guest can be served this way (it uses `VZMacPlatformConfiguration` +
 `VZMacOSBootLoader`, and macOS only needs the disk over NBD to match the original
 bytes). `computer-space.sh --nbd-macos-clone-test` automates the whole thing but
 **stops the production VM**, so it must not be run unattended.
+
+## Base + delta served as one disk (the compact-fleet step)
+
+A fleet should keep **one immutable base** and a small per-machine delta, not N
+full disks. `base-delta-serve` makes that a first-class disk backend: it serves a
+named bundle's RAW as the immutable base and seeds the machine's delta (a
+`shared_base.py diff` sqlite) into the bounded overlay **before** the guest
+attaches, so a guest that reads this NBD sees the machine, not the base.
+
+```bash
+# 1. the delta (read-only; see tools/experiments/shared_base.py)
+python3 tools/experiments/shared_base.py diff \
+    ~/vos-fleet/base.bundle/Disk.img ~/vos-fleet/machine.bundle/Disk.img \
+    /private/tmp/vos-exp-shared-base/delta
+
+# 2. serve base + that delta as one disk
+VOS_NBD_BUNDLE_ROOT=~/vos-fleet VOS_NBD_BASE_NAME=base \
+VOS_NBD_BUNDLE_OVERLAY=/private/tmp/vos-nbd-bundle-machine/overlay.sqlite \
+VOS_NBD_BUNDLE_PORT=40951 VOS_NBD_BASE_DELTA=/private/tmp/vos-exp-shared-base/delta/delta.sqlite \
+tools/computer-space.sh --nbd-base-delta-serve
+```
+
+The base is never written (`writes_to_base: 0`); only the overlay grows, bounded
+by the delta plus whatever the guest later writes. Seeding is idempotent.
+`tools/experiments/base_delta_serve_test.py` proves it end to end: it starts the
+listener, negotiates `NBD_OPT_GO` as a real client, and asserts a block that the
+machine changed reads back as the machine's block (not the base's). It is the
+11th check in the fleet self-test.
+
+The host-free reserve is 10 GiB by default; `VOS_NBD_MIN_HOST_FREE` lowers it for
+a bounded lab on a full host without weakening the production default.
 
 ## Guardrails (do not remove)
 

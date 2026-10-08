@@ -37,42 +37,42 @@ cleanup() {
 pass() { echo "  PASS  $1"; }
 fail() { echo "  FAIL  $1"; exit 1; }
 
-echo "[1/10] build supervisor"
+echo "[1/11] build supervisor"
 swiftc -O -framework Virtualization -framework AppKit "$FLEET_DIR/FleetSupervisor.swift" -o "$BIN" >/dev/null 2>&1
 [[ -x "$BIN" ]] && pass "compiled" || fail "compile"
 
 # Fake bundles so the supervisor has something to enumerate.
 mkdir -p "$TMP_ROOT/vm-a.bundle" "$TMP_ROOT/vm-b.bundle"
 
-echo "[2/10] launch supervisor"
+echo "[2/11] launch supervisor"
 "$BIN" --root "$TMP_ROOT" --names vm-a,vm-b --http-port "$HTTP_PORT" >/tmp/vos-fleet-selftest-sup.log 2>&1 &
 SP=$!
 sleep 1
 curl -sf "$SUP_URL/fleet/health" >/dev/null && pass "health" || fail "supervisor health"
 
-echo "[3/10] nested virtualization capability"
+echo "[3/11] nested virtualization capability"
 CAP="$(curl -sf "$SUP_URL/fleet/capability")"
 echo "    $CAP"
 echo "$CAP" | grep -q '"ok":true' && pass "capability reported" || fail "capability"
 
-echo "[4/10] multiplexer"
+echo "[4/11] multiplexer"
 python3 "$PY" --supervisor "$SUP_URL" serve --port "$MUX_PORT" >/tmp/vos-fleet-selftest-mux.log 2>&1 &
 MP=$!
 sleep 1
 curl -sf "$MUX_URL/health" >/dev/null && pass "mux health" || fail "mux health"
 curl -sf "$MUX_URL/fleet/status" | grep -Eq '"count": ?2' && pass "mux fans out status" || fail "mux status"
 
-echo "[5/10] per-VM control routes"
+echo "[5/11] per-VM control routes"
 python3 "$PY" --supervisor "$SUP_URL" start vm-a | grep -Eq '"ok": ?true' && pass "start vm-a accepted" || fail "start vm-a"
 python3 "$PY" --supervisor "$SUP_URL" stop vm-a | grep -Eq '"ok": ?true' && pass "stop vm-a accepted" || fail "stop vm-a"
 
-echo "[6/10] frame endpoint"
+echo "[6/11] frame endpoint"
 CODE_SUP="$(curl -s -o /dev/null -w '%{http_code}' "$SUP_URL/fleet/frame/vm-a")"
 [[ "$CODE_SUP" == "503" ]] && pass "supervisor frame route (503 no running vm)" || fail "supervisor frame route ($CODE_SUP)"
 CODE_MUX="$(curl -s -o /dev/null -w '%{http_code}' "$MUX_URL/fleet/frame/vm-a")"
 [[ "$CODE_MUX" == "503" ]] && pass "mux frame proxy (503 no running vm)" || fail "mux frame proxy ($CODE_MUX)"
 
-echo "[7/10] per-VM input route (accepts the whole verb surface)"
+echo "[7/11] per-VM input route (accepts the whole verb surface)"
 for body in \
   '{"action":"click","nx":0.5,"ny":0.5}' \
   '{"action":"move","nx":0.1,"ny":0.9}' \
@@ -87,7 +87,7 @@ CODE_BAD="$(curl -s -o /dev/null -w '%{http_code}' -X POST -H 'Content-Type: app
   -d 'not json' "$SUP_URL/fleet/input/vm-a")"
 [[ "$CODE_BAD" == "400" ]] && pass "input verbs routed, bad body rejected (400)" || fail "bad body returned $CODE_BAD"
 
-echo "[8/10] brain action normalizer (offline, no model)"
+echo "[8/11] brain action normalizer (offline, no model)"
 python3 - "$FLEET_DIR/brain.py" <<'PY' && pass "normalizer validates key/type/click" || fail "brain normalizer"
 import importlib.util, json, sys
 path = sys.argv[1]
@@ -126,7 +126,7 @@ for bad in ({"type": "key", "key": "x"*40}, {"type": "type", "text": ""},
         raise SystemExit("should have abstained: %s" % bad)
 PY
 
-echo "[9/10] fleet_push control loop survives a transient failure (offline)"
+echo "[9/11] fleet_push control loop survives a transient failure (offline)"
 python3 - "$FLEET_DIR/fleet_push.py" <<'PY' && pass "control loop is unkillable" || fail "control loop"
 import importlib.util, threading, sys, time
 path = sys.argv[1]
@@ -148,7 +148,7 @@ if not thread.is_alive() or calls["n"] < 2:
                      % (thread.is_alive(), calls["n"]))
 PY
 
-echo "[10/10] shared-base disk: base + delta round-trips (offline)"
+echo "[10/11] shared-base disk: base + delta round-trips (offline)"
 SHARED_BASE="$FLEET_DIR/../experiments/shared_base.py"
 if [[ -f "$SHARED_BASE" ]]; then
   python3 "$SHARED_BASE" selftest 2>/dev/null \
@@ -157,6 +157,17 @@ if [[ -f "$SHARED_BASE" ]]; then
     || fail "shared base round trip"
 else
   fail "shared_base.py not synced to fleet (expected $SHARED_BASE)"
+fi
+
+echo "[11/11] base+delta served over a real NBD socket (offline)"
+BD_TEST="$FLEET_DIR/../experiments/base_delta_serve_test.py"
+if [[ -f "$BD_TEST" ]]; then
+  python3 "$BD_TEST" 2>/dev/null \
+    | grep -q '"base_delta_serve_test": "passed"' \
+    && pass "an NBD client reads the machine block from base+delta" \
+    || fail "base+delta NBD serve"
+else
+  fail "base_delta_serve_test.py not synced to fleet (expected $BD_TEST)"
 fi
 
 echo "ALL FLEET SELF-TESTS PASSED"

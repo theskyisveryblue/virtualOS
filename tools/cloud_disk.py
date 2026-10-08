@@ -657,6 +657,43 @@ def self_test():
         except OSError as error:
             assert error.errno == errno.ENOSPC
         raw.close()
+        # --- shared base + delta: seed a diff into an overlay and read it back ---
+        base_img = root / "base.img"
+        machine_img = root / "machine.img"
+        with base_img.open("wb") as stream:
+            for i in range(8):
+                stream.write(bytes([(i * 5) % 256]) * BLOCK if i % 2 == 0 else bytes(BLOCK))
+        machine_blocks = []
+        for i in range(8):
+            block = (b"\xab" * BLOCK if i == 3 else
+                     b"\xcd" * BLOCK if i == 5 else
+                     (bytes([(i * 5) % 256]) * BLOCK if i % 2 == 0 else bytes(BLOCK)))
+            machine_blocks.append(block)
+        with machine_img.open("wb") as stream:
+            for block in machine_blocks:
+                stream.write(block)
+        delta_sqlite = root / "delta.sqlite"
+        delta_db = sqlite3.connect(str(delta_sqlite))
+        delta_db.execute("CREATE TABLE blocks (idx INTEGER PRIMARY KEY, data BLOB NOT NULL)")
+        for i, block in enumerate(machine_blocks):
+            base_block = (bytes([(i * 5) % 256]) * BLOCK if i % 2 == 0 else bytes(BLOCK))
+            if block != base_block:
+                delta_db.execute("INSERT INTO blocks VALUES (?,?)", (i, block))
+        delta_db.commit()
+        delta_db.close()
+        bd_overlay = root / "base-delta-overlay.sqlite"
+        bd = RawDisk(base_img, bd_overlay, overlay_limit_bytes=64 * 1024**2,
+                     min_host_free_bytes=0)
+        seed_info = seed_overlay_from_delta(bd, bd_overlay, delta_sqlite)
+        assert seed_info["blocks_seeded"] == 2, seed_info
+        for i, block in enumerate(machine_blocks):
+            assert bd.read(i * BLOCK, BLOCK) == block, "base+delta readback mismatch"
+        bd.close()
+        # Re-seeding is idempotent and the base file is never modified.
+        bd = RawDisk(base_img, bd_overlay, overlay_limit_bytes=64 * 1024**2,
+                     min_host_free_bytes=0)
+        seed_overlay_from_delta(bd, bd_overlay, delta_sqlite)
+        bd.close()
         manifest = pack(source, root / "disk")
         malformed_root = root / "malformed"
         malformed_root.mkdir()
@@ -1073,7 +1110,8 @@ def self_test():
                           "overlay_write_evicted_cache": True,
                           "overlay_checkpoint_restore_verified": True,
                           "remote_overlay_checkpoint_fake_r2_verified": True,
-                          "overlay_limit_enforced": True}))
+                          "overlay_limit_enforced": True,
+                          "base_delta_seed_readback_verified": True}))
 
 
 def lab_path(path):
@@ -1272,6 +1310,103 @@ def bundle_serve(root, name, overlay, port, overlay_limit_bytes=2 * 1024**3,
                            event_name="bundle_nbd_connection")
 
 
+def seed_overlay_from_delta(disk, overlay, delta_sqlite, *, skip_zeros=False):
+    """Seed delta blocks into a RawDisk overlay so the disk becomes the machine.
+
+    The delta is exactly what `experiments/shared_base.py diff` writes: a SQLite
+    table `blocks(idx, data)`. Seeding only adds overlay rows (replacements of the
+    immutable base), so the base stays untouched and the overlay stays bounded by
+    the delta plus whatever the guest later writes. Idempotent: re-seeding the
+    same delta overwrites the same rows.
+    """
+    overlay = Path(overlay)
+    delta_sqlite = Path(delta_sqlite)
+    if not delta_sqlite.is_file():
+        raise ValueError("delta sqlite not found: %s" % delta_sqlite)
+    db = sqlite3.connect(str(overlay))
+    try:
+        db.execute("PRAGMA journal_mode=WAL")
+        db.execute("CREATE TABLE IF NOT EXISTS blocks (idx INTEGER PRIMARY KEY, data BLOB NOT NULL)")
+        rows = list(sqlite3.connect("file:%s?mode=ro" % delta_sqlite, uri=True)
+                    .execute("SELECT idx, data FROM blocks"))
+        seeded = 0
+        for idx, data in rows:
+            data = bytes(data)
+            if skip_zeros and data and data.count(0) == len(data):
+                continue
+            db.execute("INSERT OR REPLACE INTO blocks(idx,data) VALUES (?,?)", (int(idx), data))
+            seeded += 1
+        db.commit()
+    finally:
+        db.close()
+    return {"delta_sqlite": str(delta_sqlite), "blocks_seeded": seeded,
+            "blocks_total": len(rows)}
+
+
+def base_delta_serve(root, base_name, overlay, port, delta_sqlite=None,
+                     overlay_limit_bytes=2 * 1024**3, min_host_free_bytes=None):
+    """Serve a machine as its shared BASE plus a seeded DELTA over loopback NBD.
+
+    The base is a named bundle's RAW (immutable, read-only). The delta (a
+    `shared_base.py diff` sqlite) is seeded into the overlay before serving, so a
+    guest that attaches to this NBD sees the machine. Production is refused; the
+    only mutable state is the bounded overlay under /private/tmp.
+
+    The host-free reserve is lowered via VOS_NBD_MIN_HOST_FREE so a full host can
+    still run a bounded lab without weakening the production default (10 GiB).
+    """
+    if min_host_free_bytes is None:
+        min_host_free_bytes = int(os.environ.get("VOS_NBD_MIN_HOST_FREE", 10 * 1024**3))
+    root = Path(root).resolve()
+    production_root = (Path.home() / "VirtualOSMachines").resolve()
+    if root == production_root or str(root).startswith(str(production_root) + os.sep):
+        raise ValueError("refusing to serve the production machine store")
+    if not re.fullmatch(r"[A-Za-z0-9._-]+", base_name):
+        raise ValueError("invalid base bundle name")
+    base_disk = (root / (base_name + ".bundle")).resolve() / "Disk.img"
+    if base_disk.is_symlink() or not base_disk.is_file():
+        raise ValueError("base bundle disk must be a regular file")
+    production_disk = production_root / "virtualOS.bundle/Disk.img"
+    if production_disk.is_file() and os.path.samefile(base_disk, production_disk):
+        raise ValueError("refusing to serve the production RAW disk")
+    overlay = lab_path(overlay)
+    if overlay.name != "overlay.sqlite" or not re.fullmatch(
+            r"vos-nbd-bundle-[A-Za-z0-9._-]+", overlay.parent.name):
+        raise ValueError("bundle overlay must be a dedicated /private/tmp/vos-nbd-bundle-* dir")
+    if not 20000 <= port <= 60999:
+        raise ValueError("bundle NBD port must be between 20000 and 60999")
+    stat = os.statvfs(overlay.parent)
+    if stat.f_bavail * stat.f_frsize < min_host_free_bytes:
+        raise OSError(errno.ENOSPC, "base+delta serve needs host reserve plus overlay budget")
+
+    services = {"delta_seeded": 0, "delta_total": 0}
+    if delta_sqlite:
+        disk = RawDisk(base_disk, overlay, overlay_limit_bytes=overlay_limit_bytes,
+                       min_host_free_bytes=min_host_free_bytes)
+        try:
+            services = seed_overlay_from_delta(disk, overlay, delta_sqlite)
+        finally:
+            disk.close()
+
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as listener:
+        listener.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        listener.bind(("127.0.0.1", port))
+        listener.listen(1)
+        print(json.dumps({"base_delta_listener": "ready", "host": "127.0.0.1",
+                          "port": port, "base": base_name, "source": "shared_base",
+                          "delta_sqlite": delta_sqlite or None,
+                          "delta_seeded": services.get("blocks_seeded", 0),
+                          "delta_total": services.get("blocks_total", 0),
+                          "overlay_limit_bytes": overlay_limit_bytes,
+                          "writes_to_base": 0}), flush=True)
+        factory = lambda: RawDisk(base_disk, overlay, overlay_limit_bytes=overlay_limit_bytes,
+                                  min_host_free_bytes=min_host_free_bytes)
+        serve_nbd_sessions(listener, None, overlay, disk_factory=factory,
+                           max_connections=8, first_timeout=180,
+                           reconnect_timeout=45, idle_timeout=None,
+                           event_name="base_delta_nbd_connection")
+
+
 if __name__ == "__main__":
     if sys.argv[1:] == ["self-test"]:
         self_test()
@@ -1294,6 +1429,10 @@ if __name__ == "__main__":
         clone_serve(sys.argv[2])
     elif len(sys.argv) == 6 and sys.argv[1] == "bundle-serve":
         bundle_serve(sys.argv[2], sys.argv[3], sys.argv[4], int(sys.argv[5]))
+    elif len(sys.argv) == 7 and sys.argv[1] == "base-delta-serve":
+        # ROOT BASE_NAME OVERLAY PORT DELTA_SQLITE
+        base_delta_serve(sys.argv[2], sys.argv[3], sys.argv[4], int(sys.argv[5]),
+                         delta_sqlite=sys.argv[6])
     elif len(sys.argv) == 5 and sys.argv[1] == "r2-serve":
         r2_serve(sys.argv[2], sys.argv[3], int(sys.argv[4]))
     elif len(sys.argv) == 3 and sys.argv[1] == "r2-upload-clone":
@@ -1305,4 +1444,4 @@ if __name__ == "__main__":
         print(json.dumps({"r2_bundle_upload": upload_bundle_clone(
             sys.argv[2], sys.argv[3], sys.argv[4])}, sort_keys=True), flush=True)
     else:
-        raise SystemExit("usage: cloud_disk.py self-test|check-config PATH|lab-pack SOURCE DEST|lab-serve ROOT OVERLAY PORT|bundle-serve ROOT NAME OVERLAY PORT|r2-serve CONFIG MANIFEST_SHA256 PORT (use computer-space.sh)")
+        raise SystemExit("usage: cloud_disk.py self-test|check-config PATH|lab-pack SOURCE DEST|lab-serve ROOT OVERLAY PORT|bundle-serve ROOT NAME OVERLAY PORT|base-delta-serve ROOT BASE OVERLAY PORT DELTA_SQLITE|r2-serve CONFIG MANIFEST_SHA256 PORT (use computer-space.sh)")

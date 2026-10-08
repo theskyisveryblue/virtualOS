@@ -126,6 +126,11 @@ watchdog was proven to heal a deliberately broken stack.
 
 **P1 — Compact fleet.** Make shared base+delta the default disk; boot machine B
 from base+delta in the normal path; store deltas in R2; measure bytes/machine.
+*Progress:* the delta is measured and **proven** to reconstruct a machine
+byte-for-byte (`shared_base.py verify`, receipt committed), and the disk plane now
+serves a machine as **base + delta over NBD** (`--nbd-base-delta-serve`,
+verified by a real NBD client in the fleet self-test). *Remaining:* make it the
+default boot path in `go-live`, and store the delta in R2.
 
 **P2 — Agent control.** Per-VM input on the relay + a small verb surface +
 snapshot-as-undo; complete a scripted task inside a VM with no host prompts.

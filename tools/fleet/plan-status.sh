@@ -194,6 +194,13 @@ else
   line "base+delta round-trip" "no receipt — run experiments shared_base.py verify"
 fi
 
+# Base+delta is servable as one disk when the stable plane knows the backend.
+if grep -q "base-delta-serve" "$ROOT/tools/cloud_disk.py" 2>/dev/null; then
+  line "base+delta serve" "wired (--nbd-base-delta-serve over NBD)"
+else
+  line "base+delta serve" "not wired"
+fi
+
 # --- P2: agency / guest input ---------------------------------------------
 echo; echo "[P2] agency"
 line "single-guest input" "$([[ -f "$ROOT/tools/virtualos_stream_server/inputctl.swift" ]] && echo 'inputctl present' || echo 'missing')"

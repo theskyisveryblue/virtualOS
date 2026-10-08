@@ -77,3 +77,18 @@ instead of a full **30 GiB** copy — a 95.9% saving — and the reconstruction 
 proven exact, not asserted. (This is the *raw* delta before compression; the
 stable disk plane compresses the same changed blocks further.)
 
+## Serving base + delta as one disk
+
+`tools/experiments/base_delta_serve_test.py` turns the proof into a *bootable*
+disk: it serves a base bundle's RAW over NBD with the machine's delta seeded into
+the overlay, then connects as a real NBD client and asserts a changed block reads
+back as the machine's. The stable plane exposes this as
+`computer-space.sh --nbd-base-delta-serve` (see `tools/CLOUD_DISK.md`), and it is
+the 11th check in `tools/fleet/self_test.sh`.
+
+```bash
+python3 tools/experiments/base_delta_serve_test.py
+# {"base_delta_serve_test": "passed", "block3_is_machine_block": true,
+#  "delta_seeded": 2, ...}
+```
+
