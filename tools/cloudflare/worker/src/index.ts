@@ -39,6 +39,7 @@ export interface Env {
   AUTH_TOKEN: string;
   WEB_TOKEN?: string;
   ALLOW_USAGE_UPLOADS?: string;
+  INPUT_TTL_MS?: string;
 }
 
 interface UsageEvent {
@@ -534,7 +535,14 @@ export class ControlRelay implements DurableObject {
   private fleetQueue: FleetCommand[] = [];
   private fleetResults: Map<string, FleetCommand> = new Map();
 
-  constructor(private state: DurableObjectState) {
+  // Input TTL is overridable via the INPUT_TTL_MS var so local integration
+  // tests can exercise expiry without waiting a full minute.
+  private inputTtl(): number {
+    const override = Number(this.env?.INPUT_TTL_MS);
+    return Number.isFinite(override) && override > 0 ? override : INPUT_TTL_MS;
+  }
+
+  constructor(private state: DurableObjectState, private env: Env = {} as Env) {
     // Restore the fleet input queue so commands queued while the host poller
     // is reconnecting are not lost across DO eviction or redeploys.
     this.state.blockConcurrencyWhile(async () => {
@@ -637,7 +645,7 @@ export class ControlRelay implements DurableObject {
         if (cmd.action === "frame") this.results.delete(id);
         return json({ ok: true, status: "completed", result: cmd.result });
       }
-      if (Date.now() - cmd.createdAt > INPUT_TTL_MS) {
+      if (Date.now() - cmd.createdAt > this.inputTtl()) {
         cmd.completedAt = Date.now();
         cmd.result = { ok: false, status: "expired", reason: "host did not complete command in time" };
         this.results.set(id, cmd);
@@ -791,7 +799,7 @@ export class ControlRelay implements DurableObject {
         return json({ ok: true, status: "completed", result: cmd.result });
       }
       // Never completed: expire it after the TTL so clients stop waiting.
-      if (Date.now() - cmd.createdAt > INPUT_TTL_MS) {
+      if (Date.now() - cmd.createdAt > this.inputTtl()) {
         cmd.completedAt = Date.now();
         cmd.result = { ok: false, status: "expired", reason: "host did not complete input in time" };
         this.fleetResults.set(id, cmd);
