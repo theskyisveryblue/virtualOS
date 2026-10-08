@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
-    "test": "bash test_relay_local.sh",
+    "test": "bash run-local-test.sh",
     "setup": "wrangler r2 bucket create virtualos-remote-private && wrangler secret put AUTH_TOKEN"
   },
   "devDependencies": {

@@ -7,11 +7,13 @@
 # round-trip, TTL expiry) before deploying.
 #
 # Usage:
-#   # terminal 1 — start the local relay with test tokens and a tiny input TTL
+#   # easiest — starts an isolated local relay, runs this, tears it down:
+#   tools/cloudflare/worker/run-local-test.sh      # or: npm test
+#
+#   # manual — point it at an already-running dev server:
 #   cd tools/cloudflare/worker
 #   npx --no-install wrangler dev --local --port 8799 \
 #     --var AUTH_TOKEN:hosttok --var WEB_TOKEN:webtok --var INPUT_TTL_MS:2000
-#   # terminal 2
 #   tools/cloudflare/worker/test_relay_local.sh
 #
 # Env:
