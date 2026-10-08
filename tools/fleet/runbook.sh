@@ -18,7 +18,7 @@
 #   runbook.sh live [vm]              # bring the whole live stack up (idempotent)
 #   runbook.sh status                 # print the whole-project truth scoreboard
 #   runbook.sh netboot [src] [name]   # boot a macOS bundle with its disk over NBD
-#   runbook.sh cloud [labs|r2|checkpoint] # storage plane: labs, real R2 boot, real R2 checkpoint
+#   runbook.sh cloud [labs|r2|checkpoint|shared-base] # storage plane: labs, real R2 boot, real R2 checkpoint
 #   runbook.sh stop                   # stop the launch agent / supervisor
 #   runbook.sh clean                  # remove clones + agent (never ~/VirtualOSMachines)
 #
@@ -372,7 +372,14 @@ cloud() {
       [[ -r "$cfg" ]] || die "no config: set VOS_CLOUD_DISK_CONFIG or write $cfg"
       VOS_CLOUD_DISK_CONFIG="$cfg" bash "$cs" --cloud-disk-r2-checkpoint-lab
       ;;
-    *) die "cloud [labs|r2|checkpoint]";;
+    shared-base)
+      # Compact fleet: prove base+delta round-trips and serve it over NBD.
+      local exp="$(cd "$(dirname "$cs")/experiments" 2>/dev/null && pwd)"
+      [[ -d "$exp" ]] || die "experiments/ not found next to computer-space.sh"
+      python3 "$exp/shared_base.py" selftest
+      python3 "$exp/base_delta_serve_test.py"
+      ;;
+    *) die "cloud [labs|r2|checkpoint|shared-base]";;
   esac
 }
 clean() {
