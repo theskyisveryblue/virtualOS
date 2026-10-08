@@ -38,11 +38,42 @@ python3 tools/experiments/shared_base.py diff \
     ~/vos-fleet/vm-clone2.bundle/Disk.img \
     /private/tmp/vos-exp-shared-base/delta-vm-b
 
-# Or run both at once
+# Prove base + delta reproduces the machine byte-for-byte (no materialisation)
+python3 tools/experiments/shared_base.py verify \
+    ~/vos-fleet/vm-clone.bundle/Disk.img \
+    ~/vos-fleet/vm-clone2.bundle/Disk.img \
+    /private/tmp/vos-exp-shared-base/delta-vm-b
+
+# Fast synthetic round-trip guard (no real disks)
+python3 tools/experiments/shared_base.py selftest
+
+# Or run everything (selftest + report + diff + verify)
 tools/experiments/run.sh
 ```
 
 `report` prints `fleet_saving_pct`: how much smaller one shared copy is than
 storing every machine's disk independently. `diff` writes `delta.sqlite` (only
 the changed 64 KiB blocks) plus `delta.json`, which is exactly what a machine
-needs on top of the shared base to reproduce itself.
+needs on top of the shared base to reproduce itself. `verify` streams the base
+and machine and asserts that delta-over-base equals the machine block-for-block —
+it does not materialise the reconstructed disk, so it needs no extra space next
+to a 30 GiB image.
+
+## Measured on the Mac mini (real disks)
+
+`verify` run against the production macOS disk as base and the fleet machine
+`vm-a` as the machine (both read-only APFS COW clones under `/private/tmp`):
+
+```
+base       prod macOS disk   32,212,254,720 B   491,520 blocks
+machine    vm-a              32,212,254,720 B
+delta      20,326 blocks     1,332,084,736 B    (4.14% of blocks, 4.14% of bytes)
+verify     blocks_checked 491,520   mismatches 0   stray_delta_blocks 0
+           round_trip_ok true     (base + delta == vm-a, byte-for-byte)
+```
+
+So a second machine derived from the shared base costs **~1.33 GB** of delta
+instead of a full **30 GiB** copy — a 95.9% saving — and the reconstruction is
+proven exact, not asserted. (This is the *raw* delta before compression; the
+stable disk plane compresses the same changed blocks further.)
+

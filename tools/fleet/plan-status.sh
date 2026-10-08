@@ -153,6 +153,26 @@ elif [[ "$MINI_UP" == "0" ]]; then
 else
   line "shared base+delta" "not measured — run experiments/run.sh on the Mini"
 fi
+# The round-trip receipt: proves base + delta reconstructs a machine, not just
+# that the delta is small. Written by experiments/shared_base.py verify.
+receipt="$ROOT/tools/experiments/shared-base-receipt.json"
+[[ -f "$receipt" ]] || receipt="$(mini_run "cat ~/vos-fleet/experiments/shared-base-receipt.json 2>/dev/null" || true)"
+if [[ -n "$receipt" ]]; then
+  python3 - "$receipt" <<'PY' 2>/dev/null || line "base+delta round-trip" "unparseable receipt"
+import json, sys
+d = json.loads(sys.argv[1])
+ok = d.get("round_trip_ok")
+print("%-26s %s  delta=%.0f MB (%.2f%%)  blocks=%d  mismatches=%d" % (
+    "base+delta round-trip", "PROVEN" if ok else "FAILED",
+    d.get("delta_bytes", 0)/1e6,
+    100.0 * d.get("delta_bytes", 0) / max(1, d.get("logical_bytes", 1)),
+    d.get("blocks_checked", 0), d.get("mismatches", -1)))
+PY
+elif [[ "$MINI_UP" == "0" ]]; then
+  line "base+delta round-trip" "not reachable from here (Mini off-LAN)"
+else
+  line "base+delta round-trip" "no receipt — run experiments shared_base.py verify"
+fi
 
 # --- P2: agency / guest input ---------------------------------------------
 echo; echo "[P2] agency"

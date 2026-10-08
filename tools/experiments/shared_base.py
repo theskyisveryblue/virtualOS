@@ -16,6 +16,7 @@ Separation rules (see README.md):
 Commands:
   report BASE MACHINE...        block-level sharing + fleet storage estimate
   diff   BASE MACHINE OUT_DIR   write MACHINE's delta vs BASE as a block overlay
+  verify BASE MACHINE OUT_DIR   prove BASE+delta reproduces MACHINE byte-for-byte
 """
 
 import argparse
@@ -170,13 +171,141 @@ def diff(base, machine, out_dir, limit_blocks=None):
     return manifest
 
 
+def verify(base, machine, delta_dir, limit_blocks=None):
+    """Prove that BASE + the delta overlay reconstructs MACHINE byte-for-byte.
+
+    Reads the base and machine read-only, reads delta.sqlite, and streams a
+    block-by-block comparison. Does not materialise the reconstructed disk, so it
+    needs no extra space next to a 30 GiB image.
+    """
+    base_path = _guard(base)
+    machine_path = _guard(machine)
+    delta_sqlite = Path(delta_dir) / "delta.sqlite"
+    if not delta_sqlite.is_file():
+        raise SystemExit("verify refused: no delta.sqlite in %s" % delta_dir)
+    delta = {}
+    db = sqlite3.connect(str(delta_sqlite))
+    for idx, data in db.execute("SELECT idx, data FROM blocks"):
+        delta[int(idx)] = bytes(data)
+    db.close()
+
+    checked = mismatches = 0
+    base_bytes = machine_bytes = 0
+    base_total = machine_total = delta_bytes = 0
+    with open(base_path, "rb", buffering=0) as bstream, \
+            open(machine_path, "rb", buffering=0) as mstream:
+        index = 0
+        while True:
+            if limit_blocks is not None and index >= limit_blocks:
+                break
+            raw = mstream.read(BLOCK)
+            if not raw:
+                break
+            # The reconstructed block is the delta's, if present, else the base's.
+            if index in delta:
+                reconstructed = delta[index]
+                delta_bytes += len(reconstructed)
+            else:
+                bstream.seek(index * BLOCK)
+                reconstructed = bstream.read(len(raw))
+                # The base may be shorter than the machine; the disk is
+                # zero-extended, so a missing tail block is zeros, not empty.
+                if len(reconstructed) < len(raw):
+                    reconstructed = reconstructed + b"\0" * (len(raw) - len(reconstructed))
+            checked += 1
+            if hashlib.sha256(reconstructed).hexdigest() != hashlib.sha256(raw).hexdigest():
+                mismatches += 1
+            base_total += len(reconstructed)
+            machine_total += len(raw)
+            index += 1
+
+    # Any delta block past the machine's end would be an inconsistency.
+    stray = sum(1 for idx in delta if idx >= checked)
+    manifest = {
+        "base": _label(base),
+        "machine": _label(machine),
+        "blocks_checked": checked,
+        "mismatches": mismatches,
+        "stray_delta_blocks": stray,
+        "delta_blocks": len(delta),
+        "delta_bytes": delta_bytes,
+        "logical_bytes": machine_total,
+        "round_trip_ok": mismatches == 0 and stray == 0,
+        "note": "base + delta reconstructed and compared against the machine block-by-block",
+    }
+    print(json.dumps({"shared_base_verify": manifest}, sort_keys=True))
+    receipt = os.environ.get("VOS_EXP_RECEIPT")
+    if receipt:
+        Path(receipt).write_text(json.dumps(manifest, indent=2, sort_keys=True))
+    if not manifest["round_trip_ok"]:
+        raise SystemExit("verify FAILED: %d mismatches, %d stray blocks" % (mismatches, stray))
+    return manifest
+
+
+def selftest():
+    """Synthesise a base and a machine, diff + verify, and assert the round trip.
+
+    Fast and fully isolated: writes tiny images under /private/tmp, never touches
+    a real disk. This is the regression guard for the shared-base method.
+    """
+    import tempfile
+
+    blk = 64 * 1024
+    with tempfile.TemporaryDirectory(prefix="vos-shared-base-selftest-") as tmp:
+        tmp = Path(tmp)
+        base = tmp / "base.img"
+        machine = tmp / "machine.img"
+        with open(base, "wb") as f:
+            for i in range(64):
+                f.write(bytes([(i * 7) % 256]) * blk if i % 3 == 0 else b"\0" * blk)
+        with open(machine, "wb") as f:
+            for i in range(64):
+                if i == 5:
+                    f.write(b"\xaa" * blk)
+                elif i == 17:
+                    f.write(os.urandom(blk))
+                else:
+                    f.write(bytes([(i * 7) % 256]) * blk if i % 3 == 0 else b"\0" * blk)
+            f.write(b"\xbb" * blk)
+            f.write(b"\xcc" * blk)
+
+        delta_dir = tmp / "delta"
+        diff(base, machine, delta_dir)
+        good = verify(base, machine, delta_dir)
+
+        # Corrupt one delta block and prove verify rejects it.
+        db = sqlite3.connect(str(delta_dir / "delta.sqlite"))
+        db.execute("UPDATE blocks SET data=? WHERE idx=5", (b"\x00" * blk,))
+        db.commit()
+        db.close()
+        caught = False
+        try:
+            verify(base, machine, delta_dir)
+        except SystemExit:
+            caught = True
+
+    result = {
+        "shared_base_selftest": "passed" if (good["round_trip_ok"] and caught) else "FAILED",
+        "round_trip_ok": good["round_trip_ok"],
+        "corruption_caught": caught,
+        "blocks_checked": good["blocks_checked"],
+    }
+    print(json.dumps(result, sort_keys=True))
+    if result["shared_base_selftest"] != "passed":
+        raise SystemExit("shared_base selftest FAILED")
+    return result
+
+
 def main(argv):
     parser = argparse.ArgumentParser(description="shared-base fleet disk experiment")
-    parser.add_argument("command", choices=["report", "diff"])
-    parser.add_argument("args", nargs="+")
+    parser.add_argument("command", choices=["report", "diff", "verify", "selftest"])
+    parser.add_argument("args", nargs="*")
     parser.add_argument("--limit-blocks", type=int, default=None,
                         help="only scan the first N 64 KiB blocks (sampling)")
     ns = parser.parse_args(argv)
+    if ns.command == "selftest":
+        selftest()
+        return 0
     if ns.command == "report":
         base, machines = ns.args[0], ns.args[1:]
         if not machines:
@@ -186,6 +315,10 @@ def main(argv):
         if len(ns.args) != 3:
             raise SystemExit("diff needs BASE MACHINE OUT_DIR")
         diff(ns.args[0], ns.args[1], ns.args[2], ns.limit_blocks)
+    elif ns.command == "verify":
+        if len(ns.args) != 3:
+            raise SystemExit("verify needs BASE MACHINE OUT_DIR")
+        verify(ns.args[0], ns.args[1], ns.args[2], ns.limit_blocks)
     return 0
 
 

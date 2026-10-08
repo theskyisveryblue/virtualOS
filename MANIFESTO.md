@@ -162,9 +162,19 @@ These are the scars. Every one of them is a claim we paid for.
   instead of 13,371 (~45% less), and the second machine differs from the base by
   just **0.69% — 223 MB**. Booting a machine from the shared base plus that tiny
   delta produced its real desktop. So the fleet keeps **one immutable base** and a
-  ~0.7% delta per machine, and every additional machine costs almost nothing.
+  per-machine delta, and every additional machine costs almost nothing.
   This lives in `tools/experiments/`, deliberately separate from the stable disk
   plane.
+- **Measure the delta *and* prove it reconstructs.** A sharing estimate is a
+  claim; a round trip is a receipt. `shared_base.py verify` streams the base and
+  the machine and asserts that delta-over-base equals the machine block-for-block,
+  without materialising a 30 GiB image. Against the production disk as base and
+  the *used* fleet machine `vm-a` (it has been booted, logged in, and driven), the
+  delta is **20,326 of 491,520 blocks — 1.33 GB, 4.14%** — and the verify reports
+  `mismatches 0, stray_delta_blocks 0, round_trip_ok true`. Two honest numbers,
+  not one: a *fresh* clone differs from its base by ~0.7%, but a machine that has
+  lived accumulates real changes (~4%). The method is the same; the freshness is
+  the variable. `verify` is now a check in the fleet self-test.
 - **Linux, not only macOS.** The box now boots a real Linux guest, not just macOS
   clones. An Alpine aarch64 kernel + 8.8 MB initramfs runs on
   Virtualization.framework, hands off to Alpine Init, and reaches an interactive
