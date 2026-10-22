@@ -1,0 +1,318 @@
+{
+  "" : {
+    "diagnostics" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/virtualOS-master.dia",
+    "emit-module-dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/virtualOS-master-emit-module.d",
+    "emit-module-diagnostics" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/virtualOS-master-emit-module.dia",
+    "swift-dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/virtualOS-master.swiftdeps"
+  },
+  "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/DerivedSources/GeneratedAssetSymbols.swift" : {
+    "const-values" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/GeneratedAssetSymbols.swiftconstvalues",
+    "dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/GeneratedAssetSymbols.d",
+    "diagnostics" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/GeneratedAssetSymbols.dia",
+    "index-unit-output-path" : "/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/GeneratedAssetSymbols.o",
+    "llvm-bc" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/GeneratedAssetSymbols.bc",
+    "object" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/GeneratedAssetSymbols.o",
+    "swift-dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/GeneratedAssetSymbols.swiftdeps",
+    "swiftmodule" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/GeneratedAssetSymbols~partial.swiftmodule"
+  },
+  "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/virtualOS/Extension/RestoreImage+SystemVersion.swift" : {
+    "const-values" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/RestoreImage+SystemVersion.swiftconstvalues",
+    "dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/RestoreImage+SystemVersion.d",
+    "diagnostics" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/RestoreImage+SystemVersion.dia",
+    "index-unit-output-path" : "/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/RestoreImage+SystemVersion.o",
+    "llvm-bc" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/RestoreImage+SystemVersion.bc",
+    "object" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/RestoreImage+SystemVersion.o",
+    "swift-dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/RestoreImage+SystemVersion.swiftdeps",
+    "swiftmodule" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/RestoreImage+SystemVersion~partial.swiftmodule"
+  },
+  "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/virtualOS/Extension/UInt64+Byte.swift" : {
+    "const-values" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/UInt64+Byte.swiftconstvalues",
+    "dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/UInt64+Byte.d",
+    "diagnostics" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/UInt64+Byte.dia",
+    "index-unit-output-path" : "/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/UInt64+Byte.o",
+    "llvm-bc" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/UInt64+Byte.bc",
+    "object" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/UInt64+Byte.o",
+    "swift-dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/UInt64+Byte.swiftdeps",
+    "swiftmodule" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/UInt64+Byte~partial.swiftmodule"
+  },
+  "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/virtualOS/Extension/URL+Paths.swift" : {
+    "const-values" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/URL+Paths.swiftconstvalues",
+    "dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/URL+Paths.d",
+    "diagnostics" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/URL+Paths.dia",
+    "index-unit-output-path" : "/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/URL+Paths.o",
+    "llvm-bc" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/URL+Paths.bc",
+    "object" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/URL+Paths.o",
+    "swift-dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/URL+Paths.swiftdeps",
+    "swiftmodule" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/URL+Paths~partial.swiftmodule"
+  },
+  "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/virtualOS/Extension/UserDefaults+Settings.swift" : {
+    "const-values" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/UserDefaults+Settings.swiftconstvalues",
+    "dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/UserDefaults+Settings.d",
+    "diagnostics" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/UserDefaults+Settings.dia",
+    "index-unit-output-path" : "/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/UserDefaults+Settings.o",
+    "llvm-bc" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/UserDefaults+Settings.bc",
+    "object" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/UserDefaults+Settings.o",
+    "swift-dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/UserDefaults+Settings.swiftdeps",
+    "swiftmodule" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/UserDefaults+Settings~partial.swiftmodule"
+  },
+  "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/virtualOS/Model/AppDelegate.swift" : {
+    "const-values" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/AppDelegate.swiftconstvalues",
+    "dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/AppDelegate.d",
+    "diagnostics" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/AppDelegate.dia",
+    "index-unit-output-path" : "/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/AppDelegate.o",
+    "llvm-bc" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/AppDelegate.bc",
+    "object" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/AppDelegate.o",
+    "swift-dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/AppDelegate.swiftdeps",
+    "swiftmodule" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/AppDelegate~partial.swiftmodule"
+  },
+  "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/virtualOS/Model/Bookmark.swift" : {
+    "const-values" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Bookmark.swiftconstvalues",
+    "dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Bookmark.d",
+    "diagnostics" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Bookmark.dia",
+    "index-unit-output-path" : "/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Bookmark.o",
+    "llvm-bc" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Bookmark.bc",
+    "object" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Bookmark.o",
+    "swift-dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Bookmark.swiftdeps",
+    "swiftmodule" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Bookmark~partial.swiftmodule"
+  },
+  "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/virtualOS/Model/Bundle.swift" : {
+    "const-values" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Bundle.swiftconstvalues",
+    "dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Bundle.d",
+    "diagnostics" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Bundle.dia",
+    "index-unit-output-path" : "/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Bundle.o",
+    "llvm-bc" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Bundle.bc",
+    "object" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Bundle.o",
+    "swift-dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Bundle.swiftdeps",
+    "swiftmodule" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Bundle~partial.swiftmodule"
+  },
+  "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/virtualOS/Model/Constants.swift" : {
+    "const-values" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Constants.swiftconstvalues",
+    "dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Constants.d",
+    "diagnostics" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Constants.dia",
+    "index-unit-output-path" : "/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Constants.o",
+    "llvm-bc" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Constants.bc",
+    "object" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Constants.o",
+    "swift-dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Constants.swiftdeps",
+    "swiftmodule" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Constants~partial.swiftmodule"
+  },
+  "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/virtualOS/Model/Enums.swift" : {
+    "const-values" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Enums.swiftconstvalues",
+    "dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Enums.d",
+    "diagnostics" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Enums.dia",
+    "index-unit-output-path" : "/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Enums.o",
+    "llvm-bc" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Enums.bc",
+    "object" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Enums.o",
+    "swift-dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Enums.swiftdeps",
+    "swiftmodule" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Enums~partial.swiftmodule"
+  },
+  "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/virtualOS/Model/Errors.swift" : {
+    "const-values" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Errors.swiftconstvalues",
+    "dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Errors.d",
+    "diagnostics" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Errors.dia",
+    "index-unit-output-path" : "/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Errors.o",
+    "llvm-bc" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Errors.bc",
+    "object" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Errors.o",
+    "swift-dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Errors.swiftdeps",
+    "swiftmodule" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Errors~partial.swiftmodule"
+  },
+  "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/virtualOS/Model/FileModel.swift" : {
+    "const-values" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/FileModel.swiftconstvalues",
+    "dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/FileModel.d",
+    "diagnostics" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/FileModel.dia",
+    "index-unit-output-path" : "/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/FileModel.o",
+    "llvm-bc" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/FileModel.bc",
+    "object" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/FileModel.o",
+    "swift-dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/FileModel.swiftdeps",
+    "swiftmodule" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/FileModel~partial.swiftmodule"
+  },
+  "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/virtualOS/Model/Logger.swift" : {
+    "const-values" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Logger.swiftconstvalues",
+    "dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Logger.d",
+    "diagnostics" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Logger.dia",
+    "index-unit-output-path" : "/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Logger.o",
+    "llvm-bc" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Logger.bc",
+    "object" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Logger.o",
+    "swift-dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Logger.swiftdeps",
+    "swiftmodule" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Logger~partial.swiftmodule"
+  },
+  "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/virtualOS/Model/MainViewModel.swift" : {
+    "const-values" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/MainViewModel.swiftconstvalues",
+    "dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/MainViewModel.d",
+    "diagnostics" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/MainViewModel.dia",
+    "index-unit-output-path" : "/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/MainViewModel.o",
+    "llvm-bc" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/MainViewModel.bc",
+    "object" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/MainViewModel.o",
+    "swift-dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/MainViewModel.swiftdeps",
+    "swiftmodule" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/MainViewModel~partial.swiftmodule"
+  },
+  "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/virtualOS/Model/ParametersViewDataSource.swift" : {
+    "const-values" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/ParametersViewDataSource.swiftconstvalues",
+    "dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/ParametersViewDataSource.d",
+    "diagnostics" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/ParametersViewDataSource.dia",
+    "index-unit-output-path" : "/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/ParametersViewDataSource.o",
+    "llvm-bc" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/ParametersViewDataSource.bc",
+    "object" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/ParametersViewDataSource.o",
+    "swift-dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/ParametersViewDataSource.swiftdeps",
+    "swiftmodule" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/ParametersViewDataSource~partial.swiftmodule"
+  },
+  "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/virtualOS/Model/ParametersViewDelegate.swift" : {
+    "const-values" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/ParametersViewDelegate.swiftconstvalues",
+    "dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/ParametersViewDelegate.d",
+    "diagnostics" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/ParametersViewDelegate.dia",
+    "index-unit-output-path" : "/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/ParametersViewDelegate.o",
+    "llvm-bc" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/ParametersViewDelegate.bc",
+    "object" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/ParametersViewDelegate.o",
+    "swift-dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/ParametersViewDelegate.swiftdeps",
+    "swiftmodule" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/ParametersViewDelegate~partial.swiftmodule"
+  },
+  "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/virtualOS/Model/Results.swift" : {
+    "const-values" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Results.swiftconstvalues",
+    "dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Results.d",
+    "diagnostics" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Results.dia",
+    "index-unit-output-path" : "/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Results.o",
+    "llvm-bc" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Results.bc",
+    "object" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Results.o",
+    "swift-dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Results.swiftdeps",
+    "swiftmodule" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/Results~partial.swiftmodule"
+  },
+  "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/virtualOS/Model/TableViewDataSource.swift" : {
+    "const-values" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/TableViewDataSource.swiftconstvalues",
+    "dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/TableViewDataSource.d",
+    "diagnostics" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/TableViewDataSource.dia",
+    "index-unit-output-path" : "/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/TableViewDataSource.o",
+    "llvm-bc" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/TableViewDataSource.bc",
+    "object" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/TableViewDataSource.o",
+    "swift-dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/TableViewDataSource.swiftdeps",
+    "swiftmodule" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/TableViewDataSource~partial.swiftmodule"
+  },
+  "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/virtualOS/Model/TextFieldDelegate.swift" : {
+    "const-values" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/TextFieldDelegate.swiftconstvalues",
+    "dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/TextFieldDelegate.d",
+    "diagnostics" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/TextFieldDelegate.dia",
+    "index-unit-output-path" : "/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/TextFieldDelegate.o",
+    "llvm-bc" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/TextFieldDelegate.bc",
+    "object" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/TextFieldDelegate.o",
+    "swift-dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/TextFieldDelegate.swiftdeps",
+    "swiftmodule" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/TextFieldDelegate~partial.swiftmodule"
+  },
+  "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/virtualOS/RestoreImage/RestoreImageDownload.swift" : {
+    "const-values" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/RestoreImageDownload.swiftconstvalues",
+    "dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/RestoreImageDownload.d",
+    "diagnostics" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/RestoreImageDownload.dia",
+    "index-unit-output-path" : "/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/RestoreImageDownload.o",
+    "llvm-bc" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/RestoreImageDownload.bc",
+    "object" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/RestoreImageDownload.o",
+    "swift-dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/RestoreImageDownload.swiftdeps",
+    "swiftmodule" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/RestoreImageDownload~partial.swiftmodule"
+  },
+  "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/virtualOS/RestoreImage/RestoreImageInstall.swift" : {
+    "const-values" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/RestoreImageInstall.swiftconstvalues",
+    "dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/RestoreImageInstall.d",
+    "diagnostics" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/RestoreImageInstall.dia",
+    "index-unit-output-path" : "/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/RestoreImageInstall.o",
+    "llvm-bc" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/RestoreImageInstall.bc",
+    "object" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/RestoreImageInstall.o",
+    "swift-dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/RestoreImageInstall.swiftdeps",
+    "swiftmodule" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/RestoreImageInstall~partial.swiftmodule"
+  },
+  "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/virtualOS/VM/MacPlatformConfiguration.swift" : {
+    "const-values" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/MacPlatformConfiguration.swiftconstvalues",
+    "dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/MacPlatformConfiguration.d",
+    "diagnostics" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/MacPlatformConfiguration.dia",
+    "index-unit-output-path" : "/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/MacPlatformConfiguration.o",
+    "llvm-bc" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/MacPlatformConfiguration.bc",
+    "object" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/MacPlatformConfiguration.o",
+    "swift-dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/MacPlatformConfiguration.swiftdeps",
+    "swiftmodule" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/MacPlatformConfiguration~partial.swiftmodule"
+  },
+  "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/virtualOS/VM/VMConfiguration.swift" : {
+    "const-values" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/VMConfiguration.swiftconstvalues",
+    "dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/VMConfiguration.d",
+    "diagnostics" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/VMConfiguration.dia",
+    "index-unit-output-path" : "/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/VMConfiguration.o",
+    "llvm-bc" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/VMConfiguration.bc",
+    "object" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/VMConfiguration.o",
+    "swift-dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/VMConfiguration.swiftdeps",
+    "swiftmodule" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/VMConfiguration~partial.swiftmodule"
+  },
+  "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/virtualOS/VM/VMParameters.swift" : {
+    "const-values" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/VMParameters.swiftconstvalues",
+    "dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/VMParameters.d",
+    "diagnostics" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/VMParameters.dia",
+    "index-unit-output-path" : "/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/VMParameters.o",
+    "llvm-bc" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/VMParameters.bc",
+    "object" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/VMParameters.o",
+    "swift-dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/VMParameters.swiftdeps",
+    "swiftmodule" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/VMParameters~partial.swiftmodule"
+  },
+  "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/virtualOS/ViewController/AlertController.swift" : {
+    "const-values" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/AlertController.swiftconstvalues",
+    "dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/AlertController.d",
+    "diagnostics" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/AlertController.dia",
+    "index-unit-output-path" : "/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/AlertController.o",
+    "llvm-bc" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/AlertController.bc",
+    "object" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/AlertController.o",
+    "swift-dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/AlertController.swiftdeps",
+    "swiftmodule" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/AlertController~partial.swiftmodule"
+  },
+  "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/virtualOS/ViewController/MainViewController.swift" : {
+    "const-values" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/MainViewController.swiftconstvalues",
+    "dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/MainViewController.d",
+    "diagnostics" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/MainViewController.dia",
+    "index-unit-output-path" : "/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/MainViewController.o",
+    "llvm-bc" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/MainViewController.bc",
+    "object" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/MainViewController.o",
+    "swift-dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/MainViewController.swiftdeps",
+    "swiftmodule" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/MainViewController~partial.swiftmodule"
+  },
+  "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/virtualOS/ViewController/ProgressViewController.swift" : {
+    "const-values" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/ProgressViewController.swiftconstvalues",
+    "dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/ProgressViewController.d",
+    "diagnostics" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/ProgressViewController.dia",
+    "index-unit-output-path" : "/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/ProgressViewController.o",
+    "llvm-bc" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/ProgressViewController.bc",
+    "object" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/ProgressViewController.o",
+    "swift-dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/ProgressViewController.swiftdeps",
+    "swiftmodule" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/ProgressViewController~partial.swiftmodule"
+  },
+  "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/virtualOS/ViewController/RestoreImageViewController.swift" : {
+    "const-values" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/RestoreImageViewController.swiftconstvalues",
+    "dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/RestoreImageViewController.d",
+    "diagnostics" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/RestoreImageViewController.dia",
+    "index-unit-output-path" : "/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/RestoreImageViewController.o",
+    "llvm-bc" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/RestoreImageViewController.bc",
+    "object" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/RestoreImageViewController.o",
+    "swift-dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/RestoreImageViewController.swiftdeps",
+    "swiftmodule" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/RestoreImageViewController~partial.swiftmodule"
+  },
+  "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/virtualOS/ViewController/SettingsViewController.swift" : {
+    "const-values" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/SettingsViewController.swiftconstvalues",
+    "dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/SettingsViewController.d",
+    "diagnostics" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/SettingsViewController.dia",
+    "index-unit-output-path" : "/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/SettingsViewController.o",
+    "llvm-bc" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/SettingsViewController.bc",
+    "object" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/SettingsViewController.o",
+    "swift-dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/SettingsViewController.swiftdeps",
+    "swiftmodule" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/SettingsViewController~partial.swiftmodule"
+  },
+  "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/virtualOS/ViewController/VMViewController.swift" : {
+    "const-values" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/VMViewController.swiftconstvalues",
+    "dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/VMViewController.d",
+    "diagnostics" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/VMViewController.dia",
+    "index-unit-output-path" : "/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/VMViewController.o",
+    "llvm-bc" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/VMViewController.bc",
+    "object" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/VMViewController.o",
+    "swift-dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/VMViewController.swiftdeps",
+    "swiftmodule" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/VMViewController~partial.swiftmodule"
+  },
+  "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/virtualOS/ViewController/WindowController.swift" : {
+    "const-values" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/WindowController.swiftconstvalues",
+    "dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/WindowController.d",
+    "diagnostics" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/WindowController.dia",
+    "index-unit-output-path" : "/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/WindowController.o",
+    "llvm-bc" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/WindowController.bc",
+    "object" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/WindowController.o",
+    "swift-dependencies" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/WindowController.swiftdeps",
+    "swiftmodule" : "/Users/theone/Documents/GitHub/virtualOS-upstream-latest/build/DerivedDataClean/Build/Intermediates.noindex/virtualOS.build/Debug/virtualOS.build/Objects-normal/arm64/WindowController~partial.swiftmodule"
+  }
+}
