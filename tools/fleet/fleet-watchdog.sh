@@ -29,25 +29,22 @@ ONCE=0
 CHECK_INTERVAL="${VOS_WD_INTERVAL:-30}"
 MAX_ACTIONS_PER_HOUR="${VOS_WD_MAX_ACTIONS:-10}"
 
-state_file="/tmp/vos-fleet-watchdog.state"
 log()  { printf '[%s] %s\n' "$(date '+%H:%M:%S')" "$*"; }
 
 load_relay() {
   [[ -f "$RELAY_ENV" ]] || return 1
-  # shellcheck disable=SC1090
-  source "$RELAY_ENV"
-  [[ -n "${RELAY_URL:-}" && -n "${AUTH_TOKEN:-}" ]]
+  RELAY_URL="${RELAY_URL:-https://virtualos-relay.ai-c24.workers.dev}"
 }
 
 heartbeat_state() {
   # Prints "live", "stale", or nothing when the relay is unreachable. Uses the
   # relay's own staleness verdict so the host and the watchdog agree.
-  curl -s -m 6 -H "Authorization: Bearer $AUTH_TOKEN" "$RELAY_URL/fleet/status" 2>/dev/null \
+  python3 "$FLEET_TOOLS/fleet/relay_read.py" --token-file "$RELAY_ENV" 2>/dev/null \
     | python3 -c 'import sys,json
 try:
     d=json.load(sys.stdin); l=d["liveness"]
     age=l.get("lastHeartbeatAgeSec", -1)
-    print("live" if (not l.get("isStale") and age is not None and age >= 0) else "stale")
+    print("live" if (l.get("isStale") is False and type(age) is int and age >= 0) else "stale")
 except Exception:
     pass' 2>/dev/null
 }
@@ -55,31 +52,30 @@ except Exception:
 supervisor_ok() { curl -s -m 4 "http://127.0.0.1:$SUP_PORT/fleet/status" >/dev/null 2>&1; }
 vm_running()    { curl -s -m 4 "http://127.0.0.1:$SUP_PORT/fleet/status" 2>/dev/null | grep -q '"state":"running"'; }
 agent_ok()      { pgrep -f "fleet_push.py .*--watch --control" >/dev/null 2>&1; }
+guest_resources_ok() {
+  bash "$FLEET_TOOLS/computer-resources.sh" --report \
+    | python3 "$FLEET_TOOLS/fleet/watchdog_state.py" --guest-admission
+}
 
-read_state() { [[ -f "$state_file" ]] && cat "$state_file" || echo "0 0 0"; }
-
-# actions bucket: "<window_start> <count>"
 rate_gate() {
-  local now entry win count
-  now=$(date +%s)
-  entry="$(read_state)"; set -- $entry; win="${1:-0}"; count="${2:-0}"
-  if (( now - win >= 3600 )); then win=$now; count=0; fi
-  if (( count >= MAX_ACTIONS_PER_HOUR )); then
-    log "rate cap reached ($count/hr); not acting"
-    echo "$win $count" > "$state_file"; return 1
-  fi
-  echo "$win $((count+1))" > "$state_file"; return 0
+  python3 "$FLEET_TOOLS/fleet/watchdog_state.py" "$FLEET_HOME" "$MAX_ACTIONS_PER_HOUR" \
+    || { log "recovery deferred by rate limit or private state guard"; return 1; }
 }
 
 converge() {
   log "heartbeat stale — converging"
-  rate_gate || return 1
   if ! supervisor_ok; then
+    guest_resources_ok || { log "resource guard deferred supervisor recovery"; return 1; }
+    rate_gate || return 1
     log "supervisor down; running go-live.sh"
     bash "$FLEET_TOOLS/fleet/go-live.sh" "$NAME" 2>&1 | sed 's/^/    /' || true
   elif ! vm_running; then
+    guest_resources_ok || { log "resource guard deferred VM start"; return 1; }
+    rate_gate || return 1
     log "no VM running; starting $NAME"
     bash "$FLEET_TOOLS/fleet/runbook.sh" start "$NAME" 2>&1 | sed 's/^/    /' || true
+  else
+    rate_gate || return 1
   fi
   if ! agent_ok; then
     log "stream agent down; kickstarting com.virtualos.stream"
@@ -90,7 +86,7 @@ converge() {
   # One manual push so the next check sees fresh truth even if the agent is slow.
   ( cd "$FLEET_HOME" && python3 "$FLEET_TOOLS/fleet/fleet_push.py" \
       --relay "$RELAY_URL" --supervisor "http://127.0.0.1:$SUP_PORT" \
-      --token "$AUTH_TOKEN" >/dev/null 2>&1 ) || true
+      --token-file "$RELAY_ENV" >/dev/null 2>&1 ) || true
 }
 
 log "fleet-watchdog starting (interval ${CHECK_INTERVAL}s, max ${MAX_ACTIONS_PER_HOUR} actions/hr)"

@@ -1,4 +1,4 @@
-# virtualOS fleet — browser web view (EXPERIMENTAL)
+# virtualOS fleet — archived direct browser experiment
 
 A single-file, dependency-free browser page that shows a whole experimental
 virtualOS fleet: one card per VM, live JPEG frames, nested-virtualization
@@ -10,9 +10,12 @@ capability, and per-VM start/stop controls.
   CSS, and JavaScript only.
 - **No WebAssembly.** See ["On 'web assembly'"](#on-web-assembly) below.
 
-> **EXPERIMENTAL.** This drives the local fleet supervisor over HTTP, which can
-> start and stop virtual machines. Run it only against a supervisor/mux you
-> control, and treat the page as a lab instrument, not a product UI.
+> **Unsupported with the current native HTTP boundary.** The mux and hardened
+> supervisor reject browser Origin/fetch requests and expose no wildcard CORS.
+> Serving this page locally does not grant it native control access. Use the
+> authenticated Worker `/console` at the configured project relay for browser
+> access; its host transport remains a separate native client. This page is
+> retained as an experimental reference, with a broader legacy control surface.
 
 ## What it shows
 
@@ -35,54 +38,13 @@ capability, and per-VM start/stop controls.
 - The page is read-mostly: the only state-changing calls are the explicit
   start/stop buttons.
 
-## Serve it
+## Compatibility
 
-From this directory:
-
-```bash
-cd tools/fleet/web
-python3 -m http.server 8080
-```
-
-Then open <http://127.0.0.1:8080/> in a browser.
-
-On load, the page tries the URL query param first, then falls back to the page's
-own origin:
-
-```
-http://127.0.0.1:8080/?supervisor=http://127.0.0.1:9300
-```
-
-You can also just type the supervisor/mux base URL into the text field and press
-**connect**; the page writes it back into `?supervisor=` so the link is
-shareable.
-
-> Serving over plain HTTP from `127.0.0.1` is fine for local use. If you load the
-> page from `file://`, most browsers block cross-origin `fetch`, so **serve it**
-> (or point it at a same-origin supervisor).
-
-## Point it at the right process
-
-The page expects a base URL that answers the fleet routes. Two options:
-
-1. **Multiplexer** (recommended) — one pipe for the whole fleet:
-
-   ```bash
-   tools/fleet/fleet.py serve --port 9300
-   # base URL: http://127.0.0.1:9300
-   ```
-
-2. **Supervisor directly** — the headless Swift binary's own HTTP surface:
-
-   ```bash
-   tools/fleet/fleet-supervisor --root ~/VirtualOSMachines \
-       --names vm-a,vm-b --http-port 9200 --base-port 9100
-   # base URL: http://127.0.0.1:9200
-   ```
-
-Both expose CORS headers (`Access-Control-Allow-Origin: *`) for the frame and
-status routes, so the page can be served from a different port than the fleet
-surface.
+The old direct connections to ports 9300 (mux) and 9200 (supervisor) are
+unsupported. Do not add permissive CORS or strip browser headers to restore
+this page. Native CLI clients may still use `tools/fleet/fleet.py serve --port
+9300` and its loopback routes. Browser users should use the authenticated
+Worker `/console`, which does not require exposing these local endpoints.
 
 ### Endpoints the page uses
 
@@ -94,22 +56,10 @@ surface.
 | `POST` | `/fleet/start/<vm>` | start one VM |
 | `POST` | `/fleet/stop/<vm>` | stop one VM |
 
-Note on the mux: it currently forwards `GET /fleet/status` and
-`GET /fleet/capability` and proxies frames, and it forwards `POST /fleet/start`
-(all) and `/fleet/stop/<vm>`. If a route is missing from your mux build, point
-the page at the supervisor directly.
-
-## `serve.sh`
-
-A convenience wrapper that serves this directory and prints the URLs:
-
-```bash
-tools/fleet/web/serve.sh                 # serves on :8080
-tools/fleet/web/serve.sh 8099            # custom port
-VOS_FLEET_MUX_URL=http://127.0.0.1:9300 tools/fleet/web/serve.sh
-```
-
-It prints the page URL and the suggested supervisor URL to paste into the page.
+The mux forwards native status/capability/frame requests, `POST /fleet/start`
+(all), and `/fleet/start/<vm>` or `/fleet/stop/<vm>`. `serve.sh` can still display
+the static reference page, but its printed
+local supervisor URL does not provide browser access under the current policy.
 
 ## On "web assembly"
 

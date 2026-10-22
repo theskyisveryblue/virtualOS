@@ -1,0 +1,59 @@
+{
+  "observed_at": "2026-10-21T20:49:57.813036+00:00",
+  "read_only": true,
+  "logs": [
+    {
+      "path": "/Users/ai/vos-fleet/.virtualos-nbd/vm-a/server.log",
+      "bytes": 6070,
+      "allocated_bytes": 8192,
+      "mtime_ns": 1792614370158933420,
+      "retain": true,
+      "reason": "current service logs or maintenance evidence; no retention policy approved"
+    },
+    {
+      "path": "/Users/ai/vos-fleet/.local/maintenance/ollama-metadata-20261019/sandbox-check.log",
+      "bytes": 112,
+      "allocated_bytes": 4096,
+      "mtime_ns": 1792377397282969225,
+      "retain": true,
+      "reason": "current service logs or maintenance evidence; no retention policy approved"
+    },
+    {
+      "path": "/Users/ai/vos-fleet/.local/maintenance/ollama-metadata-20261019/server.log",
+      "bytes": 2965,
+      "allocated_bytes": 4096,
+      "mtime_ns": 1792377420592334195,
+      "retain": true,
+      "reason": "current service logs or maintenance evidence; no retention policy approved"
+    }
+  ],
+  "matching_files": 3,
+  "scan_partial": false,
+  "files_removed": false,
+  "maintenance_receipts_and_private_images_excluded_from_cleanup": true,
+  "operator_logs": [
+    {
+      "path": "/private/tmp/virtualos-archive-conversion/observer.log",
+      "bytes": 38802019,
+      "allocated_bytes": 38805504,
+      "mtime_ns": 1792615816809391595,
+      "retain": true
+    },
+    {
+      "path": "/private/tmp/virtualos-archive-conversion/work-loop.log",
+      "bytes": 28670,
+      "allocated_bytes": 28672,
+      "mtime_ns": 1792612848891448586,
+      "retain": true
+    },
+    {
+      "path": "/private/tmp/virtualos-archive-conversion/recovery-watch.log",
+      "bytes": 2777597,
+      "allocated_bytes": 2781184,
+      "mtime_ns": 1792539032063157213,
+      "retain": true
+    }
+  ],
+  "operator_experiment_receipt_allocated_bytes": 905216,
+  "model_backups_and_acceptance_receipts_retained": true
+}

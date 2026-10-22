@@ -1,0 +1,6 @@
+{
+  "automatic_password_retry": false,
+  "guest_unlock": "unverified",
+  "password_submitted": true,
+  "helper_exit_code": 1
+}

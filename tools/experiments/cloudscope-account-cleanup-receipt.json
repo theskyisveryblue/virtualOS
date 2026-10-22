@@ -1,0 +1,22 @@
+{
+  "date": "2026-10-12",
+  "credential_source": "CloudScope credential vault",
+  "correct_account": {
+    "id": "c24a3fb4bedba669785c18c834f51921",
+    "name": "Ai@damidina.com's Account",
+    "worker": "virtualos-relay",
+    "snapshot_binding_bucket": "virtualos-remote-private"
+  },
+  "removed_resource": {
+    "account_id": "19e7af0d1fed38c18c210b2d431c1991",
+    "account_name": "Pivot2034@gmail.com's Account",
+    "type": "r2_bucket",
+    "name": "virtualos-snapshots",
+    "deleted_objects": 8,
+    "deleted_bytes": 313304,
+    "pending_multipart_uploads": 0,
+    "deletion_status": 200,
+    "subsequent_lookup_status": 404,
+    "absent_from_bucket_inventory": true
+  }
+}

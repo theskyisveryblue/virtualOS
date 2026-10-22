@@ -1,0 +1,23 @@
+{
+  "observed_at": "2026-10-21T20:30:09.313831+00:00",
+  "conversion_sigkill_tests_passed": 2,
+  "interruption_points": [
+    "during_conversion",
+    "before_atomic_publication"
+  ],
+  "source_hash_unchanged_at_both_points": true,
+  "incomplete_output_never_published": true,
+  "source_lock_released_after_sigkill": true,
+  "retry_and_original_raw_readback_verified": true,
+  "existing_fua_acknowledged_sigkill_readback_verified": true,
+  "existing_fua_evidence": "tools/experiments/compressed-writes-mini-verification-20261021.json",
+  "live_services_changed": false,
+  "limitation": "SIGKILL may retain unpublished temporary files; fixture teardown removed only its own generated files.",
+  "source_sha256": {
+    "tools/test_overlay_conversion_crash.py": "752050209fa3d935f95ae8b5c24ad1210f103cc3e1278a5805a9c1e58a4b93c9",
+    "tools/test_compressed_delta_nbd.py": "5dd681f0d8c9d30e44e0592027eca056a01c133f6af4c9758c7d9c14e2b04155",
+    "tools/compressed_write_overlay.py": "eeb0cc47585535af2f3193440485924c26459f19b1edf855059c920c95d1e07d",
+    "tools/cloud_disk.py": "023104b7c41a6d4dee2cd44ce489c1bd6544b61056a6926517d396bf743c4e3c",
+    "tools/compressed_delta.py": "e62350e1b2003f8ccc7b8d8b9a0053f8d57ccefc6ee8b2bf3ea52959fccdacc6"
+  }
+}

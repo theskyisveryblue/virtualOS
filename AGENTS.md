@@ -35,3 +35,30 @@ virtualOS is a Cloudflare worker (virtualos-relay); bindings: R2: virtualos-snap
   *Do:* If this project uses Next.js app/, Astro with non-standard dirs, or a custom router, extend buildSourceInsights() to recognize it. Otherwise update routeFromPageFile() in scripts/generate-openeditor-specs.mjs.
 
 <!-- openeditor-briefing:end -->
+
+## Persistent work control
+
+Use the same two commands, without appended arguments:
+
+```sh
+./tools/cloud-disk-observe.sh
+./tools/cloud-disk-archive.sh
+```
+
+Improve these files in place. Do not create numbered replacement launchers.
+The observer evaluates current evidence; the worker reports the durable queue
+and its next eligible task. Consult that state before choosing more work.
+
+Keep one worker task active. Finish its acceptance checks or record its concrete
+blocker before switching scope. Use the evaluator to review evidence. A running
+process, staged candidate or submitted request is not proof of completion.
+Completion needs current test evidence bound to the relevant source hashes.
+
+A blocked task does not end other authorized work: select another eligible
+queue item. Stale leases must expire; unattended background heartbeats must not
+pretend that an agent is working. Record progress and review findings in the
+same controller state so later turns can resume without reconstructing chat.
+
+Keep production and existing guests running unless their specific maintenance
+is approved. Time passing, controller restarts and instructions to improve the
+controller do not grant an unanswered approval or relax resource limits.

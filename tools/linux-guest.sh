@@ -8,6 +8,7 @@
 #   linux-guest.sh check --kernel PATH [--initrd PATH] [--disk PATH] [--cmdline "..."]
 #   linux-guest.sh run   --kernel PATH [--initrd PATH] [--disk PATH] [--cmdline "..."]
 #   linux-guest.sh fetch-config
+#   linux-guest.sh selection-check /absolute/private/selection.json
 #
 # No network access and no artifact downloads happen anywhere in this script.
 set -euo pipefail
@@ -156,5 +157,6 @@ case "$cmd" in
   check) check "$@" ;;
   run) run "$@" ;;
   fetch-config) fetch_config ;;
+  selection-check) python3 "$ROOT/tools/linux_guest_selection.py" "$@" ;;
   *) usage; exit 2 ;;
 esac

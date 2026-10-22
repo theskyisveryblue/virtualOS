@@ -1,0 +1,27 @@
+{
+  "observed_at": "2026-10-21T21:07:53.050508+00:00",
+  "physical_volume": {
+    "state": "fresh",
+    "available_bytes": 8200499200,
+    "host_reserve_reference_bytes": 10737418240,
+    "host_reserve_reference_met": false,
+    "vm_start_disk_reference_bytes": 15032385536,
+    "vm_start_disk_reference_met": false,
+    "bytes_short_of_vm_start_disk_reference": 6831886336,
+    "reference_thresholds_do_not_replace_live_resource_admission": true
+  },
+  "current_logical_changed_bytes": 978911232,
+  "logical_limit_bytes": 2147483648,
+  "physical_host_space_independent_of_logical_budget": true,
+  "fresh_samples_required_for_alert_status": true,
+  "capacity_forecast_requires_five_minutes_of_contiguous_samples": true,
+  "source_limits_or_admission_guards_lowered": false,
+  "tests_passed": 48,
+  "latest_sample_unix": 1792616848.452734,
+  "source_sha256": {
+    "tools/cloud-disk-observe.sh": "e2cfe98fa6d029a5145a9deea4e12e030fa773ec4a77d30f44edc7d874fe7d61",
+    "tools/overlay_growth.py": "b7ee3f279e25b60f19a3c3714e23f411eb016f36086f274058b2351cd9f304f8",
+    "tools/test_overlay_growth.py": "52815afd4224baac4c52364b97862db2253750d0149ddc54f2ad46ede791f9d8",
+    "tools/test_cloud_disk_observe.py": "90d1edae972220b2c6117a2b9a6fefba867647f94160a76369926e9a5ee5e0f4"
+  }
+}

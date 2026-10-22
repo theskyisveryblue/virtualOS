@@ -1,0 +1,14 @@
+{
+  "arch": "aarch64",
+  "boot_verified": false,
+  "data_sha256": "e4b2ec897e677f76d559b5348c5a7c5068e99933b8fbc6a5c25be5bec164ccc4",
+  "package": "linux-virt",
+  "package_sha256": "35cb4b105e28bf34ed192a33cf23dc834e90492d9d7e8467a699885cf12b0e89",
+  "schema": "virtualos-linux-package-audit/v1",
+  "signature_key": "alpine-devel@lists.alpinelinux.org-616ae350.rsa.pub",
+  "signature_verified": true,
+  "source_url": "https://dl-cdn.alpinelinux.org/alpine/v3.20/main/aarch64/linux-virt-6.6.142-r0.apk",
+  "trusted_key_sha256": "d11f6b21c61b4274e182eb888883a8ba8acdbf820dcc7a6d82a7d9fc2fd2836d",
+  "trusted_key_source": "existing_booted_initramfs",
+  "version": "6.6.142-r0"
+}

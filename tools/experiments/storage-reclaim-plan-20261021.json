@@ -1,0 +1,50 @@
+{
+  "observed_at": "2026-10-21T20:50:29.381449+00:00",
+  "state": "reviewed_completed_own_temporary_and_history_cleanup",
+  "completed_actions": [
+    {
+      "path": "/Users/ai/vos-fleet/.local/maintenance/compressed-writes-20261021/real-overlay-preview/compressed-preview.sqlite",
+      "action": "removed only own generated stale preview after verified round-trip",
+      "allocated_bytes_released": 419495936,
+      "owner": "Mini ai account",
+      "reference_review": "not a configured seed or live overlay; no open handles; original and live disks retained",
+      "verification": "tools/experiments/compressed-overlay-preview-release-20261021.json",
+      "rollback": "future activation requires fresh conversion from final closed live raw overlay"
+    },
+    {
+      "path": "/private/tmp/virtualos-archive-conversion/observer.log",
+      "action": "retain recent hot tail and compress full stopped-writer history",
+      "allocated_bytes_released": 33566720,
+      "owner": "operator account",
+      "backup": "/private/tmp/virtualos-archive-conversion/observer-history-20261021T210258Z.log.gz",
+      "verification": "tools/experiments/observer-history-compaction-20261021.json",
+      "original_log_sha256": "85e2f905b095e48dd917d5d5b39968107ec0e1c31d6c864c075956830f3a5788",
+      "rollback": "verified gzip retains every original log byte"
+    }
+  ],
+  "pending_deletion_actions": [],
+  "unknown_cache_last_use_prevents_reclamation": true,
+  "opaque_and_rollback_artifact_references_prevent_reclamation": true,
+  "model_shared_references_prevent_blob_reclamation": true,
+  "extra_model_or_guest_shutdowns_authorized": false,
+  "original_disk_or_backup_deletion_authorized": false,
+  "source_receipts": [
+    "tools/experiments/cache-candidate-reviewed-inventory-20261021.json",
+    "tools/experiments/artifact-reference-inventory-20261021.json",
+    "tools/experiments/log-growth-inventory-20261021.json",
+    "tools/experiments/model-reference-refresh-20261021.json"
+  ],
+  "wildcard_deletion_used": false,
+  "approval_gates_changed": false,
+  "foreground_log_compaction_review": {
+    "path": "/private/tmp/virtualos-archive-conversion/observer.log",
+    "owner": "operator account",
+    "scope": "compress full stopped-writer history and retain last 4 MiB hot log",
+    "expected_reclaim_bytes_at_least": 26214400,
+    "backup": "gzip archive verified against full original log SHA-256 before hot log replacement",
+    "rollback": "full original bytes remain in the verified private gzip archive",
+    "vm_services_affected": false,
+    "recipe": "/private/tmp/virtualos-compact-observer-history.py",
+    "completed": true
+  }
+}

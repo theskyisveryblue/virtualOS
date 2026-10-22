@@ -1,0 +1,20 @@
+{
+  "artifact_check": {
+    "boot_verified": false,
+    "kernel_release": "6.6.142-0-virt",
+    "linux_artifacts": "ready",
+    "missing": [],
+    "modules_checked": 4,
+    "reason": "matching_ext4_driver_available"
+  },
+  "boot_verified": false,
+  "initramfs_bytes": 9910479,
+  "initramfs_sha256": "70914fa9a71d36dfcc538ffdfeba4cc503a992dc475c755cf375d66188a092ba",
+  "kernel_bytes": 34406400,
+  "kernel_sha256": "4f5b3afb7439ea96f5c1950b35dee7c919ccc92dadee9df8acb41c9ef48a135e",
+  "modules": 134,
+  "package_sha256": "35cb4b105e28bf34ed192a33cf23dc834e90492d9d7e8467a699885cf12b0e89",
+  "persistent_linux_verified": false,
+  "schema": "virtualos-linux-ext4-artifacts/v1",
+  "source_initramfs_sha256": "90f5159c2cbf81b5d6ad7b14a314815589a7077d0e8fa4e8aa0403c3fef458ae"
+}

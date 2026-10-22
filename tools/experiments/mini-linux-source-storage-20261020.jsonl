@@ -1,0 +1,3 @@
+{"large_root_files": [{"path": "/Users/ai/vos-fleet/linux/inner-root.img", "bytes": 268435456, "allocated_bytes": 268435456}, {"path": "/Users/ai/vos-fleet/linux/Image", "bytes": 34406400, "allocated_bytes": 34406400}]}
+{"active_linux_artifacts": ["/Users/ai/vos-fleet/linux/console.log", "/Users/ai/vos-fleet/linux/console.log"]}
+{"source": "/Users/ai/vos-fleet/linux/inner-root.img", "no_open_files": false}

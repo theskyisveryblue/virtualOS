@@ -1,0 +1,21 @@
+{
+  "state": "cold; local test disks removed",
+  "scope": "completed disposable boot tests",
+  "account_id": "c24a3fb4bedba669785c18c834f51921",
+  "delta": {
+    "bucket": "virtualos-cloud-disks",
+    "object_prefix": "fleet/vm-shared-20261012-verified",
+    "manifest_sha256": "cb3b06e85a39a8fc875af693da227d214bca641e66d73ea780b17fa73c5ca8f4",
+    "source_delta_sha256": "06750008529cc97d08070bf516d8664e8780995b47d92c52a1f6f72a4b63e4f0"
+  },
+  "base": {
+    "bytes": 32212254720,
+    "sha256": "b8d7a8499d279c74f3f9c9fa13f91fb498f95f14a08c79c403adf4edd3548321",
+    "archive_bucket": "virtualos-vm-backups",
+    "archive_key": "vm-backups/20261011T230151Z-91132/virtualOS.bundle.tar.gz",
+    "archive_sha256": "0073037110369885595f21c227c6df3f66f65501daca09844a80c38a07d7b711",
+    "archive_bytes": 22266108635
+  },
+  "restore_requires": "download and verify the archived base and pinned delta before NBD start",
+  "discarded_state": "startup writes from completed login-screen boot tests; no guest input tasks"
+}

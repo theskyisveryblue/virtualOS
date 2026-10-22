@@ -26,6 +26,7 @@ final class HostScreenshotServer: NSObject, SCStreamOutput {
     private var serverSocket: Int32 = -1
     private var started = false
     private let port = HostScreenshotServer.port
+    private let clientSlots = DispatchSemaphore(value: 8)
     private var captureStarted = false
     private let streamSem = DispatchSemaphore(value: 0)
 
@@ -130,21 +131,44 @@ final class HostScreenshotServer: NSObject, SCStreamOutput {
         Logger.shared.log(level: .default, "HostScreenshotServer listening on 127.0.0.1:\(HostScreenshotServer.port)")
         while true {
             let c = Darwin.accept(fd, nil, nil)
-            guard c >= 0 else { continue }
-            DispatchQueue.global(qos: .background).async { [weak self] in self?.handleClient(c) }
+            guard c >= 0 else {
+                if errno != EINTR { Thread.sleep(forTimeInterval: 0.1) }
+                continue
+            }
+            guard clientSlots.wait(timeout: .now()) == .success else {
+                Darwin.close(c)
+                continue
+            }
+            DispatchQueue.global(qos: .background).async { [self] in
+                defer { clientSlots.signal() }
+                handleClient(c)
+            }
         }
     }
 
     private func handleClient(_ fd: Int32) {
         defer { Darwin.close(fd) }
-        var b = [UInt8](repeating: 0, count: 4096)
-        guard Darwin.read(fd, &b, 4096) > 0 else { return }
-        let raw = String(bytes: b[0..<4096], encoding: .utf8) ?? ""
+        var noSignal: Int32 = 1
+        var timeout = timeval(tv_sec: 5, tv_usec: 0)
+        guard Darwin.setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, &noSignal,
+                                socklen_t(MemoryLayout<Int32>.size)) == 0 else { return }
+        Darwin.setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &timeout, socklen_t(MemoryLayout<timeval>.size))
+        Darwin.setsockopt(fd, SOL_SOCKET, SO_SNDTIMEO, &timeout, socklen_t(MemoryLayout<timeval>.size))
+        let received = LocalHTTPPolicy.readRequest(fd, port: port)
+        guard let request = received.data else {
+            _ = "HTTP/1.1 \(received.status) Rejected\r\nConnection: close\r\nContent-Length: 0\r\n\r\n".withCString { Darwin.write(fd, $0, strlen($0)) }
+            return
+        }
+        let raw = String(decoding: request, as: UTF8.self)
+        guard raw.hasPrefix("GET ") else {
+            _ = "HTTP/1.1 405 Method Not Allowed\r\nConnection: close\r\nContent-Length: 0\r\n\r\n".withCString { Darwin.write(fd, $0, strlen($0)) }
+            return
+        }
         let p = (raw.components(separatedBy: "\r\n").first ?? "").components(separatedBy: " ").dropFirst().first ?? "/"
         let path = p.components(separatedBy: "?").first ?? p
         if path == "/frame.jpg" || path == "/screenshot" {
             if let jpeg = captureJPEG(maxSize: 1400) {
-                let h = "HTTP/1.1 200 OK\r\nContent-Type: image/jpeg\r\nContent-Length: \(jpeg.count)\r\nConnection: close\r\nCache-Control: no-cache\r\nAccess-Control-Allow-Origin: *\r\n\r\n"
+                let h = "HTTP/1.1 200 OK\r\nContent-Type: image/jpeg\r\nContent-Length: \(jpeg.count)\r\nConnection: close\r\nCache-Control: no-cache\r\n\r\n"
                 _ = h.withCString { Darwin.write(fd, $0, strlen($0)) }
                 _ = jpeg.withUnsafeBytes { Darwin.write(fd, $0.baseAddress!, $0.count) }
             } else {

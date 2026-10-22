@@ -226,7 +226,11 @@ final class VMConfiguration: VZVirtualMachineConfiguration {
 
         let spiceAgentPortConfiguration = VZVirtioConsolePortConfiguration()
         spiceAgentPortConfiguration.name = VZSpiceAgentPortAttachment.spiceAgentPortName
-        spiceAgentPortConfiguration.attachment = VZSpiceAgentPortAttachment()
+        let attachment = VZSpiceAgentPortAttachment()
+        // Host clipboard data can contain credentials. Guest automation uses
+        // its own keyboard; clipboard forwarding requires a deliberate opt-in.
+        attachment.sharesClipboard = ProcessInfo.processInfo.environment["VOS_SHARE_CLIPBOARD"] == "1"
+        spiceAgentPortConfiguration.attachment = attachment
         consoleDevice.ports[0] = spiceAgentPortConfiguration
 
         consoleDevices.append(consoleDevice)

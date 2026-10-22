@@ -1,0 +1,24 @@
+{
+  "cold_test_cleanup": "completed",
+  "at": "2026-10-13T06:52:56.596103+00:00",
+  "removed": [
+    {
+      "path": "/Users/ai/vos-shared-fleet/vm-base.bundle/Disk.img",
+      "reported_allocated_bytes": 27452465152
+    },
+    {
+      "path": "/Users/ai/vos-shared-fleet/deltas/vm-r2-restored/delta.sqlite",
+      "reported_allocated_bytes": 1677987840
+    },
+    {
+      "path": "/Users/ai/vos-shared-fleet/.virtualos-nbd/vm-r2-restored/overlay.sqlite",
+      "reported_allocated_bytes": 1683718144
+    }
+  ],
+  "free_before_bytes": 18146037760,
+  "free_after_bytes": 22168354816,
+  "actual_free_bytes_gained": 4022317056,
+  "existing_fleet_running": true,
+  "cloud_catalog": "/Users/ai/vos-shared-fleet/cloud-machines/vm-r2-restored.json",
+  "metadata_bundles_preserved": true
+}

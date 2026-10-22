@@ -1,0 +1,39 @@
+{
+  "active_or_unclean_overlay_refused": true,
+  "current_dependency_package_receipt": "tools/experiments/compressed-shared-disk-mini-20261020.json",
+  "current_dependency_regressions_passed": 43,
+  "evaluator_review_passed": true,
+  "mini_managed_overlays_found": 0,
+  "mini_receipt": "tools/experiments/offline-overlay-compaction-mini-20261020.json",
+  "mini_tests_passed": 7,
+  "old_sqlite_unused_shm_compatibility_verified": true,
+  "real_overlay_reclamation_claimed": false,
+  "schema": "virtualos-offline-overlay-compaction/v1",
+  "source_digest_and_guest_reads_verified": true,
+  "source_lock_checked": true,
+  "source_never_replaced": true,
+  "source_retained": true,
+  "source_sha256": {
+    "tools/cloud_disk.py": "023104b7c41a6d4dee2cd44ce489c1bd6544b61056a6926517d396bf743c4e3c",
+    "tools/overlay_compact.py": "53e32d1fefc3f4a68ce127dbe3c7174040c5864e48a7e9cdd4dd933963ad9e21",
+    "tools/test_overlay_compact.py": "e803bf5725d79b4cd9305b936ce8d8c377f61fefd80df8ca34480d923511c80f"
+  },
+  "tests_passed": 7,
+  "verified_at": "2026-10-21T00:58:02.290873+00:00",
+  "historical_source_sha256": {
+    "tools/cloud_disk.py": "2b273187a7608d7de56f4f25c70cd54d122229576a837dd6d32b6562ae50ce75",
+    "tools/overlay_compact.py": "53e32d1fefc3f4a68ce127dbe3c7174040c5864e48a7e9cdd4dd933963ad9e21",
+    "tools/test_overlay_compact.py": "e803bf5725d79b4cd9305b936ce8d8c377f61fefd80df8ca34480d923511c80f"
+  },
+  "current_source_validation": {
+    "observed_at": "2026-10-21T19:54:03.431374+00:00",
+    "regression_receipt": "tools/experiments/compressed-writes-mini-verification-20261021.json",
+    "regression_receipt_sha256": "8ec62484911d2ed4ae1bb7bc229ddd3a49b6cac235ee3e18bbe499565f40b515",
+    "mini_tests_passed": 55,
+    "mini_disk_self_test_passed": true,
+    "default_raw_write_format_preserved": true,
+    "new_compressed_write_format_is_opt_in": true,
+    "historical_deployment_evidence_retained": true,
+    "activation_of_new_write_codec_claimed": false
+  }
+}

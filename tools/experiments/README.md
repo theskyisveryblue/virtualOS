@@ -79,8 +79,8 @@ stable disk plane compresses the same changed blocks further.)
 
 ## Serving base + delta as one disk
 
-`tools/experiments/base_delta_serve_test.py` turns the proof into a *bootable*
-disk: it serves a base bundle's RAW over NBD with the machine's delta seeded into
+`tools/experiments/base_delta_serve_test.py` verifies the disk protocol:
+it serves a base bundle's RAW over NBD with the machine's delta seeded into
 the overlay, then connects as a real NBD client and asserts a changed block reads
 back as the machine's. The stable plane exposes this as
 `computer-space.sh --nbd-base-delta-serve` (see `tools/CLOUD_DISK.md`), and it is
@@ -91,4 +91,14 @@ python3 tools/experiments/base_delta_serve_test.py
 # {"base_delta_serve_test": "passed", "block3_is_machine_block": true,
 #  "delta_seeded": 2, ...}
 ```
+
+`boot_from_delta.sh` now exercises the managed boot path with stopped snapshots
+under an isolated fleet root. On the Mini it verified a 1,664,876,544-byte delta
+against the full 32,212,254,720-byte machine, then booted macOS twice through
+`go-live.sh`, including after a disk-service restart. Both boots reached the
+login screen, no blocks were reseeded on restart, and source disks were unchanged.
+The machine had no `Disk.img`; its bounded overlay occupied 1,694,564,352 bytes.
+See `managed-shared-boot-receipt.json` and `managed-shared-verify-receipt.json`.
+The verifier streams sorted SQLite rows; its memory regression check stays under
+1 MiB of Python allocations while comparing a 4 MiB delta.
 

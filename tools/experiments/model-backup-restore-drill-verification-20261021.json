@@ -1,0 +1,19 @@
+{
+  "observed_at": "2026-10-21T20:39:32.114658+00:00",
+  "full_backup_sha256_reread_verified": true,
+  "verified_files": {
+    "manifests/registry.ollama.ai/library/qwen3-vl/8b-instruct": "0533d74300e4f9bc367d675d4e64ffd073d50ff16a2b4096cc2e8a1cf8c96319",
+    "blobs/sha256-35dd26e0fdc8e15cb5a05bc93a8e22d1bd8966a5c82d79ba3ff6be173f1053ea": "35dd26e0fdc8e15cb5a05bc93a8e22d1bd8966a5c82d79ba3ff6be173f1053ea",
+    "blobs/sha256-1329cd5ab37e5ef6faef37cd8ff8660ffc96ed5b47b34fddf8eb0912e6c82466": "1329cd5ab37e5ef6faef37cd8ff8660ffc96ed5b47b34fddf8eb0912e6c82466",
+    "blobs/sha256-7339fa418c9ad3e8e12e74ad0fd26a9cc4be8703f9c110728a992b193be85cb2": "7339fa418c9ad3e8e12e74ad0fd26a9cc4be8703f9c110728a992b193be85cb2",
+    "blobs/sha256-f6417cb1e26962991f8e875a93f3cb0f92bc9b4955e004881251ccbf934a19d2": "f6417cb1e26962991f8e875a93f3cb0f92bc9b4955e004881251ccbf934a19d2"
+  },
+  "manifest_restored_in_isolated_temporary_directory": true,
+  "small_metadata_blobs_restored": true,
+  "weight_blob_verified_in_place_not_duplicated": true,
+  "model_inference_or_full_model_install_claimed": false,
+  "backup_contents_changed": false,
+  "stream_buffer_bytes": 1048576,
+  "uncached_reads": true,
+  "elapsed_seconds": 5.047056833049282
+}

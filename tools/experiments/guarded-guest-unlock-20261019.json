@@ -1,0 +1,17 @@
+{
+  "automatic_password_retry": false,
+  "candidate_directory": "/Users/ai/vos-fleet/.local/maintenance/ocr-readiness-20261019",
+  "credential_route": "loopback_only",
+  "fresh_desktop_frame_height": 900,
+  "fresh_desktop_frame_sha256": "cb7b3f23a68803b345494ba27603ef06465ffb1256bff25c14c5eef2f31560c8",
+  "fresh_desktop_frame_width": 1500,
+  "fresh_desktop_ocr_confirmed": true,
+  "guest_unlock": "verified_desktop",
+  "independent_visual_desktop_confirmed": true,
+  "inference_requested": false,
+  "observed_at": "2026-10-19T02:10:58.966792+00:00",
+  "password_logged": false,
+  "password_submissions": 1,
+  "password_submitted": true,
+  "private_unlock_source_tests_passed": 12
+}

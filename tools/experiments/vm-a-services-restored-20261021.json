@@ -1,0 +1,109 @@
+{
+  "observed_at": "2026-10-21T18:28:09.069623+00:00",
+  "watchdog_loaded": true,
+  "watchdog_plist_unchanged": true,
+  "fleet": {
+    "instances": [
+      {
+        "ready": true,
+        "name": "vm-a",
+        "state": "running",
+        "bundle": "/Users/ai/vos-fleet/machines/vm-a.bundle",
+        "controlPort": 9125,
+        "error": ""
+      }
+    ],
+    "count": 1,
+    "root": "/Users/ai/vos-fleet/machines",
+    "basePort": 9125,
+    "ok": true,
+    "capability": {
+      "nestedVirtualizationSupported": true,
+      "nestedVirtualizationReason": "supported",
+      "platform": "macOS Version 26.2 (Build 25C56)"
+    }
+  },
+  "processes": "  440 /Applications/virtualOS.app/Contents/MacOS/virtualOS\n 2499 ./tools/fleet/linux-guest\n",
+  "resources": {
+    "background_work": "allowed",
+    "cpu_count": 10,
+    "disk_free_kib": 17011804,
+    "families": {
+      "ai_agents": {
+        "processes": 2,
+        "sum_rss_mib": 1503.3
+      },
+      "browser_apps": {
+        "processes": 23,
+        "sum_rss_mib": 373.9
+      },
+      "browser_engines": {
+        "processes": 121,
+        "sum_rss_mib": 3677.9
+      },
+      "simulator_runtime": {
+        "processes": 0,
+        "sum_rss_mib": 0.0
+      },
+      "terminal": {
+        "processes": 1,
+        "sum_rss_mib": 6.6
+      },
+      "virtualos": {
+        "processes": 4,
+        "sum_rss_mib": 937.0
+      }
+    },
+    "load_one": 16.53,
+    "memory_free_percent": 32,
+    "reasons": [],
+    "rss_note": "RSS sums can count shared pages more than once and omit paged-out memory",
+    "swap_used_mib": 5730,
+    "top_executables": [
+      {
+        "name": "Google Chrome",
+        "processes": 77,
+        "sum_rss_mib": 2885.7
+      },
+      {
+        "name": "ollama",
+        "processes": 2,
+        "sum_rss_mib": 1503.3
+      },
+      {
+        "name": "com.apple.Virtualization.VirtualMachine",
+        "processes": 3,
+        "sum_rss_mib": 908.5
+      },
+      {
+        "name": "com.apple.WebKit.WebContent",
+        "processes": 7,
+        "sum_rss_mib": 606.3
+      },
+      {
+        "name": "Figma",
+        "processes": 9,
+        "sum_rss_mib": 192.8
+      },
+      {
+        "name": "Paper",
+        "processes": 7,
+        "sum_rss_mib": 131.4
+      },
+      {
+        "name": "Google Chrome for Testing",
+        "processes": 8,
+        "sum_rss_mib": 51.8
+      },
+      {
+        "name": "com.apple.WebKit.GPU",
+        "processes": 3,
+        "sum_rss_mib": 40.2
+      }
+    ]
+  },
+  "loaded_models": [
+    "qwen3.5:0.8b"
+  ],
+  "simulator_state": "Shutdown"
+}

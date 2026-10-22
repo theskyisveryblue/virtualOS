@@ -1,0 +1,38 @@
+{
+  "observed_at": "2026-10-21T20:33:10.416357+00:00",
+  "read_only": true,
+  "journal_mode": "wal",
+  "fresh_readonly_connection_autocheckpoint_pages": 1000,
+  "page_size": 4096,
+  "page_count": 241146,
+  "free_pages": 16,
+  "actual_backend_sha256": "2b273187a7608d7de56f4f25c70cd54d122229576a837dd6d32b6562ae50ce75",
+  "backend_explicit_synchronous_full": true,
+  "backend_overrides_autocheckpoint": false,
+  "forced_checkpoint_requested": false,
+  "journal_files_removed": false,
+  "open_handle_processes": "",
+  "handles_are_not_a_measurement_of_transaction_lifetimes": true,
+  "observed_wal_range_bytes": {
+    "minimum": 0,
+    "maximum": 4136512,
+    "samples": 37
+  },
+  "reusable_database_bytes": 65536,
+  "safe_checkpoint_conditions": "Use backend-managed flush/checkpoint. For conversion or VACUUM, cleanly stop the test guest and NBD service, release the overlay lock, and refuse pending journals; never delete live WAL/SHM files.",
+  "source_sha256": {
+    "tools/.private/compressed-writes-maintenance-20261021/wal-audit.py": "e7b409d5a53d756b3190457ac51528ba2961aef6638b25bfec5627453c975fbe",
+    "tools/cloud_disk.py": "023104b7c41a6d4dee2cd44ce489c1bd6544b61056a6926517d396bf743c4e3c",
+    "tools/overlay_growth.py": "b7ee3f279e25b60f19a3c3714e23f411eb016f36086f274058b2351cd9f304f8"
+  },
+  "prior_telemetry_source_sha256": {
+    "tools/.private/compressed-writes-maintenance-20261021/wal-audit.py": "e7b409d5a53d756b3190457ac51528ba2961aef6638b25bfec5627453c975fbe",
+    "tools/cloud_disk.py": "023104b7c41a6d4dee2cd44ce489c1bd6544b61056a6926517d396bf743c4e3c",
+    "tools/overlay_growth.py": "eb6beb64ce03e4d2a18c077d830bb9ecf578513d197e7862702c565362c9b31e"
+  },
+  "telemetry_validation_after_volume_alert_update": {
+    "verified_at": "2026-10-21T21:07:53.002158+00:00",
+    "controller_observer_tests_passed": 48,
+    "guest_disk_services_changed": false
+  }
+}

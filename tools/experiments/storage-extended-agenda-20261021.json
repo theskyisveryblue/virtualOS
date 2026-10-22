@@ -1,0 +1,220 @@
+{
+  "verified_at": "2026-10-21T19:31:10.398658+00:00",
+  "storage_agenda": [
+    {
+      "id": "compressed_mutable_overlay",
+      "title": "Compress bounded VM write overlays with verified migration",
+      "acceptance": "Preserve all disk bytes and existing limits; corruption/restart/FUA tests pass; offline forward/reverse conversions verified; independently reviewed guest boot if activated; production/Linux untouched.",
+      "dependencies": []
+    },
+    {
+      "id": "storage_baseline_refresh",
+      "title": "Measure current physical and logical storage",
+      "acceptance": "Record allocated versus logical bytes, filesystem free space, open files and time; distinguish shared APFS extents from reclaimable bytes.",
+      "dependencies": []
+    },
+    {
+      "id": "storage_evidence_refresh",
+      "title": "Review changed-source storage evidence",
+      "acceptance": "Revalidate affected acceptance checks against current source hashes; retain historical deployment hashes and mark unresolved evidence stale.",
+      "dependencies": []
+    },
+    {
+      "id": "overlay_growth_profile",
+      "title": "Measure write-overlay growth over several hours",
+      "acceptance": "Bounded read-only samples report rows, allocated bytes, WAL bytes and growth rate; no VM restarts or model inference.",
+      "dependencies": []
+    },
+    {
+      "id": "compressed_overlay_snapshot",
+      "title": "Round-trip a consistent real overlay snapshot",
+      "acceptance": "SQLite backup of the running overlay converts forward and back with identical logical fingerprints; respect 10 GiB reserve and preserve live source.",
+      "dependencies": []
+    },
+    {
+      "id": "overlay_codec_cost",
+      "title": "Measure compression CPU and disk tradeoffs",
+      "acceptance": "Use closed snapshots or small fixtures; report compression ratio, write/flush latency and bounded memory without guest load generation.",
+      "dependencies": []
+    },
+    {
+      "id": "overlay_corruption_matrix",
+      "title": "Exercise malformed compressed writes",
+      "acceptance": "Reject truncation, changed checksum, invalid lengths, trailing payload, unknown codec and decompression expansion; failed writes preserve prior bytes.",
+      "dependencies": []
+    },
+    {
+      "id": "overlay_crash_matrix",
+      "title": "Exercise interrupted write and conversion recovery",
+      "acceptance": "Fixture-only process interruption proves acknowledged FUA writes persist and incomplete conversions never replace the source.",
+      "dependencies": []
+    },
+    {
+      "id": "overlay_capacity_boundary",
+      "title": "Verify compressed writes retain logical limits",
+      "acceptance": "Compressible input cannot bypass the 2 GiB logical cap; multi-block failures are atomic and base-equivalent writes release rows.",
+      "dependencies": []
+    },
+    {
+      "id": "overlay_rollback_drill",
+      "title": "Prove compressed-to-raw rollback offline",
+      "acceptance": "Closed snapshot restores using the prior backend with matching disk bytes; document exact helper, config and service restoration order.",
+      "dependencies": []
+    },
+    {
+      "id": "overlay_service_identity",
+      "title": "Audit managed disk service identity",
+      "acceptance": "Config, seed pin, base identity, codec and running service agree; wrong-format reuse is rejected before a guest attaches.",
+      "dependencies": []
+    },
+    {
+      "id": "overlay_boot_soak",
+      "title": "Observe the migrated guest over several hours",
+      "acceptance": "After independently verified activation, record fresh relay frames and bounded overlay growth; report gaps and preserve production/Linux PIDs.",
+      "dependencies": [
+        "compressed_mutable_overlay"
+      ]
+    },
+    {
+      "id": "overlay_wal_audit",
+      "title": "Audit WAL and checkpoint storage",
+      "acceptance": "Measure WAL growth and current checkpoint behavior; identify readers and explain safe checkpoint conditions without editing live SQLite files.",
+      "dependencies": []
+    },
+    {
+      "id": "overlay_pruning_audit",
+      "title": "Measure redundant changed-block retention",
+      "acceptance": "Closed snapshot audit counts blocks equal to immutable backing and models reclaimable pages without changing live data.",
+      "dependencies": []
+    },
+    {
+      "id": "immutable_delta_density",
+      "title": "Measure immutable seed density",
+      "acceptance": "Read-only audit reports compressed payload, index/page overhead and raw fallback counts; seed SHA remains unchanged.",
+      "dependencies": []
+    },
+    {
+      "id": "base_extent_accounting",
+      "title": "Measure shared-base physical allocation",
+      "acceptance": "Record original/base clones and link identities; do not count apparent clone sizes as independent reclaimable storage.",
+      "dependencies": []
+    },
+    {
+      "id": "original_disk_preservation",
+      "title": "Verify preserved original VM disk",
+      "acceptance": "Original disk exists, remains closed and matches recorded identity; no deletion or replacement of the rollback original.",
+      "dependencies": []
+    },
+    {
+      "id": "model_reference_refresh",
+      "title": "Map model manifests to blobs",
+      "acceptance": "Each installed manifest and blob is accounted for; shared references and resident models prevent false orphan classification.",
+      "dependencies": []
+    },
+    {
+      "id": "model_backup_restore_drill",
+      "title": "Verify the offloaded model backup",
+      "acceptance": "Manifest references and every backup blob hash verify from durable operator storage; test metadata restoration in an isolated temporary directory.",
+      "dependencies": []
+    },
+    {
+      "id": "private_runtime_recheck",
+      "title": "Recheck compressed private OCR runtime",
+      "acceptance": "Pinned runtime byte inventory, signatures and sandboxed help check pass; record actual allocation without running inference.",
+      "dependencies": []
+    },
+    {
+      "id": "cache_candidate_inventory",
+      "title": "Find bounded regenerable cache candidates",
+      "acceptance": "Read-only inventory identifies owner, regeneration path, allocated size, last use and open-file checks; exclude guest disks and model data.",
+      "dependencies": []
+    },
+    {
+      "id": "artifact_reference_inventory",
+      "title": "Find unused build and maintenance artifacts",
+      "acceptance": "Trace launch agents, symlinks, imports and rollback references before classifying artifacts; report only evidence-backed candidates.",
+      "dependencies": []
+    },
+    {
+      "id": "log_growth_inventory",
+      "title": "Measure logs and retained evidence growth",
+      "acceptance": "Report largest growing logs and retention policies; preserve acceptance receipts, private evidence and current service logs.",
+      "dependencies": []
+    },
+    {
+      "id": "storage_reclaim_plan",
+      "title": "Prepare exact reviewed reclamation actions",
+      "acceptance": "List exact paths, expected physical savings, ownership, references, backup and rollback evidence; no wildcard deletion or automatic approval.",
+      "dependencies": [
+        "cache_candidate_inventory",
+        "artifact_reference_inventory",
+        "log_growth_inventory"
+      ]
+    },
+    {
+      "id": "r2_archive_reference_audit",
+      "title": "Audit cloud archive references",
+      "acceptance": "Read-only check maps receipts and manifests to archive objects and pending multipart uploads; no cloud deletion.",
+      "dependencies": []
+    },
+    {
+      "id": "r2_recovery_cost_plan",
+      "title": "Prepare bounded cloud recovery verification",
+      "acceptance": "Estimate download, temporary disk, cache and guest resource needs; retain existing recovery approval/resource gates.",
+      "dependencies": []
+    },
+    {
+      "id": "host_resource_trend",
+      "title": "Track disk, memory and swap pressure",
+      "acceptance": "Bounded hourly observations identify competing load without stopping other apps or relaxing the existing admission thresholds.",
+      "dependencies": []
+    },
+    {
+      "id": "storage_alert_thresholds",
+      "title": "Review storage reserve and growth alerts",
+      "acceptance": "Derive warning thresholds from measured growth and existing reserves; report predicted exhaustion without lowering hard safety limits.",
+      "dependencies": []
+    },
+    {
+      "id": "shell_supervisor_soak",
+      "title": "Verify hours-long shell supervision",
+      "acceptance": "Observe multiple timed ticks, deadline and lock ownership; no duplicate supervisor, unattended worker heartbeat or false completion.",
+      "dependencies": []
+    },
+    {
+      "id": "shell_reconnect_drill",
+      "title": "Exercise supervisor outage recovery",
+      "acceptance": "Fixture tests retry classified connection failures, preserve completed jobs and refuse integrity-failure retries or gated guest starts.",
+      "dependencies": []
+    },
+    {
+      "id": "storage_runbook_refresh",
+      "title": "Document measured storage and recovery procedures",
+      "acceptance": "Update existing repository documentation with verified formats, entrypoints, reserves, migration/rollback order and unresolved blockers.",
+      "dependencies": []
+    },
+    {
+      "id": "storage_final_comparison",
+      "title": "Compare final storage with the baseline",
+      "acceptance": "Report measured physical savings, logical sizes, retained backups and open blockers; staged candidates and apparent clone sizes are not savings.",
+      "dependencies": [
+        "storage_baseline_refresh",
+        "storage_runbook_refresh"
+      ]
+    }
+  ],
+  "controller_tests_passed": 41,
+  "supervisor_pid": 82805,
+  "supervisor_deadline": 1792697430.417424,
+  "supervisor_state": "supervising",
+  "background_can_implement_engineering_tasks": false,
+  "background_renews_agent_leases": false,
+  "source_sha256": {
+    "tools/cloud_disk_work_loop.py": "2ce09a68b713dfbe3f4c88831275e4619b2e06cf265662c5e0a62876bbaf9951",
+    "tools/test_cloud_disk_work_loop.py": "ca35f48017b9d6ee900fa45784662dc407ca2043cc13f8baced75a56236cae11",
+    "tools/OPTIMIZATION_WORK.md": "a3a90720e4f28dcfadbdc225cf6bc7b878ef79be8e278999c78f6d6fd959168f"
+  },
+  "preview_receipt": "tools/experiments/compressed-writes-real-preview-20261021.json",
+  "preview_logical_round_trip_verified": true,
+  "actual_live_saving_bytes": 0
+}

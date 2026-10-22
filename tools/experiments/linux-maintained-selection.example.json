@@ -1,0 +1,11 @@
+{
+  "schema": "virtualos-linux-selection/v1",
+  "mode": "maintained",
+  "profile": "/Users/ai/vos-fleet/linux/maintained-3.24-5a6555b5a6514566/profile.json",
+  "receipt": {
+    "path": "/__PRIVATE_SELECTION_DIRECTORY__/linux-maintained-persistence-receipt-20261018.json",
+    "sha256": "c2cce39b8f44c9676a46b20fe633be307d82f7c9bcb9a4b10bb94b30ed097e79"
+  },
+  "proof_disk": "/Users/ai/vos-fleet/linux/maintained-3.24-5a6555b5a6514566/persistence-tests/run.VJz4hqnH/root.img",
+  "runtime_disk": "/__PRIVATE_SELECTION_DIRECTORY__/root.img"
+}

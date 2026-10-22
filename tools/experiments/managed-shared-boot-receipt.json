@@ -1,0 +1,20 @@
+{
+  "managed_shared_disk_boot": "verified",
+  "verified_at_unix": 1791842786,
+  "machine": "vm-shared",
+  "local_machine_disk": "absent",
+  "writes_to_base": 0,
+  "guest_boots_verified": 2,
+  "disk_service_restart_verified": true,
+  "frame_size_gate_bytes": 30000,
+  "restart_blocks_reseeded": 0,
+  "source_disks_unchanged": true,
+  "frame_bytes": 279488,
+  "frame_sha256": "0c12638e9ece9c320478c3d05cffd29bb56456927c9b8cf5796aa18b527c6353",
+  "nbd_metrics_scope": "retained server log",
+  "nbd_reads": 195546,
+  "nbd_writes": 23412,
+  "overlay_blocks": 25511,
+  "overlay_allocated_bytes": 1694564352,
+  "initial_delta_bytes": 1664876544
+}

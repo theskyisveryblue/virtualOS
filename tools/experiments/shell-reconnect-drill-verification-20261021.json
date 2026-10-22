@@ -1,0 +1,24 @@
+{
+  "observed_at": "2026-10-21T21:10:32.870940+00:00",
+  "targeted_reconnect_and_gate_tests_passed": 5,
+  "retry_only_classified_connection_failures": true,
+  "completed_archive_and_linux_preserved": true,
+  "integrity_failure_not_retried": true,
+  "blocked_recovery_refuses_before_credentials": true,
+  "live_observer_network_context_corrected": true,
+  "vm_restart_or_model_inference_requested": false,
+  "source_sha256": {
+    "tools/cloud_disk_work_loop.py": "2c968ed24fb47c88e2c4c0d7bd6a4d1784730bf50fdc3bb14d8b7204bcc1b9e3",
+    "tools/test_cloud_disk_work_loop.py": "b50050e9e9390663e8b49601acdb11463be137714fad44816d580e7b0d29ced9",
+    "tools/cloud-disk-archive.sh": "4b70e1a9834d53fbd00dbccdcbdbf35deca49c584d3d618552fdd7615038b4c5",
+    "tools/cloud-disk-observe.sh": "e2cfe98fa6d029a5145a9deea4e12e030fa773ec4a77d30f44edc7d874fe7d61"
+  },
+  "historical_source_sha256": {
+    "tools/cloud_disk_work_loop.py": "0456e1975fc06805763161a308373c0acfc06843bb277cb2c90c994dfedcfe7c",
+    "tools/test_cloud_disk_work_loop.py": "ca35f48017b9d6ee900fa45784662dc407ca2043cc13f8baced75a56236cae11",
+    "tools/cloud-disk-archive.sh": "4b70e1a9834d53fbd00dbccdcbdbf35deca49c584d3d618552fdd7615038b4c5",
+    "tools/cloud-disk-observe.sh": "e2cfe98fa6d029a5145a9deea4e12e030fa773ec4a77d30f44edc7d874fe7d61"
+  },
+  "source_reviewed_at": "2026-10-21T21:38:02.500465+00:00",
+  "source_review": "Additive fixed snapshot-audit job; existing tick cadence, deadline, locks, recovery admission and agent lease behavior preserved. Current controller suite 63 tests passed; historical soak observations remain historical."
+}

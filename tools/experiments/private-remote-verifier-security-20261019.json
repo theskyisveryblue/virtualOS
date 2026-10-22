@@ -1,0 +1,27 @@
+{
+  "credential_arguments_removed": true,
+  "focused_tests_passed": 6,
+  "https_required": true,
+  "inherited_proxy_disabled": true,
+  "mini_focused_tests_passed": 6,
+  "mini_python_compatibility_receipt": "private-remote-verifier-compatibility-20261019.json",
+  "no_configuration_smoke_exit": 1,
+  "private_unique_output": true,
+  "real_local_http_tests": {
+    "redirect_does_not_forward_credential": true,
+    "response_byte_limit": true,
+    "slow_stream_absolute_deadline": true
+  },
+  "real_private_frame_captured": false,
+  "real_remote_endpoint_contacted": false,
+  "schema": "virtualos-private-remote-verifier-security/v1",
+  "service_restarted": false,
+  "source_sha256": {
+    "tools/cloudflare/test_verify_private_remote.py": "c7a326fe62c47d6e99c69359437f65dd5c51ad8efbe1e1ba2e25c227ebef9bb8",
+    "tools/cloudflare/verify_private_remote.py": "6dfa3e78643823f8f0b1aa4ca1a626d8f97f1e79c277e36703e68db0d63a13c6",
+    "tools/cloudflare/verify_private_remote.sh": "f48bb6b48549018fdd90eb9035ee53516d88e0da253e47f57509e801e1b44384"
+  },
+  "unhealthy_service_blocks_frame_request": true,
+  "verification_scope": "health_and_jpeg_envelope",
+  "verified_at": "2026-10-19T03:14:57.316884+00:00"
+}

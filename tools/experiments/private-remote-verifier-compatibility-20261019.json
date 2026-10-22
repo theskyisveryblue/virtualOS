@@ -1,0 +1,23 @@
+{
+  "actual_remote_endpoint_requested": false,
+  "isolated_fixture_tests_passed": 6,
+  "live_host_tools_replaced": false,
+  "metadata_resources": {
+    "cpu_count": 10,
+    "load_one": 7.7861328125,
+    "potentially_available_bytes": 3424944128,
+    "swapouts": 19219359
+  },
+  "private_source_directory": "/Users/ai/vos-fleet/.local/maintenance/ocr-readiness-20261019/tools/cloudflare",
+  "python_version": "3.9.6",
+  "real_guest_frame_requested": false,
+  "real_tunnel_started": false,
+  "schema": "virtualos-private-verifier-compatibility/v1",
+  "services_changed": false,
+  "source_sha256": {
+    "test_verify_private_remote.py": "c7a326fe62c47d6e99c69359437f65dd5c51ad8efbe1e1ba2e25c227ebef9bb8",
+    "verify_private_remote.py": "6dfa3e78643823f8f0b1aa4ca1a626d8f97f1e79c277e36703e68db0d63a13c6"
+  },
+  "test_returncode": 0,
+  "verified_at": "2026-10-19T03:31:07.336288+00:00"
+}

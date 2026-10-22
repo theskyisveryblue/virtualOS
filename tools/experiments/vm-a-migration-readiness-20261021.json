@@ -1,0 +1,71 @@
+{
+  "observed_at": "2026-10-21T17:27:15.621344+00:00",
+  "state": "verified_running",
+  "migration_approved": true,
+  "model_offload_approved": true,
+  "disk_free_bytes": 10921713664,
+  "minimum_restart_free_bytes": 15032385536,
+  "estimated_compressed_seed_bytes": 1168285619,
+  "original_disk_preserved": true,
+  "guests_or_services_changed": true,
+  "backup_state": "complete_sha256_and_local_readback_verified",
+  "evidence": [
+    "vm-a-migration-preflight-20261021.json",
+    "vm-a-migration-identities-20261021.json",
+    "mini-model-blob-reference-audit-20261021.json"
+  ],
+  "next_steps": [],
+  "backup_receipt": "tools/experiments/mini-inactive-model-backup-20261021.json",
+  "backup_bytes": 6140405513,
+  "model_offload_receipt": "tools/experiments/mini-model-offload-20261021.json",
+  "conversion_receipt": "tools/experiments/vm-a-compressed-conversion-20261021.json",
+  "compressed_delta_bytes": 1192714240,
+  "full_disk_reconstruction_verified": true,
+  "test_vm_stopped": false,
+  "production_linux_unchanged": true,
+  "latest_start_receipt": "tools/experiments/vm-a-migrated-start-20261021.json",
+  "latest_memory_free_percent": 28,
+  "minimum_memory_free_percent": 50,
+  "managed_disk_verified": true,
+  "managed_disk_receipt": "tools/experiments/vm-a-managed-compressed-disk-verified-20261021.json",
+  "latest_disk_free_bytes": 17279025152,
+  "admission_retries": [
+    {
+      "observed_at": "2026-10-21T17:25:26.760687+00:00",
+      "memory_free_percent": 48,
+      "started": false
+    },
+    {
+      "observed_at": "2026-10-21T17:25:41.915712+00:00",
+      "memory_free_percent": 45,
+      "started": false
+    },
+    {
+      "observed_at": "2026-10-21T17:25:57.099562+00:00",
+      "memory_free_percent": 47,
+      "started": false
+    },
+    {
+      "observed_at": "2026-10-21T17:26:12.259051+00:00",
+      "memory_free_percent": 47,
+      "started": false
+    },
+    {
+      "observed_at": "2026-10-21T17:26:27.449143+00:00",
+      "memory_free_percent": 48,
+      "started": false
+    },
+    {
+      "observed_at": "2026-10-21T17:26:42.613005+00:00",
+      "memory_free_percent": 46,
+      "started": false
+    }
+  ],
+  "guest_boot_verified": true,
+  "test_watchdog_loaded": true,
+  "test_supervisor_loaded": true,
+  "managed_disk_service_running": true,
+  "original_bundle": "/Users/ai/vos-fleet/vm-a-original-20261021.bundle",
+  "pending_permission": null,
+  "verification_receipt": "tools/experiments/vm-a-compressed-migration-verification-20261021.json"
+}

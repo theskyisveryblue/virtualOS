@@ -1,0 +1,301 @@
+{
+  "active_app_public_signing_review": {
+    "candidate_adds_hardened_runtime_flag": true,
+    "hardened_runtime_flag": false,
+    "identifier": "com.github.yep.ios.virtualOS",
+    "observed_at": "2026-10-19T03:59:45Z",
+    "path": "/Applications/virtualOS.app",
+    "signature": "adhoc",
+    "source": "fresh pinned LAN SSH codesign -dv --verbose=2; exit 0",
+    "team_identifier": null
+  },
+  "all_app_build_source_sha256": {
+    "virtualOS/AppDelegate.swift": "c146f44b9f5ef6a4769f52b0dff784fd04be4691bb55f65f7180fb947825fad5",
+    "virtualOS/Extension/OperatingSystemVersion+String.swift": "345c9a704192fa959897c7ad399859ef7fa3b0618045e626b32dc1a17a10a099",
+    "virtualOS/Extension/UInt64+Byte.swift": "3f31b78c00debd35dd0eed03217e4dcabba96376446fbf72fcd2a1845f8f919c",
+    "virtualOS/Extension/URL+Paths.swift": "05aba826e71a95c213e5767bda55355045d22576e3f1a05184278f65ed096803",
+    "virtualOS/Extension/UserDefaults+Settings.swift": "e5640202aba270516700e2aa5f6f2786d65a52f846560e061bd16cd6fbd112e3",
+    "virtualOS/Model/Bookmark.swift": "3ba025cc4fa4766a58978f84c6db59c2886f4167b8ae957ca9130e21ff252827",
+    "virtualOS/Model/Bundle.swift": "e1ffce3db391cf6f9355095597d9ebdc8961fdbe240496215edb4ae270f7a043",
+    "virtualOS/Model/Constants.swift": "4999b5dc0d08700eac1f04e5f2ea84915a5a06d7755aed3bdcb89956c4571573",
+    "virtualOS/Model/FileModel.swift": "621a8507f5118a77cf0fbbb9ebf84e66562a8b4fd354cb52d2bf493908f76b67",
+    "virtualOS/Model/HostScreenshotServer.swift": "1eb44658997bc21940cb53978ec97fab84abaf8da61ac641d9f7d407d9590635",
+    "virtualOS/Model/Logger.swift": "637d26dae5ba4a2e3b708c204cb97e63cf5da3d6b176e5a60fd5e4b5ad372f3f",
+    "virtualOS/Model/MainViewModel.swift": "77d2811e47eb054f142a61b624978d7693e89ee298be5d30922213385f5f8c96",
+    "virtualOS/Model/ParametersViewDataSource.swift": "9baab9f24af7ed8751cb0392309e9bf8c6d7b16731f88af6deb76c25d8361d8a",
+    "virtualOS/Model/ParametersViewDelegate.swift": "8b70ab2d55eefc6916c9e25cdd3ce571a623b7b7bbb9219d24cc41eb6b09c108",
+    "virtualOS/Model/TableViewDataSource.swift": "4eebc3f9054c7187a8762bb80a56596a9299b8c996d47134a43dda32ace22051",
+    "virtualOS/Model/TextFieldDelegate.swift": "c6ae24f74ccf98261724efddf2770bfb3b4e54e6f6e439f047f9393c69d9d781",
+    "virtualOS/Model/VMAutoLogin.swift": "ae88ea3e62a5c5cd7dc2aa7a8885dd2f63621534a16aa47647f8364556ae999f",
+    "virtualOS/Model/VMCommandServer.swift": "3db087903c2e31a2de7413562cea6ac5db747f14e8a42620a59ee6e38fc21c27",
+    "virtualOS/Model/VMHostController.swift": "810559c0edd7d0705ff60436bc3f9209f028eef6fa1ee54aae9b12700e9db166",
+    "virtualOS/Resources/Info.plist": "ef825fc7b0ce2e10acb03840a2ada1cc437655caf8b41439e6a4c34e68cded1d",
+    "virtualOS/Resources/virtualOS.entitlements": "9fce1f382d3a22a10fd4fb8da31a37a1559acf56ad894091a64cefbdbbc36daf",
+    "virtualOS/Resources/virtualOSRemote.entitlements": "2326352f239ebc33029b53d7c3e53d349da7ce0affb96c112a59d202e75d6f7e",
+    "virtualOS/RestoreImage/RestoreImageDownload.swift": "7a825e2dfe403aad90b53c2a1ae96602d93ae226f0c07263108ff5c4103a9c46",
+    "virtualOS/RestoreImage/RestoreImageInstall.swift": "134d93882d04119ecd33bf4277904780d5db546dfde1cab51e4ed2edd78ed69e",
+    "virtualOS/VM/MacPlatformConfiguration.swift": "1dde379dd8b294ac4b07757984ff31e9a67e36d3540a779669c80bcdc3ad6f53",
+    "virtualOS/VM/VMConfiguration.swift": "79e97e5fcfc4f8d145b7145ac3aafef80fa7250e586aa6821e5e333e62a39674",
+    "virtualOS/VM/VMParameters.swift": "d2edb550a4515563453ff0003caa320ab145972451a1cd98289788b499f1a2cf",
+    "virtualOS/ViewController/AlertController.swift": "288ecd300070a9c74f05d4ca5f5f981e9daf6e124b43230b321fe94a10ebbc81",
+    "virtualOS/ViewController/MainViewController.swift": "79ae17ece0b585fd47cac27520d4ddb88b75f1780c54a8a80c69bcc63d8eb824",
+    "virtualOS/ViewController/ProgressViewController.swift": "ccdc8e48653b77c66c004bbc3f595c70a45c38354faef791a2ac20684309a996",
+    "virtualOS/ViewController/RestoreImageViewController.swift": "f7cc0d1565e5e0951cb1d4cbbc6c40686e4768fa55247177b0685d4746a6917d",
+    "virtualOS/ViewController/SettingsViewController.swift": "c4443fab31c0f32eae2f1212ce0e31af6974b6c922ca813f09a311709c287a68",
+    "virtualOS/ViewController/VMViewController.swift": "c22717482c134c7b76aa078b03b8a158d2dce7477b8b3537a04a7c5ee796e618"
+  },
+  "app_launched": false,
+  "app_source_files_checked": 34,
+  "browser_compatibility": {
+    "alternate_mux_listener_review": {
+      "evidence": "read-only evaluator lsof query: exit1, empty result",
+      "listening_processes_found": false,
+      "observed_at": "2026-10-19T04:36:42.082505Z",
+      "ports": [
+        9300,
+        9301
+      ],
+      "scope": "only these two TCP listen ports on the Mini"
+    },
+    "alternate_python_mux_requires_its_own_browser_boundary": true,
+    "direct_native_dashboard_supported": false,
+    "intended_browser_path": "authenticated Cloudflare Worker /console via the native fleet stream",
+    "legacy_dashboard": "tools/fleet/web/index.html",
+    "live_browser_compatibility_tested": false,
+    "native_cli_clients_supported_by_policy": true,
+    "reason": "native-client policy rejects browser Origin and Sec-Fetch-Site headers"
+  },
+  "build_timestamp_at_least_all_app_sources": true,
+  "bundle_inventory": {
+    "entries": [
+      {
+        "kind": "directory",
+        "path": "Contents"
+      },
+      {
+        "bytes": 1820,
+        "kind": "file",
+        "path": "Contents/Info.plist",
+        "sha256": "6c59f2e434225a26020a7b05ca1cdc413fd84fac0dc43d0c467a5e4981bd5254"
+      },
+      {
+        "kind": "directory",
+        "path": "Contents/MacOS"
+      },
+      {
+        "bytes": 16760,
+        "kind": "file",
+        "path": "Contents/MacOS/__preview.dylib",
+        "sha256": "570fb4a0ebfc8f1c26b0fda8d7804dc484ba849620f07bec22778366bafe8c4b"
+      },
+      {
+        "bytes": 58560,
+        "kind": "file",
+        "path": "Contents/MacOS/virtualOS",
+        "sha256": "3956674c9f0b80bd07127b9ee0d94f4060755e217b7c99361707c8182d2fbf39"
+      },
+      {
+        "bytes": 1726392,
+        "kind": "file",
+        "path": "Contents/MacOS/virtualOS.debug.dylib",
+        "sha256": "0d2bb88aff1bce27221168a3945be0aba814124d267a23b7fc57cfb8d27ad06e"
+      },
+      {
+        "bytes": 8,
+        "kind": "file",
+        "path": "Contents/PkgInfo",
+        "sha256": "82502191c9484b04d685374f9879a0066069c49b8acae7a04b01d38d07e8eca0"
+      },
+      {
+        "kind": "directory",
+        "path": "Contents/Resources"
+      },
+      {
+        "bytes": 36740,
+        "kind": "file",
+        "path": "Contents/Resources/AppIcon.icns",
+        "sha256": "ecafdcac5cfe17a62cec970b46fdb201d80e997b730b2142e51e84f1f089ceae"
+      },
+      {
+        "bytes": 612648,
+        "kind": "file",
+        "path": "Contents/Resources/Assets.car",
+        "sha256": "04282824d00a24bb8b0629db62e123de58a33c59e2540ff090b4f7fe075200ff"
+      },
+      {
+        "kind": "directory",
+        "path": "Contents/Resources/Base.lproj"
+      },
+      {
+        "kind": "directory",
+        "path": "Contents/Resources/Base.lproj/Main.storyboardc"
+      },
+      {
+        "bytes": 13299,
+        "kind": "file",
+        "path": "Contents/Resources/Base.lproj/Main.storyboardc/3i8-CK-z3h-view-ZKN-dg-QbR.nib",
+        "sha256": "9961b1cd4eda4458c7446b2247d0f12414d86780de0765acafde9fd222d76324"
+      },
+      {
+        "bytes": 983,
+        "kind": "file",
+        "path": "Contents/Resources/Base.lproj/Main.storyboardc/Info.plist",
+        "sha256": "46efe08095f05eac7a5e61c37dd7ea9f9cefa1b1551009739d7de6c76800db04"
+      },
+      {
+        "bytes": 29879,
+        "kind": "file",
+        "path": "Contents/Resources/Base.lproj/Main.storyboardc/MainMenu.nib",
+        "sha256": "36664a49c8456ecd8d9d31f7fc0bfc56d5602c628d6efaf35d6087797de00ead"
+      },
+      {
+        "bytes": 1653,
+        "kind": "file",
+        "path": "Contents/Resources/Base.lproj/Main.storyboardc/MainViewController.nib",
+        "sha256": "5ba43d567c12186c408b644e5f03e16fac381f3f2de3c002e567a1fbc3f13aac"
+      },
+      {
+        "bytes": 1545,
+        "kind": "file",
+        "path": "Contents/Resources/Base.lproj/Main.storyboardc/NSViewController-Xqe-mX-POt.nib",
+        "sha256": "46499c7cb9685b55219c2c6770e1b69e75baa7710d9b55f698f4df2b7af5f788"
+      },
+      {
+        "bytes": 3131,
+        "kind": "file",
+        "path": "Contents/Resources/Base.lproj/Main.storyboardc/NSWindowController.nib",
+        "sha256": "f7781ed4e6c96be059bb3f509fd8fd9a925e2aba0384d68ee7ed5c1f5d293688"
+      },
+      {
+        "bytes": 1549,
+        "kind": "file",
+        "path": "Contents/Resources/Base.lproj/Main.storyboardc/ProgressViewController.nib",
+        "sha256": "9f67e17e4cdaf527c181a50066d8a24fa057fa48d4b4caae53d1221747a58e1e"
+      },
+      {
+        "bytes": 3041,
+        "kind": "file",
+        "path": "Contents/Resources/Base.lproj/Main.storyboardc/ProgressWindowController.nib",
+        "sha256": "db38ed1a57891faefd9c524974e59612d2c32f050ba88678b0b584370a978338"
+      },
+      {
+        "bytes": 1557,
+        "kind": "file",
+        "path": "Contents/Resources/Base.lproj/Main.storyboardc/RestoreImageViewController.nib",
+        "sha256": "49fd3f916d52eefd8105b6ae29ce9edc6031a4646ca3b9770d9f87bf28afb01c"
+      },
+      {
+        "bytes": 1645,
+        "kind": "file",
+        "path": "Contents/Resources/Base.lproj/Main.storyboardc/VMViewController.nib",
+        "sha256": "bfcc515740185abcff17f4edd088605dc570cdd39ae319f955868c64097e9f4b"
+      },
+      {
+        "bytes": 34664,
+        "kind": "file",
+        "path": "Contents/Resources/Base.lproj/Main.storyboardc/XfG-lQ-9wD-view-m2S-Jp-Qdl.nib",
+        "sha256": "90260e47ee465adea8f4ee31be277281795e72c5e8fd44836e3855420f7a2185"
+      },
+      {
+        "bytes": 10308,
+        "kind": "file",
+        "path": "Contents/Resources/Base.lproj/Main.storyboardc/Xqe-mX-POt-view-yG5-4w-bTo.nib",
+        "sha256": "2fac9de5cd204594dd212d5bbdfe670ed817166b0e284ea803e88dc3d802d00a"
+      },
+      {
+        "bytes": 9079,
+        "kind": "file",
+        "path": "Contents/Resources/Base.lproj/Main.storyboardc/af9-Kg-thA-view-dx2-J9-Puh.nib",
+        "sha256": "ea6ba2130b45c6cc62a68befa40a42ca6ba62e0c198a045148317568f2732047"
+      },
+      {
+        "bytes": 7541,
+        "kind": "file",
+        "path": "Contents/Resources/Base.lproj/Main.storyboardc/tuV-Zf-1ry-view-xiX-Ev-7h8.nib",
+        "sha256": "adff5035b6501dae7b21631742d696029513fb887cc6cb28571812ac8a0e759c"
+      },
+      {
+        "kind": "directory",
+        "path": "Contents/_CodeSignature"
+      },
+      {
+        "bytes": 7498,
+        "kind": "file",
+        "path": "Contents/_CodeSignature/CodeResources",
+        "sha256": "7facf7e654cfeb024c39544445563f5cb6baa73e4f853baffe5114bd1273f808"
+      }
+    ],
+    "file_bytes": 2580300,
+    "format": "sorted relative paths with directory kinds, file sizes and SHA256, or symlink targets; canonical JSON sorted keys compact separators",
+    "sha256": "5b9907a3b1124305f4e14976f139a7c773f59f717d8dca305ab52731078c0f7d"
+  },
+  "candidate_entitlements": {
+    "com.apple.security.device.camera": true,
+    "com.apple.security.network.client": true,
+    "com.apple.security.network.server": true,
+    "com.apple.security.virtualization": true
+  },
+  "candidate_main": {
+    "bytes": 58560,
+    "device": 16777231,
+    "inode": 561482408,
+    "sha256": "3956674c9f0b80bd07127b9ee0d94f4060755e217b7c99361707c8182d2fbf39"
+  },
+  "candidate_path": "/private/tmp/vos-native-app-candidate-20261019/virtualOS.app",
+  "codesign": {
+    "deep_strict_verification_passed": true,
+    "hardened_runtime": true,
+    "notarized": false,
+    "signature": "adhoc",
+    "team_identifier": null
+  },
+  "guest_usability_verified": false,
+  "limits": [
+    "private Debug testing candidate; ad hoc signature does not establish developer identity or notarization",
+    "entitlements preserve current deployed app capabilities; App Sandbox is not enabled",
+    "native HTTP boundary checks use shared policy and standalone fleet fixture; production app changes are not active"
+  ],
+  "mini_stage_receipt": "tools/experiments/native-app-private-mini-stage-20261019.json",
+  "mini_staged": true,
+  "native_http_tcp_test_count": 10,
+  "prepared_at": "2026-10-19T03:56:36.663588+00:00",
+  "prior_unsigned_app_build_passed": true,
+  "private_mini_candidate_path": "/Users/ai/vos-fleet/.local/maintenance/native-app-20261019/virtualOS.app",
+  "production_app_replaced": false,
+  "schema": "virtualos-private-native-app-candidate/v1",
+  "source_build_distinct_inode": true,
+  "source_files": {
+    "virtualOS.xcodeproj/project.pbxproj": {
+      "bytes": 12607,
+      "device": 16777231,
+      "inode": 27783593,
+      "sha256": "c906f557e8e76a3812ca9a0cf091e5b91849643dffea47e0f274a859541e13cc"
+    },
+    "virtualOS/Model/HostScreenshotServer.swift": {
+      "bytes": 8518,
+      "device": 16777231,
+      "inode": 403312468,
+      "sha256": "1eb44658997bc21940cb53978ec97fab84abaf8da61ac641d9f7d407d9590635"
+    },
+    "virtualOS/Model/VMCommandServer.swift": {
+      "bytes": 43392,
+      "device": 16777231,
+      "inode": 259714015,
+      "sha256": "3db087903c2e31a2de7413562cea6ac5db747f14e8a42620a59ee6e38fc21c27"
+    },
+    "virtualOS/Resources/virtualOSRemote.entitlements": {
+      "bytes": 353,
+      "device": 16777231,
+      "inode": 499774923,
+      "sha256": "2326352f239ebc33029b53d7c3e53d349da7ce0affb96c112a59d202e75d6f7e"
+    }
+  },
+  "state": "signed_private_candidate_not_activated",
+  "unsigned_build_main": {
+    "bytes": 39640,
+    "device": 16777231,
+    "inode": 560739336,
+    "sha256": "d4e760c6b2b6a846d60da9f13c1773f94819e0def13b9c271bdf874c8d574f34"
+  },
+  "vm_actions_invoked": false
+}

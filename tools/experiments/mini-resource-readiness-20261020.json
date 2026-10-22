@@ -1,0 +1,384 @@
+{
+  "changes_made": false,
+  "disk_free_bytes": 6814846976,
+  "largest_processes": [
+    {
+      "executable": "/System/Library/Frameworks/Virtualization.framework/Versions/A/XPCServices/com.apple.Virtualization.VirtualMachine.xpc/Contents/MacOS/com.apple.Virtualization.VirtualMachine",
+      "pid": 2657,
+      "rss_bytes": 1133101056
+    },
+    {
+      "executable": "/opt/homebrew/Cellar/ollama/0.23.2/libexec/ollama",
+      "pid": 28874,
+      "rss_bytes": 1033994240
+    },
+    {
+      "executable": "/Users/ai/Applications/Mac Mini Live View.app/Contents/MacOS/MacMiniLiveView",
+      "pid": 2525,
+      "rss_bytes": 616693760
+    },
+    {
+      "executable": "/System/Library/Frameworks/WebKit.framework/Versions/A/XPCServices/com.apple.WebKit.WebContent.xpc/Contents/MacOS/com.apple.WebKit.WebContent",
+      "pid": 1259,
+      "rss_bytes": 207060992
+    },
+    {
+      "executable": "/Library/Developer/CoreSimulator/Volumes/iOS_23F77/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 26.5.simruntime/Contents/Resources/RuntimeRoot/usr/libexec/icloudmailagent",
+      "pid": 45330,
+      "rss_bytes": 200163328
+    },
+    {
+      "executable": "/Library/Developer/CoreSimulator/Volumes/iOS_23F77/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 26.5.simruntime/Contents/Resources/RuntimeRoot/System/Library/PrivateFrameworks/SiriInference.framework/Support/siriinferenced",
+      "pid": 44737,
+      "rss_bytes": 159498240
+    },
+    {
+      "executable": "/System/Library/Frameworks/WebKit.framework/Versions/A/XPCServices/com.apple.WebKit.WebContent.xpc/Contents/MacOS/com.apple.WebKit.WebContent",
+      "pid": 47664,
+      "rss_bytes": 151519232
+    },
+    {
+      "executable": "/System/Library/Frameworks/WebKit.framework/Versions/A/XPCServices/com.apple.WebKit.WebContent.xpc/Contents/MacOS/com.apple.WebKit.WebContent",
+      "pid": 1258,
+      "rss_bytes": 148013056
+    },
+    {
+      "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/155.0.8059.84/Helpers/Google Chrome Helper (Aperitif Renderer).app/Contents/MacOS/Google Chrome Helper (Aperitif Renderer)",
+      "pid": 2616,
+      "rss_bytes": 133234688
+    },
+    {
+      "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/155.0.8059.84/Helpers/Google Chrome Helper (Aperitif Renderer).app/Contents/MacOS/Google Chrome Helper (Aperitif Renderer)",
+      "pid": 93600,
+      "rss_bytes": 128073728
+    },
+    {
+      "executable": "/Library/Developer/CoreSimulator/Volumes/iOS_23F77/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 26.5.simruntime/Contents/Resources/RuntimeRoot/usr/libexec/appleaccountd",
+      "pid": 45339,
+      "rss_bytes": 127746048
+    },
+    {
+      "executable": "/Library/Developer/CoreSimulator/Volumes/iOS_23F77/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 26.5.simruntime/Contents/Resources/RuntimeRoot/System/Library/PrivateFrameworks/CalendarDaemon.framework/Support/calaccessd",
+      "pid": 44786,
+      "rss_bytes": 125763584
+    },
+    {
+      "executable": "/Library/Developer/CoreSimulator/Volumes/iOS_23F77/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 26.5.simruntime/Contents/Resources/RuntimeRoot/System/Library/PrivateFrameworks/PhotoAnalysis.framework/Support/photoanalysisd",
+      "pid": 44827,
+      "rss_bytes": 118112256
+    },
+    {
+      "executable": "/Library/Developer/CoreSimulator/Volumes/iOS_23F77/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 26.5.simruntime/Contents/Resources/RuntimeRoot/System/Library/CoreServices/SpringBoard.app/SpringBoard",
+      "pid": 1570,
+      "rss_bytes": 115752960
+    },
+    {
+      "executable": "node",
+      "pid": 48806,
+      "rss_bytes": 115720192
+    },
+    {
+      "executable": "/System/Library/PrivateFrameworks/MediaAnalysis.framework/Versions/A/mediaanalysisd",
+      "pid": 38712,
+      "rss_bytes": 115507200
+    },
+    {
+      "executable": "/Library/Developer/CoreSimulator/Volumes/iOS_23F77/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 26.5.simruntime/Contents/Resources/RuntimeRoot/Applications/News.app/PlugIns/NewsToday2.appex/NewsToday2",
+      "pid": 79503,
+      "rss_bytes": 113491968
+    },
+    {
+      "executable": "/Users/ai/Applications/Merge Browser.app/Contents/Frameworks/Merge Engine.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.53/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+      "pid": 46353,
+      "rss_bytes": 112590848
+    },
+    {
+      "executable": "/Users/ai/Applications/Merge Browser.app/Contents/MacOS/../Frameworks/Merge Engine.app/Contents/MacOS/Google Chrome",
+      "pid": 2788,
+      "rss_bytes": 108314624
+    },
+    {
+      "executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+      "pid": 2523,
+      "rss_bytes": 103284736
+    }
+  ],
+  "loaded_models": [
+    {
+      "expires_at": "2026-10-20T19:47:58.658243-04:00",
+      "name": "qwen3.5:0.8b",
+      "size": 2111662336,
+      "size_vram": 2111662336
+    }
+  ],
+  "observed_at": "2026-10-20T23:46:03.040043+00:00",
+  "schema": "virtualos-resource-readiness/v1",
+  "storage": [
+    {
+      "complete": true,
+      "largest": [
+        {
+          "allocated_bytes": 6747594752,
+          "path": "/Users/ai/Library/Caches"
+        },
+        {
+          "allocated_bytes": 1727741952,
+          "path": "/Users/ai/Library/Caches/Contacts Network News Browser"
+        },
+        {
+          "allocated_bytes": 990318592,
+          "path": "/Users/ai/Library/Caches/Merge REALM Collector"
+        },
+        {
+          "allocated_bytes": 901468160,
+          "path": "/Users/ai/Library/Caches/pen-updater"
+        },
+        {
+          "allocated_bytes": 639320064,
+          "path": "/Users/ai/Library/Caches/com.figma.Desktop.ShipIt"
+        },
+        {
+          "allocated_bytes": 504098816,
+          "path": "/Users/ai/Library/Caches/Contacts Browser"
+        },
+        {
+          "allocated_bytes": 368168960,
+          "path": "/Users/ai/Library/Caches/Merge Browser"
+        },
+        {
+          "allocated_bytes": 358305792,
+          "path": "/Users/ai/Library/Caches/com.todesktop.2601167vjw8xe.ShipIt"
+        },
+        {
+          "allocated_bytes": 279654400,
+          "path": "/Users/ai/Library/Caches/@paperdesktop-updater"
+        },
+        {
+          "allocated_bytes": 269582336,
+          "path": "/Users/ai/Library/Caches/SiriTTS"
+        },
+        {
+          "allocated_bytes": 241074176,
+          "path": "/Users/ai/Library/Caches/Homebrew"
+        },
+        {
+          "allocated_bytes": 66564096,
+          "path": "/Users/ai/Library/Caches/bun"
+        }
+      ],
+      "root": "/Users/ai/Library/Caches"
+    },
+    {
+      "complete": true,
+      "largest": [
+        {
+          "allocated_bytes": 30494720,
+          "path": "/Users/ai/.cache"
+        },
+        {
+          "allocated_bytes": 23449600,
+          "path": "/Users/ai/.cache/xcanvas-opencode"
+        },
+        {
+          "allocated_bytes": 2347008,
+          "path": "/Users/ai/.cache/mergevip-openeditor-preview-Ds1S3K"
+        },
+        {
+          "allocated_bytes": 2347008,
+          "path": "/Users/ai/.cache/mergevip-openeditor-preview-wv7Nss"
+        },
+        {
+          "allocated_bytes": 2347008,
+          "path": "/Users/ai/.cache/mergevip-openeditor-preview-lHuWXJ"
+        },
+        {
+          "allocated_bytes": 4096,
+          "path": "/Users/ai/.cache/huggingface"
+        },
+        {
+          "allocated_bytes": 0,
+          "path": "/Users/ai/.cache/opencode"
+        }
+      ],
+      "root": "/Users/ai/.cache"
+    },
+    {
+      "complete": true,
+      "largest": [
+        {
+          "allocated_bytes": 4811264000,
+          "path": "/Users/ai/Library/Developer"
+        },
+        {
+          "allocated_bytes": 4772077568,
+          "path": "/Users/ai/Library/Developer/CoreSimulator"
+        },
+        {
+          "allocated_bytes": 39178240,
+          "path": "/Users/ai/Library/Developer/Xcode"
+        },
+        {
+          "allocated_bytes": 8192,
+          "path": "/Users/ai/Library/Developer/DVTDownloads"
+        },
+        {
+          "allocated_bytes": 0,
+          "path": "/Users/ai/Library/Developer/XCTestDevices"
+        },
+        {
+          "allocated_bytes": 0,
+          "path": "/Users/ai/Library/Developer/XCPGDevices"
+        }
+      ],
+      "root": "/Users/ai/Library/Developer"
+    },
+    {
+      "complete": true,
+      "largest": [
+        {
+          "allocated_bytes": 29588398080,
+          "path": "/Users/ai/vos-fleet"
+        },
+        {
+          "allocated_bytes": 27452362752,
+          "path": "/Users/ai/vos-fleet/vm-a.bundle"
+        },
+        {
+          "allocated_bytes": 1165762560,
+          "path": "/Users/ai/vos-fleet/.local"
+        },
+        {
+          "allocated_bytes": 855027712,
+          "path": "/Users/ai/vos-fleet/linux"
+        },
+        {
+          "allocated_bytes": 35414016,
+          "path": "/Users/ai/vos-fleet/input-guard-20261017"
+        },
+        {
+          "allocated_bytes": 11022336,
+          "path": "/Users/ai/vos-fleet/tools"
+        },
+        {
+          "allocated_bytes": 1433600,
+          "path": "/Users/ai/vos-fleet/vm-net.bundle"
+        },
+        {
+          "allocated_bytes": 1433600,
+          "path": "/Users/ai/vos-fleet/vm-from-delta.bundle"
+        },
+        {
+          "allocated_bytes": 483328,
+          "path": "/Users/ai/vos-fleet/maintenance"
+        },
+        {
+          "allocated_bytes": 40960,
+          "path": "/Users/ai/vos-fleet/experiments"
+        },
+        {
+          "allocated_bytes": 4096,
+          "path": "/Users/ai/vos-fleet/.watchdog"
+        },
+        {
+          "allocated_bytes": 0,
+          "path": "/Users/ai/vos-fleet/machines"
+        }
+      ],
+      "root": "/Users/ai/vos-fleet"
+    },
+    {
+      "complete": true,
+      "largest": [
+        {
+          "allocated_bytes": 27476983808,
+          "path": "/Users/ai/VirtualOSMachines"
+        },
+        {
+          "allocated_bytes": 27475546112,
+          "path": "/Users/ai/VirtualOSMachines/virtualOS.bundle"
+        },
+        {
+          "allocated_bytes": 1437696,
+          "path": "/Users/ai/VirtualOSMachines/.virtualOS-r2-metadata.bundle"
+        }
+      ],
+      "root": "/Users/ai/VirtualOSMachines"
+    },
+    {
+      "complete": true,
+      "largest": [
+        {
+          "allocated_bytes": 14132269056,
+          "path": "/Users/ai/.ollama"
+        },
+        {
+          "allocated_bytes": 14132244480,
+          "path": "/Users/ai/.ollama/models"
+        },
+        {
+          "allocated_bytes": 4096,
+          "path": "/Users/ai/.ollama/cache"
+        },
+        {
+          "allocated_bytes": 4096,
+          "path": "/Users/ai/.ollama/backup"
+        }
+      ],
+      "root": "/Users/ai/.ollama"
+    },
+    {
+      "complete": true,
+      "largest": [
+        {
+          "allocated_bytes": 2105769984,
+          "path": "/private/tmp"
+        },
+        {
+          "allocated_bytes": 576495616,
+          "path": "/private/tmp/xcanvas-browser.HwwyUp"
+        },
+        {
+          "allocated_bytes": 232587264,
+          "path": "/private/tmp/xcanvas-browser.EFCcAE"
+        },
+        {
+          "allocated_bytes": 217710592,
+          "path": "/private/tmp/xcanvas-browser.64iKcF"
+        },
+        {
+          "allocated_bytes": 214192128,
+          "path": "/private/tmp/xcanvas-browser.jgT2sv"
+        },
+        {
+          "allocated_bytes": 213127168,
+          "path": "/private/tmp/xcanvas-browser.Br2BJM"
+        },
+        {
+          "allocated_bytes": 210993152,
+          "path": "/private/tmp/xcanvas-browser.W4pdkH"
+        },
+        {
+          "allocated_bytes": 210042880,
+          "path": "/private/tmp/xcanvas-browser.LdB29p"
+        },
+        {
+          "allocated_bytes": 179273728,
+          "path": "/private/tmp/xcanvas-browser.xiR6Sv"
+        },
+        {
+          "allocated_bytes": 13508608,
+          "path": "/private/tmp/framer-collect-build-100-20261018T233600Z"
+        },
+        {
+          "allocated_bytes": 7774208,
+          "path": "/private/tmp/xcanvas-browser.ikEcGI"
+        },
+        {
+          "allocated_bytes": 245760,
+          "path": "/private/tmp/virtualos-input-fix-20261018"
+        }
+      ],
+      "root": "/private/tmp"
+    }
+  ]
+}

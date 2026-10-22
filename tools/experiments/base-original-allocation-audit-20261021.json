@@ -1,0 +1,29 @@
+{
+  "observed_at": "2026-10-21T20:37:53.019149+00:00",
+  "read_only": true,
+  "files": [
+    {
+      "path": "/Users/ai/vos-fleet/vm-a-base-20261021.bundle/Disk.img",
+      "logical_bytes": 32212254720,
+      "allocated_bytes": 27474112512,
+      "device": 16777232,
+      "inode": 267229377,
+      "link_count": 1,
+      "mtime_ns": 1792333740465052298
+    },
+    {
+      "path": "/Users/ai/vos-fleet/vm-a-original-20261021.bundle/Disk.img",
+      "logical_bytes": 32212254720,
+      "allocated_bytes": 27426009088,
+      "device": 16777232,
+      "inode": 212790670,
+      "link_count": 1,
+      "mtime_ns": 1792601256681625725
+    }
+  ],
+  "original_closed": true,
+  "base_and_original_are_distinct_inodes": true,
+  "physical_shared_extents_not_measured": true,
+  "allocated_bytes_must_not_be_added_to_estimate_reclaimable_space": true,
+  "original_deleted_or_changed": false
+}

@@ -1,0 +1,175 @@
+{
+  "observed_at": "2026-10-21T19:53:31.012016+00:00",
+  "read_only": true,
+  "files": [
+    {
+      "path": "/Users/ai/vos-fleet/vm-a-base-20261021.bundle/Disk.img",
+      "logical_bytes": 32212254720,
+      "allocated_bytes": 27474112512,
+      "device": 16777232,
+      "inode": 267229377,
+      "link_count": 1,
+      "mtime_ns": 1792333740465052298
+    },
+    {
+      "path": "/Users/ai/vos-fleet/vm-a-original-20261021.bundle/Disk.img",
+      "logical_bytes": 32212254720,
+      "allocated_bytes": 27426009088,
+      "device": 16777232,
+      "inode": 212790670,
+      "link_count": 1,
+      "mtime_ns": 1792601256681625725
+    },
+    {
+      "path": "/Users/ai/vos-fleet/deltas/vm-a-compressed-20261021.sqlite",
+      "logical_bytes": 1192714240,
+      "allocated_bytes": 1208025088,
+      "device": 16777232,
+      "inode": 267242854,
+      "link_count": 1,
+      "mtime_ns": 1792601458176774924
+    },
+    {
+      "path": "/Users/ai/vos-fleet/.virtualos-nbd/vm-a/overlay.sqlite",
+      "logical_bytes": 971431936,
+      "allocated_bytes": 973144064,
+      "device": 16777232,
+      "inode": 267268278,
+      "link_count": 1,
+      "mtime_ns": 1792612400908131520
+    },
+    {
+      "path": "/Users/ai/vos-fleet/.virtualos-nbd/vm-a/overlay.sqlite-wal",
+      "logical_bytes": 3518512,
+      "allocated_bytes": 4210688,
+      "device": 16777232,
+      "inode": 267268280,
+      "link_count": 1,
+      "mtime_ns": 1792612401074739489
+    },
+    {
+      "path": "/Users/ai/vos-fleet/.local/maintenance/compressed-writes-20261021/real-overlay-preview/compressed-preview.sqlite",
+      "logical_bytes": 417488896,
+      "allocated_bytes": 419495936,
+      "device": 16777232,
+      "inode": 267576714,
+      "link_count": 1,
+      "mtime_ns": 1792610884593295905
+    }
+  ],
+  "physical_allocations_are_not_additive_for_apfs_clones": true,
+  "overlay": {
+    "stored_blocks": 14692,
+    "stored_payload_bytes": 962854912,
+    "page_count": 237182,
+    "free_pages": 16,
+    "page_size": 4096,
+    "codec": "raw",
+    "logical_limit_bytes": 2147483648
+  },
+  "private_ocr_runtime_allocated_bytes": 229699584,
+  "private_ocr_archive_allocated_bytes": 802168832,
+  "free_bytes": 16318533632,
+  "resources": {
+    "background_work": "allowed",
+    "cpu_count": 10,
+    "disk_free_kib": 15936056,
+    "families": {
+      "ai_agents": {
+        "processes": 2,
+        "sum_rss_mib": 994.4
+      },
+      "browser_apps": {
+        "processes": 23,
+        "sum_rss_mib": 355.5
+      },
+      "browser_engines": {
+        "processes": 130,
+        "sum_rss_mib": 4765.8
+      },
+      "simulator_runtime": {
+        "processes": 0,
+        "sum_rss_mib": 0.0
+      },
+      "terminal": {
+        "processes": 1,
+        "sum_rss_mib": 5.9
+      },
+      "virtualos": {
+        "processes": 4,
+        "sum_rss_mib": 221.2
+      }
+    },
+    "load_one": 7.17,
+    "memory_free_percent": 30,
+    "reasons": [],
+    "rss_note": "RSS sums can count shared pages more than once and omit paged-out memory",
+    "swap_used_mib": 5935,
+    "top_executables": [
+      {
+        "name": "Google Chrome",
+        "processes": 81,
+        "sum_rss_mib": 3361.7
+      },
+      {
+        "name": "ollama",
+        "processes": 2,
+        "sum_rss_mib": 994.4
+      },
+      {
+        "name": "com.apple.WebKit.WebContent",
+        "processes": 7,
+        "sum_rss_mib": 723.0
+      },
+      {
+        "name": "Google Chrome for Testing",
+        "processes": 10,
+        "sum_rss_mib": 507.2
+      },
+      {
+        "name": "com.apple.Virtualization.VirtualMachine",
+        "processes": 3,
+        "sum_rss_mib": 194.1
+      },
+      {
+        "name": "Paper",
+        "processes": 7,
+        "sum_rss_mib": 164.2
+      },
+      {
+        "name": "Figma",
+        "processes": 9,
+        "sum_rss_mib": 132.7
+      },
+      {
+        "name": "Pen",
+        "processes": 4,
+        "sum_rss_mib": 41.8
+      }
+    ]
+  },
+  "fleet": {
+    "count": 1,
+    "instances": [
+      {
+        "ready": true,
+        "error": "",
+        "bundle": "/Users/ai/vos-fleet/machines/vm-a.bundle",
+        "name": "vm-a",
+        "controlPort": 9125,
+        "state": "running"
+      }
+    ],
+    "ok": true,
+    "basePort": 9125,
+    "root": "/Users/ai/vos-fleet/machines",
+    "capability": {
+      "nestedVirtualizationSupported": true,
+      "nestedVirtualizationReason": "supported",
+      "platform": "macOS Version 26.2 (Build 25C56)"
+    }
+  },
+  "preserved_processes": "  440 /Applications/virtualOS.app/Contents/MacOS/virtualOS\n 2499 ./tools/fleet/linux-guest\n80901 /Users/ai/vos-fleet/tools/fleet/fleet-supervisor\n",
+  "original_open_files": "",
+  "original_disk_closed": true
+}

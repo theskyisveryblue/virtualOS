@@ -11,6 +11,7 @@ from pathlib import Path
 import re
 import shutil
 import sqlite3
+import stat
 import tempfile
 import zlib
 
@@ -66,8 +67,22 @@ def _lab_path(path):
 
 def _private_parent(path):
     parent = path.parent
-    if parent.is_symlink() or not parent.is_dir() or parent.stat().st_mode & 0o077:
+    info = parent.lstat()
+    if (not stat.S_ISDIR(info.st_mode) or info.st_uid != os.getuid() or
+            info.st_mode & 0o077):
         raise ValueError("checkpoint output parent must be a private directory")
+
+
+def _read_regular(path, limit):
+    # Check the opened descriptor: a path check followed by ordinary open can
+    # race a symlink replacement, and opening a FIFO can block indefinitely.
+    fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+    with os.fdopen(fd, "rb") as stream:
+        info = os.fstat(stream.fileno())
+        if (not stat.S_ISREG(info.st_mode) or info.st_uid != os.getuid() or
+                info.st_nlink != 1 or info.st_mode & 0o022):
+            raise ValueError("checkpoint input must be an owned regular file")
+        return stream.read(limit + 1)
 
 
 def _base_identity(base_dir, scratch_parent):
@@ -169,8 +184,7 @@ def restore_overlay(snapshot, base_dir, destination, expected_sha256,
             (snapshot / "objects").is_symlink()):
         raise ValueError("invalid checkpoint restore source or destination")
     _private_parent(destination)
-    with (snapshot / "manifest.json").open("rb") as stream:
-        manifest_bytes = stream.read(max_bytes + 1)
+    manifest_bytes = _read_regular(snapshot / "manifest.json", max_bytes)
     if len(manifest_bytes) > max_bytes or digest(manifest_bytes) != expected_sha256:
         raise ValueError("checkpoint manifest hash mismatch")
     manifest = json.loads(manifest_bytes)
@@ -208,8 +222,7 @@ def restore_overlay(snapshot, base_dir, destination, expected_sha256,
                 object_path = snapshot / "objects" / (key + ".z")
                 if object_path.is_symlink():
                     raise ValueError("checkpoint object symlink refused")
-                with object_path.open("rb") as stream:
-                    encoded = stream.read(BLOCK + 65)
+                encoded = _read_regular(object_path, BLOCK + 64)
                 if (len(encoded) != entry["encoded_size"] or digest(encoded) != key):
                     raise ValueError("checkpoint object hash mismatch")
                 decoder = zlib.decompressobj()
@@ -275,8 +288,7 @@ def upload_checkpoint(snapshot, base_dir, store, expected_sha256,
         raise ValueError("invalid checkpoint upload source or byte bound")
     if (snapshot / "manifest.json").is_symlink() or (snapshot / "objects").is_symlink():
         raise ValueError("checkpoint upload symlink refused")
-    with (snapshot / "manifest.json").open("rb") as stream:
-        manifest_bytes = stream.read(max_bytes + 1)
+    manifest_bytes = _read_regular(snapshot / "manifest.json", max_bytes)
     if len(manifest_bytes) > max_bytes or digest(manifest_bytes) != expected_sha256:
         raise ValueError("checkpoint upload manifest pin mismatch")
     manifest = json.loads(manifest_bytes)
@@ -310,8 +322,7 @@ def upload_checkpoint(snapshot, base_dir, store, expected_sha256,
         path = snapshot / "objects" / (entry["key"] + ".z")
         if path.is_symlink():
             raise ValueError("checkpoint upload object symlink refused")
-        with path.open("rb") as stream:
-            encoded = stream.read(BLOCK + 65)
+        encoded = _read_regular(path, BLOCK + 64)
         if len(encoded) != entry["encoded_size"] or digest(encoded) != entry["key"]:
             raise ValueError("checkpoint upload object hash mismatch")
         decoder = zlib.decompressobj()
@@ -348,8 +359,8 @@ def restore_remote_checkpoint(base_dir, destination, reader, expected_sha256,
     os.chmod(staging, 0o700)
     try:
         manifest_bytes = reader.fetch_manifest()
-        if len(manifest_bytes) > max_bytes:
-            raise ValueError("remote checkpoint manifest exceeds byte bound")
+        if len(manifest_bytes) > max_bytes or digest(manifest_bytes) != expected_sha256:
+            raise ValueError("remote checkpoint manifest size or hash mismatch")
         manifest = json.loads(manifest_bytes)
         if not isinstance(manifest, dict) or not isinstance(manifest.get("blocks"), list):
             raise ValueError("remote checkpoint manifest schema invalid")

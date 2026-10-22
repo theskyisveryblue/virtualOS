@@ -20,7 +20,8 @@ additive and does not touch the existing macOS path.
 | File | Role |
 | --- | --- |
 | `tools/fleet/LinuxGuest.swift` | standalone Swift helper: builds a `VZLinuxBootLoader` VM |
-| `tools/linux-guest.sh` | wrapper: `build` / `check` / `run` / `fetch-config` |
+| `tools/linux-guest.sh` | wrapper: `build` / `check` / `run` / `fetch-config` / `selection-check` |
+| `tools/linux_guest_selection.py` | read-only validation of an explicit future maintained or legacy selection |
 | `tools/LINUX_GUEST.md` | this document |
 
 ## What Apple's `VZLinuxBootLoader` needs
@@ -118,12 +119,70 @@ swiftc -framework Virtualization -framework Foundation \
     tools/fleet/LinuxGuest.swift -o tools/fleet/linux-guest
 ```
 
+## Prepare a maintained selection without activating it
+
+The reviewed maintained pair is Alpine 3.24.2 with kernel 6.18.57. Its separate
+two-boot receipt is
+[`experiments/linux-maintained-persistence-receipt-20261018.json`](experiments/linux-maintained-persistence-receipt-20261018.json).
+The existing Mini LaunchAgent still invokes `linux/run-guest.sh` with the
+original `linux/Image`, `linux/initramfs`, and `linux/inner-root.img`. Nothing in
+`selection-check` edits those paths, starts a VM, or changes that LaunchAgent.
+
+[`experiments/linux-maintained-selection.example.json`](experiments/linux-maintained-selection.example.json)
+contains the real retained profile/proof paths and placeholders for a future
+private selection directory. It is a template, not an active configuration.
+The artifact profile's `boot_verified: false` describes its original build;
+the separately pinned persistence receipt supplies the actual two-boot evidence.
+
+Prepare a runtime disk only during a later healthy resource window:
+
+1. Run `python3 tools/linux_lab_resources.py check` and require success. Confirm
+   the retained proof disk has no open descriptors. Keep the current Linux
+   guest, source disk, and original boot artifacts unchanged.
+2. Create a **new**, owned mode-0700 directory for the runtime copy. Refuse an
+   existing destination directory or linked path. Use APFS `cp -c` to copy the
+   retained proof disk into that new directory as `root.img`, then set mode
+   0600. Never use the proof disk itself as a writable runtime disk. A copy
+   failure should stop preparation; do not fall back to a full copy under
+   storage pressure.
+3. Copy the reviewed receipt and example JSON into the private directory, with
+   mode 0600. Replace both `__PRIVATE_SELECTION_DIRECTORY__` placeholders with
+   its literal absolute path. Keep the receipt SHA-256 and maintained artifact
+   pins unchanged; the selector checks the actual receipt, kernel, initrd,
+   proof disk, and separate runtime disk. It hashes disks in bounded 1 MiB reads.
+4. Validate the private configuration:
+
+   ```sh
+   tools/linux-guest.sh selection-check /absolute/private/directory/selection.json
+   ```
+
+Success returns proposed arguments and `activation_required: true`. It proves
+only the **initial** prepared copy: once that runtime disk has guest writes,
+this initial-copy check deliberately refuses it. Persistent runtime identity
+tracking, launch integration, resource admission at activation, and rollout
+remain separate work. A failed maintained check never selects legacy artifacts;
+legacy validation requires an explicit `mode: "legacy"` configuration with
+each artifact's path and SHA-256.
+
 ## What has and has not been verified
+
+Failed private persistence images can be made sparse through
+`linux_lab_storage.sparsify` after an explicit SHA-256 review and unused-file
+checks. It builds and rereads a sparse copy before atomic replacement, preserves
+every logical byte and diagnostic log, and refuses successful proof images.
+On October 20, one failed, entirely zero 256 MiB image went from 256 MiB of
+reported allocation to zero while retaining its exact SHA-256. The source image
+remained open and was preserved. Per-file allocation is not a measurement of
+unique APFS extents or of net volume space gained; see
+`experiments/failed-linux-sparse-receipt-20261020.json`.
 
 - **Verified:** `swiftc` compiles `LinuxGuest.swift` without a kernel present;
   `--check` fails gracefully on a nonexistent path; `--check` prints the planned
   configuration for paths that exist; `fetch-config` prints offline.
-- **Not verified:** an actual Linux boot. No kernel, initrd, or rootfs was
-  obtained or run during the construction of this helper. A real boot may
-  require cmdline/console tuning (e.g. `console=hvc0` vs `ttyS0`, `root=`
-  device naming) that can only be confirmed against real artifacts.
+- **Verified:** real Alpine boot and, separately, two disk-rooted persistence
+  boots of both the legacy Alpine 3.20 baseline and maintained Alpine 3.24.2.
+  Both persistence proofs locked root password login, retained their private
+  proof disks/logs, and left existing guests running. See the two October 18
+  persistence receipts under `experiments/` for pins and scope.
+- **Open:** activation of the maintained profile as the default Linux guest,
+  runtime identity tracking after initial writes, and nested virtualization.

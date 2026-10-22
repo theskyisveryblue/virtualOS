@@ -1,0 +1,32 @@
+{
+  "schema": "virtualos-managed-compressed-disk-verification/v1",
+  "observed_at": "2026-10-21T17:00:47.654407+00:00",
+  "sessions": [
+    {
+      "session": 1,
+      "verified_blocks": [
+        0,
+        1,
+        19,
+        491519
+      ]
+    },
+    {
+      "session": 2,
+      "verified_blocks": [
+        0,
+        1,
+        19,
+        491519
+      ]
+    }
+  ],
+  "runtime_overlay_blocks": 0,
+  "runtime_overlay_bytes": 16384,
+  "immutable_seed_bytes": 1192714240,
+  "seed_not_copied_into_overlay": true,
+  "full_logical_bytes": 32212254720,
+  "original_disk_retained": true,
+  "guest_boot_verified": false,
+  "disk_service_pid": 88374
+}

@@ -1,0 +1,20 @@
+{
+  "api_url": "https://api.github.com/repos/ollama/ollama/releases/tags/v0.40.6",
+  "asset": {
+    "browser_download_url": "https://github.com/ollama/ollama/releases/download/v0.40.6/ollama-darwin.tgz",
+    "digest": "sha256:b2b55434865a668decb494110d7fd970eed3ecc8837be2872f672ccbb95df974",
+    "name": "ollama-darwin.tgz",
+    "size": 174459907
+  },
+  "inference_requested": false,
+  "official_release_matches_existing_archive_pin": true,
+  "published_at": "2026-10-16T22:00:46Z",
+  "release_api_response_sha256": "952ccf7128c5c6edaad2c145513ad3e91279999baa211ea5b48fbf4f5758f19e",
+  "release_url": "https://github.com/ollama/ollama/releases/tag/v0.40.6",
+  "runtime_downloaded_by_this_check": false,
+  "runtime_inventory_sha256": "8e2986b681848675b29a05d2e626f1954c5b204b0ad042d182ee1366ca07dde5",
+  "runtime_inventory_verification_receipt": "private-mini-ollama-metadata-20261019.json",
+  "schema": "virtualos-private-runtime-provenance/v1",
+  "tag": "v0.40.6",
+  "verified_at": "2026-10-19T02:45:14.479531+00:00"
+}

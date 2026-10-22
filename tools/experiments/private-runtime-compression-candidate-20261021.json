@@ -1,0 +1,15 @@
+{
+  "schema": "virtualos-private-runtime-compression/v1",
+  "state": "candidate_verified_not_activated",
+  "observed_at": "2026-10-21T18:48:09.286738+00:00",
+  "source": "/Users/ai/vos-fleet/.local/maintenance/ollama-metadata-20261019/runtime",
+  "candidate": "/Users/ai/vos-fleet/.local/maintenance/ollama-metadata-20261019/runtime-compressed-candidate",
+  "inventory_sha256": "8e2986b681848675b29a05d2e626f1954c5b204b0ad042d182ee1366ca07dde5",
+  "all_entries_byte_and_metadata_identical": true,
+  "verified_files": 47,
+  "strict_codesign_verified_files": 32,
+  "source_allocated_bytes": 566071296,
+  "candidate_allocated_bytes": 229699584,
+  "allocated_bytes_reduction": 336371712,
+  "guest_or_model_process_changes": false
+}

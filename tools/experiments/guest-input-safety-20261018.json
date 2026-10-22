@@ -1,0 +1,8 @@
+{
+  "schema": "virtualos-input-safety/v1",
+  "verified_at": 1792364999.226814,
+  "unsupported_text_refused_before_guest_input": true,
+  "reason": "live guest keyboard needs update for shifted text",
+  "test_guest_restarted": false,
+  "candidate_active": false
+}

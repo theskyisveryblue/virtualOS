@@ -267,8 +267,8 @@ if [[ "${1:-}" == --cloud-disk-r2-upload-clone ]]; then
   exit 0
 fi
 
-if [[ $# -gt 1 || ( $# -eq 1 && "$1" != --reclaim-caches && "$1" != --reclaim-local-lab && "$1" != --vm-summary && "$1" != --raw-hole-lab && "$1" != --nbd-api-probe && "$1" != --nbd-source-build-check && "$1" != --nbd-r2-metadata-prepare && "$1" != --nbd-r2-metadata-check && "$1" != --nbd-bundle-serve && "$1" != --nbd-base-delta-serve && "$1" != --nbd-vz-lab && "$1" != --nbd-macos-config-check && "$1" != --nbd-r2-macos-config-check && "$1" != --nbd-macos-clone-test && "$1" != --nbd-clone-serve && "$1" != --guest-tree-probe && "$1" != --guest-tree-transport && "$1" != --guest-hex-smoke && "$1" != --guest-accessibility-open && "$1" != --intent-plan-compile && "$1" != --promote-debug-app && "$1" != --virtualization-api-inventory && "$1" != --cloud-disk-self-test && "$1" != --cloud-disk-checkpoint-self-test && "$1" != --cloud-disk-config-check && "$1" != --cloud-disk-lab-pack && "$1" != --cloud-disk-lab-serve && "$1" != --cloud-disk-r2-serve && "$1" != --cloud-disk-r2-boot-lab && "$1" != --cloud-disk-r2-checkpoint-lab && "$1" != --cloud-disk-r2-upload-bundle ) ]]; then
-  echo 'Usage: ./tools/computer-space.sh [--display-diagnostics|--guest-ax-verify finder_window_present|--reclaim-operator-playwright-cache|--reclaim-operator-puppeteer-cache|--reclaim-operator-uv-cache|--reclaim-operator-go-cache|--reclaim-operator-build-cache|--reclaim-caches|--reclaim-local-lab|--vm-summary|--raw-hole-lab|--nbd-api-probe|--nbd-source-build-check|--nbd-r2-metadata-prepare|--nbd-r2-metadata-check|--nbd-bundle-serve|--nbd-base-delta-serve|--nbd-vz-lab|--nbd-macos-config-check|--nbd-r2-macos-config-check|--nbd-macos-clone-test|--nbd-clone-serve|--guest-tree-probe|--guest-tree-transport|--guest-hex-smoke|--guest-accessibility-open|--guest-accessibility-authorize|--intent-plan-compile|--promote-debug-app|--virtualization-api-inventory|--cloud-disk-self-test|--cloud-disk-config-check|--cloud-disk-lab-pack|--cloud-disk-lab-serve|--cloud-disk-r2-serve|--cloud-disk-r2-upload-clone|--cloud-disk-r2-boot-lab|--cloud-disk-r2-checkpoint-lab|--cloud-disk-r2-upload-bundle]' >&2
+if [[ $# -gt 1 || ( $# -eq 1 && "$1" != --reclaim-caches && "$1" != --reclaim-local-lab && "$1" != --vm-summary && "$1" != --raw-hole-lab && "$1" != --nbd-api-probe && "$1" != --nbd-source-build-check && "$1" != --nbd-r2-metadata-prepare && "$1" != --nbd-r2-metadata-check && "$1" != --nbd-bundle-serve && "$1" != --nbd-base-delta-serve && "$1" != --nbd-vz-lab && "$1" != --nbd-macos-config-check && "$1" != --nbd-r2-macos-config-check && "$1" != --nbd-macos-clone-test && "$1" != --nbd-clone-serve && "$1" != --guest-tree-probe && "$1" != --guest-tree-transport && "$1" != --guest-hex-smoke && "$1" != --guest-accessibility-open && "$1" != --intent-plan-compile && "$1" != --promote-debug-app && "$1" != --virtualization-api-inventory && "$1" != --cloud-disk-self-test && "$1" != --cloud-disk-checkpoint-self-test && "$1" != --cloud-disk-config-check && "$1" != --cloud-disk-lab-pack && "$1" != --cloud-disk-lab-serve && "$1" != --cloud-disk-r2-serve && "$1" != --cloud-disk-r2-boot-lab && "$1" != --cloud-disk-r2-checkpoint-lab && "$1" != --cloud-disk-r2-upload-bundle && "$1" != --cloud-disk-r2-upload-delta && "$1" != --cloud-disk-r2-pull-delta ) ]]; then
+  echo 'Usage: ./tools/computer-space.sh [--display-diagnostics|--guest-ax-verify finder_window_present|--reclaim-operator-playwright-cache|--reclaim-operator-puppeteer-cache|--reclaim-operator-uv-cache|--reclaim-operator-go-cache|--reclaim-operator-build-cache|--reclaim-caches|--reclaim-local-lab|--vm-summary|--raw-hole-lab|--nbd-api-probe|--nbd-source-build-check|--nbd-r2-metadata-prepare|--nbd-r2-metadata-check|--nbd-bundle-serve|--nbd-base-delta-serve|--nbd-vz-lab|--nbd-macos-config-check|--nbd-r2-macos-config-check|--nbd-macos-clone-test|--nbd-clone-serve|--guest-tree-probe|--guest-tree-transport|--guest-hex-smoke|--guest-accessibility-open|--guest-accessibility-authorize|--intent-plan-compile|--promote-debug-app|--virtualization-api-inventory|--cloud-disk-self-test|--cloud-disk-config-check|--cloud-disk-lab-pack|--cloud-disk-lab-serve|--cloud-disk-r2-serve|--cloud-disk-r2-upload-clone|--cloud-disk-r2-boot-lab|--cloud-disk-r2-checkpoint-lab|--cloud-disk-r2-upload-bundle|--cloud-disk-r2-upload-delta|--cloud-disk-r2-pull-delta]' >&2
   exit 2
 fi
 
@@ -570,7 +570,7 @@ if [[ "${1:-}" == --nbd-base-delta-serve ]]; then
      -n "${VOS_NBD_BUNDLE_OVERLAY:-}" && "${VOS_NBD_BUNDLE_PORT:-}" =~ ^[0-9]+$ ]] || {
     echo 'nbd_base_delta_serve=refused: root, base name, overlay, and numeric port required' >&2; exit 2;
   }
-  python3 "$script_dir/cloud_disk.py" base-delta-serve "$VOS_NBD_BUNDLE_ROOT" \
+  exec python3 "$script_dir/cloud_disk.py" base-delta-serve "$VOS_NBD_BUNDLE_ROOT" \
     "$VOS_NBD_BASE_NAME" "$VOS_NBD_BUNDLE_OVERLAY" "$VOS_NBD_BUNDLE_PORT" \
     "${VOS_NBD_BASE_DELTA:-}"
   exit 0
@@ -1037,6 +1037,36 @@ if [[ "${1:-}" == --cloud-disk-r2-upload-bundle ]]; then
   }
   python3 "$script_dir/cloud_disk.py" r2-upload-bundle \
     "$VOS_R2_UPLOAD_ROOT" "$VOS_R2_UPLOAD_NAME" "$VOS_CLOUD_DISK_CONFIG"
+  exit 0
+fi
+
+if [[ "${1:-}" == --cloud-disk-r2-upload-delta ]]; then
+  script_dir="$(cd "$(dirname "$0")" && pwd)"
+  [[ -n "${VOS_CLOUD_DISK_CONFIG:-}" && -n "${VOS_DELTA_SQLITE:-}" ]] || {
+    echo 'cloud_disk_r2_upload_delta=refused: VOS_CLOUD_DISK_CONFIG and VOS_DELTA_SQLITE required' >&2; exit 2;
+  }
+  if [[ -n "${VOS_DELTA_SOURCE_HOST:-}" ]]; then
+    python3 "$script_dir/cloud_disk.py" r2-upload-remote-delta "$VOS_DELTA_SOURCE_HOST" \
+      "$VOS_DELTA_SQLITE" "$VOS_CLOUD_DISK_CONFIG"
+  else
+    python3 "$script_dir/cloud_disk.py" r2-upload-delta "$VOS_DELTA_SQLITE" "$VOS_CLOUD_DISK_CONFIG"
+  fi
+  exit 0
+fi
+
+if [[ "${1:-}" == --cloud-disk-r2-pull-delta ]]; then
+  script_dir="$(cd "$(dirname "$0")" && pwd)"
+  [[ -n "${VOS_CLOUD_DISK_CONFIG:-}" && -n "${VOS_DELTA_SQLITE:-}" &&
+     "${VOS_DELTA_MANIFEST_SHA256:-}" =~ ^[0-9a-f]{64}$ ]] || {
+    echo 'cloud_disk_r2_pull_delta=refused: config, destination, and pinned manifest SHA-256 required' >&2; exit 2;
+  }
+  if [[ -n "${VOS_DELTA_SOURCE_HOST:-}" ]]; then
+    python3 "$script_dir/cloud_disk.py" r2-pull-remote-delta "$VOS_DELTA_SOURCE_HOST" \
+      "$VOS_DELTA_SQLITE" "$VOS_CLOUD_DISK_CONFIG" "$VOS_DELTA_MANIFEST_SHA256"
+  else
+    python3 "$script_dir/cloud_disk.py" r2-pull-delta "$VOS_CLOUD_DISK_CONFIG" \
+      "$VOS_DELTA_SQLITE" "$VOS_DELTA_MANIFEST_SHA256"
+  fi
   exit 0
 fi
 

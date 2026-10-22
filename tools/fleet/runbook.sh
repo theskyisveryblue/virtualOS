@@ -9,9 +9,11 @@
 #   runbook.sh doctor                 # check host readiness, entitlements, limits
 #   runbook.sh capacity               # report Apple's active-VM limit
 #   runbook.sh entitle [binary]       # sign a binary with virtualization entitle
+#   runbook.sh build [new_binary]     # build and sign a new supervisor binary
 #   runbook.sh agent install|remove   # install the GUI-session launch agent
 #   runbook.sh clone <name> [src]     # APFS COW clone of a bundle (read src only)
 #   runbook.sh boot <names>           # start the supervisor for named bundles
+#   runbook.sh start <name>           # start one VM through the running supervisor
 #   runbook.sh frame <vm> [out.jpg]   # capture one frame
 #   runbook.sh desktop <vm> [timeout] # poll frames until non-blank, save it
 #   runbook.sh stream <vm> [relay]    # push status + a live frame to Cloudflare
@@ -51,10 +53,10 @@ set -euo pipefail
 FLEET_HOME="${VOS_FLEET_HOME:-$HOME/vos-fleet}"
 SRC_ROOT="${VOS_FLEET_SRC:-$HOME/VirtualOSMachines}"
 MACHINES="$FLEET_HOME/machines"
-AGENT_LABEL="com.virtualos.fleet"
+AGENT_LABEL="${VOS_FLEET_AGENT_LABEL:-com.virtualos.fleet}"
 AGENT_PLIST="$HOME/Library/LaunchAgents/$AGENT_LABEL.plist"
 ENTITLEMENTS="$FLEET_HOME/tools/fleet/fleet.entitlements"
-SUPERVISOR="$FLEET_HOME/tools/fleet/fleet-supervisor"
+SUPERVISOR="${VOS_SUPERVISOR:-$FLEET_HOME/tools/fleet/fleet-supervisor}"
 HTTP_PORT="${VOS_FLEET_HTTP_PORT:-9225}"
 BASE_PORT="${VOS_FLEET_BASE_PORT:-9125}"
 
@@ -111,13 +113,26 @@ except Exception:
 
 entitle() {
   local bin="${1:-$SUPERVISOR}"
+  local entitlements="${2:-$ENTITLEMENTS}"
   [[ -f "$bin" ]] || die "no such binary: $bin"
-  [[ -f "$ENTITLEMENTS" ]] || die "missing entitlements: $ENTITLEMENTS"
-  codesign --force --sign - --entitlements "$ENTITLEMENTS" "$bin"
+  [[ -f "$entitlements" ]] || die "missing entitlements: $entitlements"
+  codesign --force --sign - --entitlements "$entitlements" "$bin"
   log "signed: $bin"
   codesign -d --entitlements :- "$bin" 2>/dev/null | grep -q virtualization \
     && log "verified: virtualization entitlement" || die "entitlement not applied"
 }
+
+build() (
+  local output="${1:-$SUPERVISOR}" scratch
+  [[ ! -e "$output" ]] || die "build target exists; choose a new binary path"
+  mkdir -p "$(dirname "$output")"
+  scratch="$(mktemp "$output.build.XXXXXX")"
+  trap 'rm -f "$scratch"' EXIT
+  swiftc -O -framework Virtualization -framework AppKit "$(dirname "$0")/FleetSupervisor.swift" -o "$scratch"
+  entitle "$scratch" "$(dirname "$0")/fleet.entitlements"
+  mv "$scratch" "$output"
+  log "built signed supervisor: $output"
+)
 
 agent_install() {
   local names="$1"
@@ -201,7 +216,8 @@ frame() {
 desktop() {
   local vm="${1:-}" timeout="${2:-180}" out="${3:-/tmp/vos-$1-desktop.jpg}"
   [[ -n "$vm" ]] || die "desktop requires a vm"
-  local waited=0 threshold=100000
+  local waited=0 threshold="${VOS_DESKTOP_MIN_BYTES:-100000}"
+  [[ "$threshold" =~ ^[0-9]+$ ]] && (( threshold >= 10000 && threshold <= 10000000 )) || die "invalid VOS_DESKTOP_MIN_BYTES"
   while [[ $waited -lt $timeout ]]; do
     local code bytes
     code="$(curl -s -o "$out.tmp" -w '%{http_code}' "http://127.0.0.1:$HTTP_PORT/fleet/frame/$vm" || true)"
@@ -327,18 +343,18 @@ PY
 }
 
 stream() {
-  local relay="${RELAY_URL:-}" token="${AUTH_TOKEN:-${VOS_AUTH_TOKEN:-}}"
+  local relay="${RELAY_URL:-${1:-https://virtualos-relay.ai-c24.workers.dev}}"
+  local token="${AUTH_TOKEN:-${VOS_AUTH_TOKEN:-}}"
   local env_file="$HOME/.config/virtualos/relay.env"
   if [[ -r "$env_file" ]]; then
-    # shellcheck disable=SC1090
-    source "$env_file"
-    relay="${relay:-${RELAY_URL:-}}"; token="${token:-${AUTH_TOKEN:-}}"
+    python3 "$FLEET_HOME/tools/fleet/fleet_push.py" \
+      --relay "$relay" --supervisor "http://127.0.0.1:$HTTP_PORT" \
+      --token-file "$env_file" --verbose
+    return
   fi
-  [[ -n "$relay" ]] || relay="${1:-}"
-  [[ -n "$relay" ]] || die "no relay: set RELAY_URL, or pass relay URL, or write $env_file"
   [[ -n "$token" ]] || die "no token: set AUTH_TOKEN or write $env_file"
-  python3 "$FLEET_HOME/tools/fleet/fleet_push.py" \
-    --relay "$relay" --supervisor "http://127.0.0.1:$HTTP_PORT" --token "$token" --verbose
+  VOS_AUTH_TOKEN="$token" python3 "$FLEET_HOME/tools/fleet/fleet_push.py" \
+    --relay "$relay" --supervisor "http://127.0.0.1:$HTTP_PORT" --verbose
 }
 
 stop() { agent_remove; pkill -f "$SUPERVISOR" 2>/dev/null || true; log "fleet stopped"; }
@@ -378,6 +394,7 @@ cloud() {
       [[ -d "$exp" ]] || die "experiments/ not found next to computer-space.sh"
       python3 "$exp/shared_base.py" selftest
       python3 "$exp/base_delta_serve_test.py"
+      bash "$(dirname "$cs")/fleet/go-live.sh" --self-test
       ;;
     *) die "cloud [labs|r2|checkpoint|shared-base]";;
   esac
@@ -393,15 +410,17 @@ case "${1:-doctor}" in
   doctor) doctor ;;
   capacity) capacity ;;
   entitle) shift; entitle "${1:-}" ;;
+  build) shift; build "${1:-}" ;;
   agent) shift; case "${1:-}" in install) shift; agent_install "${1:-vm-a}";; remove) agent_remove;; *) die "agent install|remove";; esac ;;
   clone) shift; clone "${1:-}" "${2:-}" ;;
   boot) shift; boot "${1:-}" ;;
+  start) shift; python3 "$(dirname "$0")/fleet.py" --supervisor "http://127.0.0.1:${VOS_SUP_PORT:-$HTTP_PORT}" start "${1:?start requires a machine name}" ;;
   frame) shift; frame "${1:-}" "${2:-}" ;;
   desktop) shift; desktop "${1:-}" "${2:-}" "${3:-}" ;;
   stream) shift; stream "${1:-}" ;;
   netboot) shift; netboot "${1:-}" "${2:-}" "${3:-}" ;;
   cloud) shift; cloud "${1:-labs}" ;;
-  live) shift; exec "$(cd "$(dirname "$0")" && pwd)/go-live.sh" "${1:-}" ;;
+  live) shift; exec "$(cd "$(dirname "$0")" && pwd)/go-live.sh" "$@" ;;
   status) exec "$(cd "$(dirname "$0")" && pwd)/plan-status.sh" "${2:-}" ;;
   stop) stop ;;
   clean) clean ;;

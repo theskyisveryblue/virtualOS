@@ -1,0 +1,30 @@
+{
+  "actual_vm_or_cloud_requests": false,
+  "fixture_ports_ephemeral_only": true,
+  "guest_or_service_actions": false,
+  "isolated_fixture_tests_passed": 8,
+  "live_mux_activated": false,
+  "metadata_resources": {
+    "cpu_count": 10,
+    "load_one": 6.2431640625,
+    "potentially_available_bytes": 3579494400,
+    "swapouts": 19302887
+  },
+  "preserved_processes": [
+    "  440 Sun Oct 18 10:31:36 2026     /Applications/virtualOS.app/Contents/MacOS/virtualOS",
+    " 1756 Sun Oct 18 21:16:18 2026     bash",
+    " 2499 Sun Oct 18 10:32:15 2026     ./tools/fleet/linux-guest",
+    " 2503 Sun Oct 18 10:32:15 2026     /Users/ai/vos-fleet/tools/fleet/fleet-supervisor",
+    "35688 Sun Oct 18 19:20:44 2026     /Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+  ],
+  "private_source_directory": "/Users/ai/vos-fleet/.local/maintenance/fleet-mux-review-20261019",
+  "python_version": "3.9.6",
+  "schema": "virtualos-fleet-mux-private-fixture-compatibility/v1",
+  "source_sha256": {
+    "fleet/fleet.py": "3a42d2a4f080dfd5c08994ba1a651246d0a7ae9eb5f057847485d3a56a72d895",
+    "fleet/test_fleet_mux.py": "ae9960a9d3852648c5a59cd3fc1ee53e996911b684f6e8c6e143f4aee6a26359"
+  },
+  "test_returncode": 0,
+  "test_summary": "........\n----------------------------------------------------------------------\nRan 8 tests in 12.087s\n\nOK\n",
+  "verified_at": "2026-10-19T04:39:37.815042+00:00"
+}

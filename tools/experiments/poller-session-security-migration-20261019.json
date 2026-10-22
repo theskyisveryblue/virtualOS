@@ -1,0 +1,24 @@
+{
+  "backup_directory": "/Users/ai/vos-fleet/.local/poller-session-security-s4s9db7m",
+  "guest_input_applied": false,
+  "mini_integration_tests_passed": 0,
+  "operator_candidate_integration_tests_passed": 2,
+  "pids": [
+    440,
+    2503,
+    2499,
+    35688
+  ],
+  "private_backup": true,
+  "process_identities_unchanged": true,
+  "schema": "virtualos-poller-session-security-migration/v1",
+  "script_mode_preserved": true,
+  "services_restarted": false,
+  "sha256_after": "5fcf9aa6f27419669aec315690c157414265bee1a33bd94a8b94308f392fc91e",
+  "sha256_before": "09b53019d111d7b5fd64d82bed9518760946636af3cfbfbe86f3743684ff041d",
+  "status_relay_live": true,
+  "status_returncode": 0,
+  "unrelated_tail_preserved": true,
+  "verified_at": "2026-10-19T01:50:43.165163+00:00",
+  "watchdog_pid": 1756
+}

@@ -4,7 +4,17 @@ Two layers: a **Tunnel** for direct streaming, and a **Worker relay** for comman
 
 The Worker is deployed in the Ai account at
 `https://virtualos-relay.ai-c24.workers.dev`. The browser console is
-`https://virtualos-relay.ai-c24.workers.dev/console`. On 2026-10-03, the Mini
+`https://virtualos-relay.ai-c24.workers.dev/console`.
+
+The checked-in Wrangler binding is `SNAPSHOTS → virtualos-remote-private` in the
+Ai account, alongside the `CONTROL` Durable Object and its SQLite migration.
+The generated project briefing's `virtualos-snapshots` name is stale: the
+[account cleanup receipt](../experiments/cloudscope-account-cleanup-receipt.json)
+records removal of that bucket from the former account on October 12. Use
+[wrangler.toml](worker/wrangler.toml) for the current deployment binding. This
+source review is not a fresh cloud-account inventory.
+
+On 2026-10-03, the Mini
 poller returned a guest JPEG through the relay; the frame result was consumed
 once and was not stored in R2.
 
@@ -21,8 +31,8 @@ once and was not stored in R2.
           │  long-poll
           ▼
  ┌─────────────────────────┐
- │  poller.sh (your Mac)   │  ← executes commands via AppleScript + stream server
- │  virtualOS + VM running │
+ │  fleet_push.py (Mini)   │  ← guest frames and per-VM bounded input
+ │  supervisor + guests    │
  └─────────────────────────┘
 ```
 
@@ -51,129 +61,72 @@ The deployment URL is `https://virtualos-relay.ai-c24.workers.dev`.
 ssh mac-mini-ai '/Users/ai/Documents/GitHub/virtualOS/tools/cloudflare/poller-session.sh status'
 ```
 
-The deployment script starts the poller on the Mini. It long-polls the Worker
-and executes guest commands locally.
+The deployment script starts the configured host transport on the Mini. The
+current fleet path uses `fleet_push.py --token-file`; it streams guest frames
+and executes per-VM input locally.
 
 Open `/console` on the Worker URL for browser control of the guest desktop.
-The browser secret is kept in the current tab only. `frame` images and command
-results pass through the relay and are not written to R2 by default. Browser
-control is limited to guest frame, click, key, type, and an explicit guarded
-unlock action. The unlock button uses the Mini's existing `computer-wake.sh`
-and `computer-unlock.sh`, which checks the guest screen before sending the
-configured password.
+The browser secret is kept in the current tab only. Single-guest `frame` command
+results are transient. The fleet stream stores the latest frame for each VM in
+private R2 at `fleet/frames/<vm>.jpg`, overwriting that same key on each upload.
+Frame responses prohibit browser caching; this does not remove the R2 object.
+Browser control sends guest frames, clicks, keys and bounded text. The current **Wake
+guest** button sends a single Space key; it does not submit a password. Guarded
+unlock is a separate Mini-local operation that verifies the visible password
+prompt before reading the private credential.
 
-### 3) Send commands from anywhere
+### 3) Use the browser console
 
-```bash
-# Set these once
-export RELAY=https://virtualos-relay.yourname.workers.dev
-export TOKEN=your-secret
+Open the pinned `/console` URL and enter the narrower browser key saved at
+`~/.config/virtualos/browser-token`. Keep that file private (mode 0600). The tab
+keeps the key only in memory; disconnect clears the visible frame and typed
+text. Select a machine and wait for a fresh frame before sending input. Stale
+heartbeats disable control.
 
-# Start the VM
-curl -X POST $RELAY/cmd -H "Authorization: Bearer $TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"action":"start"}'
-
-# Type the password
-curl -X POST $RELAY/cmd -H "Authorization: Bearer $TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"action":"password","params":{"password":"YOUR_VM_PASSWORD"}}'
-
-# Take a screenshot (uploaded to R2)
-curl -X POST $RELAY/cmd -H "Authorization: Bearer $TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"action":"screenshot"}'
-
-# View the screenshot
-curl -o screen.jpg $RELAY/screenshot -H "Authorization: Bearer $TOKEN"
-
-# Type text
-curl -X POST $RELAY/cmd -H "Authorization: Bearer $TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"action":"type","params":{"text":"hello world"}}'
-
-# Press a key
-curl -X POST $RELAY/cmd -H "Authorization: Bearer $TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"action":"key","params":{"key":"enter"}}'
-
-# Keyboard shortcut (Cmd+V)
-curl -X POST $RELAY/cmd -H "Authorization: Bearer $TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"action":"shortcut","params":{"key":"v","modifiers":["command"]}}'
-
-# Click at normalized coordinates
-curl -X POST $RELAY/cmd -H "Authorization: Bearer $TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"action":"click","params":{"nx":0.5,"ny":0.5}}'
-
-# Focus an app
-curl -X POST $RELAY/cmd -H "Authorization: Bearer $TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"action":"focus","params":{"app":"Terminal"}}'
-
-# Check VM status
-curl $RELAY/status -H "Authorization: Bearer $TOKEN"
-
-# Stop the VM
-curl -X POST $RELAY/cmd -H "Authorization: Bearer $TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"action":"stop"}'
-```
-
-### 4) R2 Snapshots
-
-Store and retrieve small, explicitly approved snapshots. This Worker route is
-not suitable for a 30 GiB VM disk; a live VM still needs a local block device.
+Do not copy bearer tokens into command arguments or send a guest password
+through the relay. For a read-only fleet status check, the protected local
+reader uses the existing token file without shell-evaluating its contents:
 
 ```bash
-# Upload a snapshot
-curl -X PUT $RELAY/snapshots/my-vm-backup.tar.gz \
-  -H "Authorization: Bearer $TOKEN" \
-  -H "Content-Type: application/octet-stream" \
-  --data-binary @my-vm-backup.tar.gz
-
-# List snapshots
-curl $RELAY/snapshots -H "Authorization: Bearer $TOKEN"
-
-# Download
-curl -o backup.tar.gz $RELAY/snapshots/my-vm-backup.tar.gz \
-  -H "Authorization: Bearer $TOKEN"
-
-# Delete
-curl -X DELETE $RELAY/snapshots/my-vm-backup.tar.gz \
-  -H "Authorization: Bearer $TOKEN"
+python3 tools/fleet/relay_read.py --token-file "$HOME/.config/virtualos/browser-token"
 ```
 
-## Available commands
+The host credential can perform additional administrative operations. Keep it
+separate from the browser key; normal browser use does not need it.
 
-| Action | Params | What it does |
-|--------|--------|--------------|
-| `start` | — | Launch virtualOS and start the VM; the app unlocks after detecting the guest password prompt when configured |
-| `stop` | — | Quit virtualOS |
-| `restart` | — | Stop then start |
-| `screenshot` | — | Capture screen, upload to R2 |
-| `type` | `text` | Type text into VM |
-| `key` | `key` (enter/escape/tab/delete/up/down/left/right/space) | Press a key |
-| `shortcut` | `key`, `modifiers[]` (command/shift/option/control) | Keyboard shortcut |
-| `click` | `nx`, `ny` (0.0-1.0) | Click at normalized coordinates |
-| `focus` | `app` | Focus an app in the VM |
-| `status` | — | Report VM state |
-| `password` | `password` (required) | Type password + press Enter |
+### 4) R2 snapshots
+
+The authenticated `/snapshots` routes list, upload, retrieve and delete explicit
+snapshot objects. These routes persist the supplied bytes. The fleet's latest
+frames also persist in their separate R2 keys; single-guest command results are
+transient. Use the chunked cloud-disk workflow
+in [CLOUD_DISK.md](../CLOUD_DISK.md) for full VM disks, including hash verification
+and recovery gates.
+
+The legacy `poller.sh` still implements additional host commands. It is a
+separate compatibility path with a broader command surface and is not the live
+fleet stream process. Its source now uses protected-file relay credentials and
+stdin request bodies, excludes passwords from training traces, and creates
+private unique capture files. Thirteen isolated fixtures pass on the Mini's
+Python 3.9, including transport bounds, secret-argument checks, deployment
+packaging and failed-upload reporting. This migration has not been deployed;
+it does not narrow the legacy host command surface. See
+[`legacy-relay-security-fixtures-20261019.json`](../experiments/legacy-relay-security-fixtures-20261019.json).
 
 ## Command flow
 
 1. Client POSTs to `/cmd` → gets back `{ "id": "uuid" }`
 2. Poller long-polls `/cmd/poll` → receives the command
-3. Poller executes locally (AppleScript / streaming server / screencapture)
+3. The selected host executes the bounded guest command locally
 4. Poller POSTs result to `/cmd/{id}/result`
 5. Client can check `/cmd/{id}` for the result
 
 ## Training traces
 
 The relay accepts explicit structured usage events for later review. Normal
-browser and host control does not automatically persist command history or
-screen frames. The poller captures before/after training traces only when
+browser and host control does not automatically create a training history.
+The latest fleet frame is stored in R2 as described above, independently of
+training traces. The poller captures before/after training traces only when
 `VOS_RELAY_TRAINING_TRACE=1` is deliberately set.
 
 - `POST /usage`
@@ -218,6 +171,16 @@ storage and logging alone do not update model weights.
 
 For low-latency frame streaming (bypassing the Worker relay), use a Cloudflare Tunnel directly to the streaming server. See `cloudflared-config.example.yml` and `run_private_stack.sh`.
 
+`verify_private_remote.sh` retains the direct-tunnel verifier's environment
+interface (`REMOTE_URL`, Access client ID/secret and `VOS_AUTH_TOKEN`). It now
+uses bounded HTTPS requests without credential arguments, proxy inheritance or
+redirects. It rejects an unhealthy JSON response before requesting the frame,
+and writes successful output to a unique private directory and file. A
+35-second absolute deadline bounds slow responses. This legacy verifier checks
+a Codex window frame's JPEG envelope; it does not prove a guest task completed.
+The [security receipt](../experiments/private-remote-verifier-security-20261019.json)
+records local tests only; no real tunnel capture was performed by that check.
+
 The Tunnel and Worker relay can run side by side:
 - Tunnel → real-time frame streaming to the iOS/Mac remote apps
 - Worker → command-and-control, screenshots, snapshots from anywhere
@@ -227,5 +190,5 @@ The Tunnel and Worker relay can run side by side:
 - `AUTH_TOKEN` is stored as a Wrangler secret (never in code)
 - Control endpoints require Bearer auth; `/health` and the static `/console` shell are public
 - `WEB_TOKEN` permits only guest frame and bounded input commands
-- The Durable Object is a singleton — one command queue per deployment
+- Fleet commands have separate per-VM queues; the compatibility path retains its legacy queue
 - R2 bucket is private, only accessible through the Worker

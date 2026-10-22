@@ -1,0 +1,98 @@
+{
+  "observed_at": "2026-10-21T18:22:45.555142+00:00",
+  "data_erased": false,
+  "installed_models_removed": false,
+  "loaded_models_before": [
+    "qwen3.5:0.8b"
+  ],
+  "simulator_before": {
+    "udid": "0F92165B-EFE9-4F39-B46A-7D0064BD3C22",
+    "name": "iPhone 17",
+    "state": "Booted",
+    "lastBootedAt": "2026-10-18T14:31:46Z"
+  },
+  "simulator_shutdown_requested": true,
+  "model_unload_requested": true,
+  "model_unload_done_reason": "unload",
+  "loaded_models_after": [],
+  "simulator_after": "Shutdown",
+  "resources": {
+    "background_work": "allowed",
+    "cpu_count": 10,
+    "disk_free_kib": 19502748,
+    "families": {
+      "ai_agents": {
+        "processes": 1,
+        "sum_rss_mib": 16.0
+      },
+      "browser_apps": {
+        "processes": 23,
+        "sum_rss_mib": 559.4
+      },
+      "browser_engines": {
+        "processes": 127,
+        "sum_rss_mib": 6312.0
+      },
+      "simulator_runtime": {
+        "processes": 0,
+        "sum_rss_mib": 0.0
+      },
+      "terminal": {
+        "processes": 1,
+        "sum_rss_mib": 6.5
+      },
+      "virtualos": {
+        "processes": 3,
+        "sum_rss_mib": 42.6
+      }
+    },
+    "load_one": 6.55,
+    "memory_free_percent": 52,
+    "reasons": [],
+    "rss_note": "RSS sums can count shared pages more than once and omit paged-out memory",
+    "swap_used_mib": 3440,
+    "top_executables": [
+      {
+        "name": "Google Chrome",
+        "processes": 81,
+        "sum_rss_mib": 5002.7
+      },
+      {
+        "name": "com.apple.WebKit.WebContent",
+        "processes": 7,
+        "sum_rss_mib": 1034.7
+      },
+      {
+        "name": "Paper",
+        "processes": 7,
+        "sum_rss_mib": 274.7
+      },
+      {
+        "name": "Figma",
+        "processes": 9,
+        "sum_rss_mib": 220.2
+      },
+      {
+        "name": "Google Chrome for Testing",
+        "processes": 8,
+        "sum_rss_mib": 94.9
+      },
+      {
+        "name": "Pen",
+        "processes": 4,
+        "sum_rss_mib": 47.7
+      },
+      {
+        "name": "com.apple.WebKit.GPU",
+        "processes": 3,
+        "sum_rss_mib": 44.0
+      },
+      {
+        "name": "virtualOS",
+        "processes": 1,
+        "sum_rss_mib": 33.8
+      }
+    ]
+  },
+  "preserved_processes": "  440 /Applications/virtualOS.app/Contents/MacOS/virtualOS\n 2499 ./tools/fleet/linux-guest\n"
+}

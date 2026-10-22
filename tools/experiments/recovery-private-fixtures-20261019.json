@@ -1,0 +1,23 @@
+{
+  "existing_audit_restarted": false,
+  "guest_or_service_actions": false,
+  "isolated_fixture_tests_passed": 26,
+  "metadata_resources": {
+    "cpu_count": 10,
+    "load_one": 7.2294921875,
+    "potentially_available_bytes": 3321233408,
+    "swapouts": 19302887
+  },
+  "private_source_directory": "/Users/ai/vos-fleet/.local/maintenance/recovery-review-20261019",
+  "python_version": "3.9.6",
+  "real_recovery_invoked": false,
+  "schema": "virtualos-recovery-fixture-review/v1",
+  "source_sha256": {
+    "cloud_disk.py": "49cdb88f54c62baadc3ec2b0ef9e73c4a52061be563cac06d0c4f349de1147b6",
+    "cloud_disk_recovery.py": "5e5d74b0ac6ee3e4ab5e91549870ace283edc39ab9ae3f1649ce2c0b7106269f",
+    "test_cloud_disk_recovery.py": "a3f4f0647de30d15f7c4adb7d9913be5599d5e881dfc197bcf8aae8eab90d481"
+  },
+  "test_returncode": 0,
+  "test_summary": "..........................\n----------------------------------------------------------------------\nRan 26 tests in 0.641s\n\nOK\n",
+  "verified_at": "2026-10-19T04:14:08.709370+00:00"
+}

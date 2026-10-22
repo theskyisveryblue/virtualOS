@@ -1,0 +1,22 @@
+{
+  "com.virtualos.fleet": {
+    "code": 113,
+    "state_lines": []
+  },
+  "com.virtualos.fleet-watchdog": {
+    "code": 113,
+    "state_lines": []
+  },
+  "com.virtualos.disk.vm-a": {
+    "code": 0,
+    "state_lines": [
+      "state = running",
+      "runs = 1",
+      "pid = 88374",
+      "last exit code = (never exited)",
+      "state = active",
+      "state = active"
+    ]
+  },
+  "fleet_error": "URLError"
+}

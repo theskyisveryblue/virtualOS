@@ -1,0 +1,44 @@
+{
+  "schema": "virtualos-private-runtime-compression/v1",
+  "state": "activated_verified",
+  "observed_at": "2026-10-21T18:50:19.653394+00:00",
+  "source": "/Users/ai/vos-fleet/.local/maintenance/ollama-metadata-20261019/runtime",
+  "candidate": "/Users/ai/vos-fleet/.local/maintenance/ollama-metadata-20261019/runtime-compressed-candidate",
+  "inventory_sha256": "8e2986b681848675b29a05d2e626f1954c5b204b0ad042d182ee1366ca07dde5",
+  "all_entries_byte_and_metadata_identical": true,
+  "verified_files": 47,
+  "strict_codesign_verified_files": 32,
+  "source_allocated_bytes": 566071296,
+  "candidate_allocated_bytes": 229699584,
+  "allocated_bytes_reduction": 336371712,
+  "guest_or_model_process_changes": false,
+  "private_ocr_stage_verifier_passed": true,
+  "sandboxed_help_execution_passed": true,
+  "model_bytes_retained": 397821516,
+  "release_archive_retained": true,
+  "replaced_extraction_removed": true,
+  "free_before_old_extraction_removal_bytes": 16322998272,
+  "disk_free_after_bytes": 16903057408,
+  "fleet": {
+    "count": 1,
+    "instances": [
+      {
+        "ready": true,
+        "error": "",
+        "bundle": "/Users/ai/vos-fleet/machines/vm-a.bundle",
+        "name": "vm-a",
+        "controlPort": 9125,
+        "state": "running"
+      }
+    ],
+    "ok": true,
+    "basePort": 9125,
+    "root": "/Users/ai/vos-fleet/machines",
+    "capability": {
+      "nestedVirtualizationSupported": true,
+      "nestedVirtualizationReason": "supported",
+      "platform": "macOS Version 26.2 (Build 25C56)"
+    }
+  },
+  "protected_processes": "  440 /Applications/virtualOS.app/Contents/MacOS/virtualOS\n 2499 ./tools/fleet/linux-guest\n"
+}

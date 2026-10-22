@@ -1,0 +1,97 @@
+{
+  "schema": "virtualos-maintained-linux-persistence-receipt/v1",
+  "scope": "isolated signature-verified Alpine 3.24.2 userland and Linux 6.18.57, two disk-rooted persistence boots",
+  "verified_at": "2026-10-18T19:12:32.168901+00:00",
+  "integrity_checked_at": "2026-10-18T23:07:32.364046+00:00",
+  "mini_run_directory": "/Users/ai/vos-fleet/linux/maintained-3.24-5a6555b5a6514566/persistence-tests/run.VJz4hqnH",
+  "profile_fingerprint": "5a6555b5a65145666300a030d56a55895dee326b3fa606ec931fd8b861046907",
+  "kernel_release": "6.18.57-0-virt",
+  "kernel_sha256": "1993474a172566b1573234900ff611c9fa4307b9398742c4c210b1e9664d6e56",
+  "initramfs_sha256": "30fd14142dcbd44c149a7e798551481ae335174c160c2f6605f82d0b2add9b3f",
+  "kernel_package_sha256": "b3820fee22e0366a15f7c139e5bc00348e333f3e7f77802271df7ded795aee4f",
+  "trusted_public_key_sha256": "d11f6b21c61b4274e182eb888883a8ba8acdbf820dcc7a6d82a7d9fc2fd2836d",
+  "rootfs_profile_sha256": "08a94fc9438bd19e03a97dfecb8ae4df69654339dc91800f25a3238aba3a1797",
+  "rootfs_packages": 42,
+  "all_package_signatures_verified": true,
+  "legacy_regular_userland_files_retained": 0,
+  "root_login_locked": true,
+  "root_shadow_mode": "0600",
+  "root_mount_verified": "ext4,rw",
+  "disk_rooted_boot_1": true,
+  "disk_rooted_boot_2": true,
+  "persist_marker_counts": [
+    1,
+    2
+  ],
+  "marker_boot_1": "init: boot #0 at 0.22",
+  "marker_boot_2": "init: boot #1 at 0.26",
+  "maintained_userland": true,
+  "persistent": true,
+  "guest_budget": {
+    "cpus": 1,
+    "memory_gib": 1
+  },
+  "production_guests_restarted_by_lab": false,
+  "source_disk_formatted": false,
+  "proof_disk_retained": true,
+  "logs_preserved": true,
+  "files": {
+    "init.sh": {
+      "allocated_bytes": 4096,
+      "bytes": 775,
+      "mode": "0o600",
+      "sha256": "7dc447921ce0b4140459ed69111f6f100884b37eb323a0fe6d9b6812e10065c0"
+    },
+    "install-console.log": {
+      "allocated_bytes": 20480,
+      "bytes": 18103,
+      "mode": "0o600",
+      "sha256": "f66eb602028b865951cf921939f6dfdc22bfa540b13fda502d4ed2bdc75e27ca"
+    },
+    "lab-state.json": {
+      "allocated_bytes": 4096,
+      "bytes": 229,
+      "mode": "0o600",
+      "sha256": "7d9e02913ff0a0a43b7447efeefb5dc6dc29e50cf9ce227a8b0f187540c3c42d"
+    },
+    "reboot1-console.log": {
+      "allocated_bytes": 4096,
+      "bytes": 2720,
+      "mode": "0o600",
+      "sha256": "c736676273b4fbd98a850a2fc8d36fdb52b26a1769a0cdea958289acbcee7ea4"
+    },
+    "reboot2-console.log": {
+      "allocated_bytes": 4096,
+      "bytes": 2946,
+      "mode": "0o600",
+      "sha256": "ed39ac9bf023a1fa81324cefad88c987e0d8264ffe8ed7c3155e1ad84c768d2a"
+    },
+    "resource-watch.log": {
+      "allocated_bytes": 0,
+      "bytes": 0,
+      "mode": "0o600",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "root.img": {
+      "allocated_bytes": 22974464,
+      "bytes": 268435456,
+      "mode": "0o600",
+      "sha256": "8f18656717e613bb4a02433d9b44478f99373c2ae5ca653c65c4cec388673c5e"
+    }
+  },
+  "boot_evidence": {
+    "install-console.log": [
+      "MAINTAINED_USERLAND",
+      "ROOT_LOGIN_LOCKED"
+    ],
+    "reboot1-console.log": [
+      "PERSIST:1",
+      "ALPINE_RELEASE:3.24.2"
+    ],
+    "reboot2-console.log": [
+      "PERSIST:2",
+      "ALPINE_RELEASE:3.24.2"
+    ]
+  },
+  "notes": "Fresh installer userland built only from authenticated Alpine 3.24 MAIN packages; signed kernel packet module explicitly included for DHCP. Offline authenticated package cache installs rootfs. This isolated proof preserves default guest/artifact selection; it does not prove nested virtualization or a production migration."
+}

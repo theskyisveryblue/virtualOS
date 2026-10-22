@@ -2,13 +2,35 @@
 # One operator entry point for bounded private computer-use work.
 set -euo pipefail
 
-if [[ $# -ne 1 || ! "$1" =~ ^(--continuous|--continuous-restart|--once|--dock-practice|--research-smoke|--research-swarm|--research-status)$ ]]; then
-  echo 'Usage: ./tools/computer-work.sh --continuous|--continuous-restart|--once|--dock-practice|--research-smoke|--research-swarm|--research-status' >&2
+if [[ $# -ne 1 || ! "$1" =~ ^(--continuous|--continuous-restart|--status|--once|--dock-practice|--research-smoke|--research-swarm|--research-status)$ ]]; then
+  echo 'Usage: ./tools/computer-work.sh --continuous|--continuous-restart|--status|--once|--dock-practice|--research-smoke|--research-swarm|--research-status' >&2
   exit 2
 fi
 
 repo_dir="$(cd "$(dirname "$0")/.." && pwd)"
 mode="$1"
+if [[ "$mode" == --status ]]; then
+  worker_pid="$(pgrep -f '[c]omputer-work.sh --continuous$' 2>/dev/null | head -1 || true)"
+  screen_list="$(screen -ls 2>&1 || true)"
+  if grep -q '[.]virtualos-work' <<< "$screen_list"; then
+    if [[ "$screen_list" =~ ([0-9]+)[.]virtualos-work ]]; then
+      session_pid="${BASH_REMATCH[1]}"
+    else
+      session_pid='unknown'
+    fi
+    elapsed="$(ps -o etime= -p "$session_pid" 2>/dev/null | tr -d ' ' || true)"
+    printf 'work=running_detached session_pid=%s worker_pid=%s elapsed=%s\n' \
+      "$session_pid" "${worker_pid:-unknown}" "${elapsed:-unknown}"
+  elif [[ -n "$worker_pid" ]]; then
+    elapsed="$(ps -o etime= -p "$worker_pid" 2>/dev/null | tr -d ' ' || true)"
+    printf 'work=running pid=%s elapsed=%s\n' "$worker_pid" "${elapsed:-unknown}"
+  else
+    echo 'work=stopped'
+  fi
+  log="$HOME/Library/Logs/virtualos-computer-work.log"
+  [[ -f "$log" ]] && tail -n 8 "$log"
+  exit 0
+fi
 if [[ "$mode" == --continuous-restart ]]; then
   command -v screen >/dev/null || { echo 'work=refused: screen is unavailable' >&2; exit 1; }
   log="$HOME/Library/Logs/virtualos-computer-work.log"
@@ -271,7 +293,7 @@ if [[ "$mode" == --continuous || "$mode" == --once ]]; then
     cycle_failed=0
     receipt_sha=''
     if status="$(ssh -o BatchMode=yes -o ConnectTimeout=8 mac-mini-ai \
-      '/Users/ai/Documents/GitHub/virtualOS/tools/computer-status.sh' 2>/dev/null)"; then
+      '/Users/ai/vos-fleet/tools/computer-status.sh' 2>/dev/null)"; then
       disk_kb="$(printf '%s\n' "$status" | awk -F= '$1=="disk_free_kib" {print $2; exit}')"
       runner_state="$(printf '%s\n' "$status" | awk -F'[ =]' '$1=="quality_runner" {print $2; exit}')"
       receipt_sha="$(printf '%s\n' "$status" | awk -F= '$1=="r2_receipt_sha256" {print $2; exit}')"
@@ -281,14 +303,14 @@ if [[ "$mode" == --continuous || "$mode" == --once ]]; then
         remaining_hours="$(( (end_at - now + 3599) / 3600 ))"
         if (( remaining_hours > 0 )); then
           if ! ssh -o BatchMode=yes -o ConnectTimeout=8 mac-mini-ai \
-            '/Users/ai/Documents/GitHub/virtualOS/tools/computer-resources.sh --guard' >/dev/null 2>&1; then
+            '/Users/ai/vos-fleet/tools/computer-resources.sh --guard' >/dev/null 2>&1; then
             echo 'work=mini_observation_paused_by_resource_guard'
             if (( now - last_offline_attempt >= 3600 )) &&
                ssh -o BatchMode=yes -o ConnectTimeout=8 mac-mini-ai \
-                 '/Users/ai/Documents/GitHub/virtualOS/tools/computer-resources.sh --guard-offline' >/dev/null 2>&1; then
+                 '/Users/ai/vos-fleet/tools/computer-resources.sh --guard-offline' >/dev/null 2>&1; then
               last_offline_attempt="$now"
               if target_json="$(ssh -o BatchMode=yes -o ConnectTimeout=8 mac-mini-ai \
-                '/Users/ai/Documents/GitHub/virtualOS/tools/computer-decision.sh --next-visible-finder-target')"; then
+                '/Users/ai/vos-fleet/tools/computer-decision.sh --next-visible-finder-target')"; then
                 target="$(python3 -c 'import json,sys
 try:
     print(json.load(sys.stdin).get("target") or "")
@@ -300,7 +322,7 @@ except (ValueError, TypeError):
               fi
               if [[ "$target" =~ ^(Applications|Downloads|Documents|Desktop|Recents)$ ]]; then
                 if ssh -o BatchMode=yes -o ConnectTimeout=8 mac-mini-ai \
-                  "cd /Users/ai/Documents/GitHub/virtualOS && ./tools/computer-journey.sh --offline-only --one-shot --target $target"; then
+                  "cd /Users/ai/vos-fleet && ./tools/computer-journey.sh --offline-only --one-shot --target $target"; then
                   echo "work=offline_curriculum_verified target=$target"
                 else
                   echo "work=offline_curriculum_deferred target=$target"
@@ -310,7 +332,7 @@ except (ValueError, TypeError):
               fi
             fi
           elif ssh -o BatchMode=yes -o ConnectTimeout=8 mac-mini-ai \
-            "cd /Users/ai/Documents/GitHub/virtualOS && VOS_CUA_OVERNIGHT_HOURS=$remaining_hours VOS_CUA_QUALITY_CURRICULUM=1 ./tools/computer-start.sh --quality"; then
+            "cd /Users/ai/vos-fleet && VOS_CUA_OVERNIGHT_HOURS=$remaining_hours VOS_CUA_QUALITY_CURRICULUM=1 ./tools/computer-start.sh --quality"; then
             echo 'work=mini_observation_started'
           else
             echo 'work=mini_observation_start_failed'
@@ -327,21 +349,21 @@ except (ValueError, TypeError):
         '/Users/ai/Library/Application Support/virtualOS/computer-use' \
         '/Users/ai/Library/Application Support/virtualOS/computer-use/journeys'; do
         if ! ssh -o BatchMode=yes -o ConnectTimeout=8 mac-mini-ai \
-          "/Users/ai/Documents/GitHub/virtualOS/tools/computer-decision.sh --ingest-traces '$trace_dir'"; then
+          "/Users/ai/vos-fleet/tools/computer-decision.sh --ingest-traces '$trace_dir'"; then
           echo 'work=offline_trace_ingest_deferred'
         fi
       done
       if policy_stats="$(ssh -o BatchMode=yes -o ConnectTimeout=8 mac-mini-ai \
-        '/Users/ai/Documents/GitHub/virtualOS/tools/computer-decision.sh --stats' 2>/dev/null)"; then
+        '/Users/ai/vos-fleet/tools/computer-decision.sh --stats' 2>/dev/null)"; then
         feedback_rows="$(printf '%s' "$policy_stats" | python3 -c \
           'import json,sys; d=json.load(sys.stdin); print(str(d.get("feedback_rows", ""))+":"+str(d.get("source_app_rows", "")))')" || feedback_rows=''
         if [[ "$feedback_rows" =~ ^[0-9]+:[0-9]+$ && "$feedback_rows" != "$last_dataset_rows" ]]; then
           if ssh -o BatchMode=yes -o ConnectTimeout=8 mac-mini-ai \
-            '/Users/ai/Documents/GitHub/virtualOS/tools/computer-decision.sh --export-local'; then
+            '/Users/ai/vos-fleet/tools/computer-decision.sh --export-local'; then
             last_dataset_rows="$feedback_rows"
             echo "work=offline_dataset_updated feedback_source_counts=$feedback_rows"
             if ssh -o BatchMode=yes -o ConnectTimeout=8 mac-mini-ai \
-              '/Users/ai/Documents/GitHub/virtualOS/tools/computer-decision.sh --train-local'; then
+              '/Users/ai/vos-fleet/tools/computer-decision.sh --train-local'; then
               echo 'work=offline_linear_updated'
             else
               echo 'work=offline_linear_deferred'
@@ -352,6 +374,20 @@ except (ValueError, TypeError):
         fi
       else
         echo 'work=offline_dataset_status_unavailable'
+      fi
+      if ssh -o BatchMode=yes -o ConnectTimeout=8 mac-mini-ai \
+        '/Users/ai/vos-fleet/tools/computer-model-api.sh --self-test-mini'; then
+        echo 'work=model_api_passed'
+      elif ssh -o BatchMode=yes -o ConnectTimeout=8 mac-mini-ai \
+        '/Users/ai/vos-fleet/tools/computer-resources.sh --guard' >/dev/null 2>&1 &&
+           ssh -o BatchMode=yes -o ConnectTimeout=8 mac-mini-ai \
+        '/Users/ai/vos-fleet/tools/computer-model-api.sh --start-mini' &&
+           ssh -o BatchMode=yes -o ConnectTimeout=8 mac-mini-ai \
+        '/Users/ai/vos-fleet/tools/computer-model-api.sh --self-test-mini'; then
+        echo 'work=model_api_recovered'
+      else
+        echo 'work=model_api_deferred'
+        cycle_failed=1
       fi
       local_free_kb="$(df -Pk /private/tmp | awk 'NR==2 {print $4}')"
       if [[ "$local_free_kb" =~ ^[0-9]+$ ]] && (( local_free_kb >= 524288 )); then

@@ -1,0 +1,19 @@
+{
+  "observed_at": "2026-10-21T20:36:19.423001+00:00",
+  "read_only": true,
+  "seed_identity_matches_prior_verified_baseline": true,
+  "live_metadata_matches_verified_build": true,
+  "blocks": 34475,
+  "raw_bytes": 2259353600,
+  "encoded_payload_bytes": 1164404475,
+  "stored_database_bytes": 1192714240,
+  "page_bytes": 1192714240,
+  "metadata_index_page_overhead_bytes": 28309765,
+  "compressed_payload_ratio": 0.5153706241466586,
+  "payload_totals_source": "previous full build and reconstruction receipt for unchanged immutable file",
+  "raw_fallback_blocks": 0,
+  "format": "compressed-v1 initial seed always stores zlib",
+  "full_table_scan": "aborted at two-second budget; metadata-only fallback used",
+  "fresh_full_file_sha256_performed": false,
+  "query_elapsed_seconds": 0.005185249999999808
+}

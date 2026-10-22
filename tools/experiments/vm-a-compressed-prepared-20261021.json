@@ -1,0 +1,97 @@
+{
+  "observed_at": "2026-10-21T16:59:34.447207+00:00",
+  "original_disk": "/Users/ai/vos-fleet/vm-a-original-20261021.bundle/Disk.img",
+  "cfg": {
+    "baseName": "vm-a-base-20261021",
+    "platformName": "vm-a-original-20261021",
+    "delta": "/Users/ai/vos-fleet/deltas/vm-a-compressed-20261021.sqlite",
+    "deltaFormat": "compressed-v1",
+    "deltaSHA256": "ed2a522a2ff69e3210927c83df8784478794474d849371215168f8bd8332ba6b",
+    "port": 40991
+  },
+  "original_supervisor_binary_unchanged": true,
+  "guest_start_requested": false,
+  "disk_service": "persistent shared disk ready on :40991",
+  "prepared": true,
+  "diskless_bundle": true,
+  "platform_metadata_matches_original": true,
+  "resources": {
+    "background_work": "allowed",
+    "cpu_count": 10,
+    "disk_free_kib": 18267652,
+    "families": {
+      "ai_agents": {
+        "processes": 2,
+        "sum_rss_mib": 984.8
+      },
+      "browser_apps": {
+        "processes": 24,
+        "sum_rss_mib": 228.9
+      },
+      "browser_engines": {
+        "processes": 113,
+        "sum_rss_mib": 1685.7
+      },
+      "simulator_runtime": {
+        "processes": 147,
+        "sum_rss_mib": 193.3
+      },
+      "terminal": {
+        "processes": 1,
+        "sum_rss_mib": 5.6
+      },
+      "virtualos": {
+        "processes": 3,
+        "sum_rss_mib": 13.7
+      }
+    },
+    "load_one": 6.05,
+    "memory_free_percent": 34,
+    "reasons": [],
+    "rss_note": "RSS sums can count shared pages more than once and omit paged-out memory",
+    "swap_used_mib": 4946,
+    "top_executables": [
+      {
+        "name": "ollama",
+        "processes": 2,
+        "sum_rss_mib": 984.8
+      },
+      {
+        "name": "Google Chrome",
+        "processes": 69,
+        "sum_rss_mib": 934.8
+      },
+      {
+        "name": "com.apple.WebKit.WebContent",
+        "processes": 7,
+        "sum_rss_mib": 621.8
+      },
+      {
+        "name": "Figma",
+        "processes": 9,
+        "sum_rss_mib": 89.6
+      },
+      {
+        "name": "Paper",
+        "processes": 7,
+        "sum_rss_mib": 87.1
+      },
+      {
+        "name": "Google Chrome for Testing",
+        "processes": 8,
+        "sum_rss_mib": 29.8
+      },
+      {
+        "name": "com.apple.WebKit.GPU",
+        "processes": 3,
+        "sum_rss_mib": 28.6
+      },
+      {
+        "name": "Pen",
+        "processes": 4,
+        "sum_rss_mib": 27.4
+      }
+    ]
+  },
+  "preserved_processes": "  440 /Applications/virtualOS.app/Contents/MacOS/virtualOS\n 2499 ./tools/fleet/linux-guest\n"
+}

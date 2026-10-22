@@ -178,7 +178,7 @@ without an Ollama call. The private learner now holds 39 outcomes in 53 KiB,
 with an 11,369-byte dataset and 1,542-byte shadow model. Recents was not visible,
 so it was not clicked. The curriculum now chooses the least-covered currently
 visible sidebar goal, capped at three successes or three failures per goal.
-The ten-hour `.sh` worker attempts at most one such action per hour while
+The bounded `.sh` worker attempts at most one such action per hour while
 the stricter background guard remains paused. Other app and site workflows
 can call the same symbolic `--observe`/`--suggest` interface after they have
 grounded actions and independent outcome checks. Local-only feedback is not
@@ -235,8 +235,15 @@ training split (50 examples) and scored 7/10 on its separate test split,
 versus a 5/10 majority baseline. The artifact and evaluation are in the
 private [virtualos-ui-router-v1](https://huggingface.co/fdotinc/virtualos-ui-router-v1)
 model repository. It recommends an interface mode; its confidence is
-uncalibrated and it cannot operate Xcode or judge a design. A Hugging Face
-CPU Job was attempted with a ten-minute cap. The active fine-grained token
+uncalibrated and it cannot operate Xcode or judge a design.
+`./tools/computer-train.sh --router` reproduced the router locally on
+2026-10-10 from the checksum-pinned public split. Its model and metrics matched
+the checked-in copies byte for byte (SHA-256 `c71696cd3abc44bc104e37d9b7b3a56b0cc791dc6c7fafe80f3204db7e3ce2b7`
+and `70f18f5eafe83d44a8b3f391a8204e6ed26f6b81313c1fcfb383bc3432c60eca`).
+A separate `./tools/computer-decision.sh --train-local` run on the Mini trained
+from 39 verified local outcomes, but held-out accuracy tied the always-abstain
+baseline at 6/11, so that 1,542-byte model remains shadow-only.
+A Hugging Face CPU Job was attempted with a ten-minute cap. The active fine-grained token
 lacked `job.write`; the stored write token passed that check but the account
 returned HTTP 402 for insufficient prepaid credits. Training therefore ran
 locally from the verified Hugging Face download, followed by a private Hub
@@ -254,6 +261,9 @@ whitespace pairs; pairs under a 0.5 rating gap were omitted. Inference uses
 macOS `sips` plus Python's standard library, with the same features as
 training. These tests concern perturbed graphic designs, not complete UI/UX
 quality or Xcode screens.
+`./tools/computer-train.sh --design` reproduced all three models from the
+checksum-pinned public shards on 2026-10-10; all six model and metrics files
+matched the checked-in copies byte for byte.
 
 `./tools/computer-preference.sh --vote FAMILY DIMENSION LEFT RIGHT left|right`
 records an explicit local preference, image hashes, and compact derived
@@ -276,6 +286,9 @@ screen IDs. On 547 unseen-screen ratings, usability MAE was 0.616 versus a
 artifact is in the private [virtualos-ui-critique-v1](https://huggingface.co/fdotinc/virtualos-ui-critique-v1)
 repository. The model interprets an existing human critique; it does not see
 or assess a screenshot and has no measured Xcode or current website accuracy.
+`./tools/computer-train.sh --critique` reproduced the model from the public
+UICrit CSV on 2026-10-10; its model and metrics matched the checked-in copies
+byte for byte.
 
 `./tools/computer-xcode.sh --collect` records the actual Xcode project,
 scheme, target, configuration, and selected build settings in
@@ -301,6 +314,22 @@ downloads were removed after every hosted file passed SHA-256 comparison.
 The verified Hub commits are `031f70bd8b7c` (router), `62aab3c22797`
 (design principles), and `0fd57e80792c` (critique). Keep local copies for
 offline inference; these commit IDs are remote recovery points.
+`./tools/computer-hf.sh --verify` now checks the current private Hub heads and
+compares every local model/metrics JSON file byte-for-byte with its remote copy.
+On 2026-10-10, the operator's current Hugging Face token received HTTP 404 for
+all three private repositories, so remote availability could not be reverified
+with that token. This does not affect offline inference: the Mini's 15,342-byte
+bundle was loaded by the model API, and its route, critique, design, and
+unauthorized-request checks passed.
+The same day, `VOS_CUA_WORK_HOURS=20 ./tools/computer-work.sh
+--continuous-restart` started a detached 20-hour operator worker. Its guarded
+cycle imported the existing 39 verified local feedback rows, retrained the
+1,542-byte shadow model, passed the format and Mini model API checks, and
+audited the R2 archive (12 examples, 24 images). The Mini quality runner is
+active in observation mode. The production guest currently returns a visually
+blank 980×700 frame (12,415 JPEG bytes, zero grayscale variation); one safe
+`computer-wake.sh` key did not change it. No new guest task action was taken.
+The worker continues bounded checks and will retry when the guest is usable.
 The ten JSON model/metric files contain 118,383 bytes of decimal text. The
 shipped bundle replaces every float with a two-byte int16 fixed-point value
 (`tools/model_bundle.py`, `VOSB1` with a SHA-256 header) and Brotli-compresses
@@ -352,3 +381,267 @@ probe now turns a failed screenshot read into a concise refusal rather than a
 Python traceback. New guest actions remain paused when the Mini's offline
 resource guard exceeds its swap limit; waking the display did not override
 that guard.
+Later on 2026-10-10 the Mini returned the same 12,415-byte black frame again.
+`computer doctor` reported `screenshot_usable=false`, and a guarded Space key
+plus one bottom-corner guest click did not wake it. The VM health endpoint still
+reported `running` and `ready`, so those flags alone cannot admit training
+actions. The Mini had neither a verified VM backup receipt nor a staging clone;
+the production VM was left running. The quality runner now defers guest checks
+when `computer doctor` reports an unusable screenshot, while its read-only
+evaluation and dataset checks continue.
+
+On 2026-10-11, `vm-backup-detached` created a consistent APFS clone and restarted
+the production VM. The guest screen became usable again. The R2 multipart upload
+is in progress from the clone; no verified VM backup receipt exists yet. The
+backup script now retains the clone if upload, audit, or restart verification
+fails. Its detached monitor stops a low-disk upload while retaining the clone.
+The Mini's February `inputctl` binary was older than its October Swift source
+and incorrectly required Accessibility permission for OCR. Rebuilding the
+helper through `./tools/computer-check.sh --build-ocr` on the operator Mac and
+staging the arm64 binary restored guest-only OCR; the Mini's no-model preflight
+passed. A new 72-hour quality runner now performs hourly read-only evaluation
+and dataset readiness checks even while memory pressure pauses guest actions.
+Once the guard permits guest work, it will wake and unlock the guest before its
+hourly guarded check. The Mini's current swap use exceeds the 8 GiB action
+threshold, so no new model action has been claimed.
+
+The later 2026-10-11 check found the operator worker, VM archive uploader, and
+backup monitor stopped. R2 retained 349 pending archive parts totaling
+2,927,624,192 bytes; the complete staging clone remained on the Mini. No verified
+VM archive receipt exists. A guarded Space key temporarily restored the guest
+display, but a later doctor check returned the blank 12,415-byte frame again.
+The guest preflight also found `~/.config/virtualos/computer-stop`; that marker
+was left in place. The observation quality runner remained active. The live
+Mini model API passed route/critique/design (200) and unauthorized-request (401)
+checks, and all 12 local plain/bundle API tests passed.
+
+`tools/cloud_disk_delta_probe.py CONFIG` now provides a bounded real-R2 delta
+check using three synthetic blocks under a fresh fleet prefix. Its first real
+run passed exact upload/download comparison, immutable object reuse, and
+wrong-pin rejection with the existing local delta preserved. It retained four
+objects (66,177 compressed block bytes plus the manifest); the receipt is in
+`tools/experiments/r2-delta-probe-receipt.json`. This is transport evidence, not
+a real VM delta or verified VM archive.
+
+The archive transfer is now resuming through
+`./tools/computer-r2-sync.sh vm-resume-detached`. The Mini regenerated the gzip
+archive and matched all 349 original multipart MD5s (2,927,624,192 bytes) before
+forwarding only new bytes over SSH. New parts then uploaded. A controlled
+halt/restart retained the parts and successfully reverified the enlarged
+352-part prefix; the subsequent transfer advanced through part 354. The disk
+monitor is active, and a low-disk halt now retains both the multipart upload
+and clone. The pending receipt records the full archive hash and clone identity
+before multipart completion, allowing an interrupted full-download audit to
+retry against the same clone. Verified receipt publication precedes clone
+release. Seventeen resume tests pass, including interrupted transfers,
+wrong-prefix refusal, source/tail hashing, clone identity checks, and retention
+of the pending receipt after a failed completion call. The full archive is still
+in progress and has no verified receipt yet.
+
+A subsequent continuation moved the multipart metadata from the SSH command
+line to a separate stdin file descriptor. This avoids macOS command-length
+failures when the archive has thousands of parts. A real bash pipeline test
+passed with a multi-megabyte metadata list, forwarding no archive bytes until
+the entire existing prefix matched. The transfer also reads one upcoming 8 MiB
+part while the current part uploads to R2. Tests confirm that a failed upload
+does not wait for a blocked prefetch before allowing source cleanup. Twenty
+resume tests now pass. The live updated uploader reverified the 378-part prefix
+and advanced through part 385 (3,229,614,080 compressed bytes), with the monitor
+active and about 32 GiB free on the Mini. Full archive verification remains
+pending; no throughput improvement is claimed from the short observation.
+
+On 2026-10-12 the transfer had stopped after part 396
+(3,321,888,768 compressed bytes) because Mini SSH became unavailable. The old
+monitor exited without a receipt. Direct LAN SSH timed out, and the configured
+`mac-mini.mergerealestate.ca` Cloudflare SSH hostname no longer resolved. The
+read-only relay scoreboard still showed a fresh heartbeat and `vm-a:running`.
+No full VM archive receipt or pending completion receipt exists.
+
+The backup monitor now waits through SSH outages instead of exiting, and can
+resume the existing multipart transfer after verifying a complete, closed clone
+and at least 10 GiB of disk reserve. Integrity failures refuse automatic retries;
+the restart count is bounded. Explicit monitor stops and upload halts leave a
+stop marker, preventing automatic recovery from undoing an intentional pause.
+VM backup and recovery accept `VOS_VM_SSH_HOST` for an alternate route. A new
+48-hour detached monitor is active and has logged `waiting_for_ssh`. All 27
+resume/recovery tests pass. The guest stop marker remains separate; no guest
+automation or claim of completed cloud recovery was made.
+
+## Extended storage work queue — 2026-10-21
+
+Continue through the same no-argument shell entrypoints:
+
+```sh
+./tools/cloud-disk-observe.sh
+./tools/cloud-disk-archive.sh
+```
+
+The detached supervisor runs for a bounded 24-hour window and samples every minute. It reconciles evidence and eligible existing jobs; it does not implement these engineering tasks or renew unattended agent leases. One agent task stays active at a time. Tasks need source-bound evidence before completion. Keep production and Linux running and preserve the original VM disk. Approval and resource gates remain in force.
+
+This is an ordered backlog, not a claim that every item is already running. The persistent controller is authoritative for current status. The observer now also samples raw or compressed write overlays without decoding guest contents: changed-block count, logical bytes, database allocation, WAL size and reusable pages. Samples are timestamped in `/private/tmp/virtualos-archive-conversion/observer.log`; SQLite reads time out and cannot write guest blocks. Multi-hour verification remains pending until enough live samples exist. Queue reports now include a bounded overlay-growth summary: observation span, missing-sample gaps, latest sample age and recent growth rate. Forecasts require at least five minutes of fresh contiguous samples; stale data, codec switches and observation outages cannot produce a capacity forecast. A roughly 19-minute interruption was detected and is retained in the evidence rather than treated as continuous monitoring.
+
+1. **Compress bounded VM write overlays with verified migration** (`compressed_mutable_overlay`). Done when: Preserve all disk bytes and existing limits; corruption/restart/FUA tests pass; offline forward/reverse conversions verified; independently reviewed guest boot if activated; production/Linux untouched.
+
+2. **Measure current physical and logical storage** (`storage_baseline_refresh`). Done when: Record allocated versus logical bytes, filesystem free space, open files and time; distinguish shared APFS extents from reclaimable bytes.
+
+3. **Review changed-source storage evidence** (`storage_evidence_refresh`). Done when: Revalidate affected acceptance checks against current source hashes; retain historical deployment hashes and mark unresolved evidence stale.
+
+4. **Measure write-overlay growth over several hours** (`overlay_growth_profile`). Done when: Bounded read-only samples report rows, allocated bytes, WAL bytes and growth rate; no VM restarts or model inference.
+
+5. **Round-trip a consistent real overlay snapshot** (`compressed_overlay_snapshot`). Done when: SQLite backup of the running overlay converts forward and back with identical logical fingerprints; respect 10 GiB reserve and preserve live source.
+
+6. **Measure compression CPU and disk tradeoffs** (`overlay_codec_cost`). Done when: Use closed snapshots or small fixtures; report compression ratio, write/flush latency and bounded memory without guest load generation.
+
+7. **Exercise malformed compressed writes** (`overlay_corruption_matrix`). Done when: Reject truncation, changed checksum, invalid lengths, trailing payload, unknown codec and decompression expansion; failed writes preserve prior bytes.
+
+8. **Exercise interrupted write and conversion recovery** (`overlay_crash_matrix`). Done when: Fixture-only process interruption proves acknowledged FUA writes persist and incomplete conversions never replace the source.
+
+9. **Verify compressed writes retain logical limits** (`overlay_capacity_boundary`). Done when: Compressible input cannot bypass the 2 GiB logical cap; multi-block failures are atomic and base-equivalent writes release rows.
+
+10. **Prove compressed-to-raw rollback offline** (`overlay_rollback_drill`). Done when: Closed snapshot restores using the prior backend with matching disk bytes; document exact helper, config and service restoration order.
+
+11. **Audit managed disk service identity** (`overlay_service_identity`). Done when: Config, seed pin, base identity, codec and running service agree; wrong-format reuse is rejected before a guest attaches.
+
+12. **Observe the migrated guest over several hours** (`overlay_boot_soak`). Done when: After independently verified activation, record fresh relay frames and bounded overlay growth; report gaps and preserve production/Linux PIDs.
+
+13. **Audit WAL and checkpoint storage** (`overlay_wal_audit`). Done when: Measure WAL growth and current checkpoint behavior; identify readers and explain safe checkpoint conditions without editing live SQLite files.
+
+14. **Measure redundant changed-block retention** (`overlay_pruning_audit`). Done when: Closed snapshot audit counts blocks equal to immutable backing and models reclaimable pages without changing live data.
+
+15. **Measure immutable seed density** (`immutable_delta_density`). Done when: Read-only audit reports compressed payload, index/page overhead and raw fallback counts; seed SHA remains unchanged.
+
+16. **Measure shared-base physical allocation** (`base_extent_accounting`). Done when: Record original/base clones and link identities; do not count apparent clone sizes as independent reclaimable storage.
+
+17. **Verify preserved original VM disk** (`original_disk_preservation`). Done when: Original disk exists, remains closed and matches recorded identity; no deletion or replacement of the rollback original.
+
+18. **Map model manifests to blobs** (`model_reference_refresh`). Done when: Each installed manifest and blob is accounted for; shared references and resident models prevent false orphan classification.
+
+19. **Verify the offloaded model backup** (`model_backup_restore_drill`). Done when: Manifest references and every backup blob hash verify from durable operator storage; test metadata restoration in an isolated temporary directory.
+
+20. **Recheck compressed private OCR runtime** (`private_runtime_recheck`). Done when: Pinned runtime byte inventory, signatures and sandboxed help check pass; record actual allocation without running inference.
+
+21. **Find bounded regenerable cache candidates** (`cache_candidate_inventory`). Done when: Read-only inventory identifies owner, regeneration path, allocated size, last use and open-file checks; exclude guest disks and model data.
+
+22. **Find unused build and maintenance artifacts** (`artifact_reference_inventory`). Done when: Trace launch agents, symlinks, imports and rollback references before classifying artifacts; report only evidence-backed candidates.
+
+23. **Measure logs and retained evidence growth** (`log_growth_inventory`). Done when: Report largest growing logs and retention policies; preserve acceptance receipts, private evidence and current service logs.
+
+24. **Prepare exact reviewed reclamation actions** (`storage_reclaim_plan`). Done when: List exact paths, expected physical savings, ownership, references, backup and rollback evidence; no wildcard deletion or automatic approval.
+
+25. **Audit cloud archive references** (`r2_archive_reference_audit`). Done when: Read-only check maps receipts and manifests to archive objects and pending multipart uploads; no cloud deletion.
+
+26. **Prepare bounded cloud recovery verification** (`r2_recovery_cost_plan`). Done when: Estimate download, temporary disk, cache and guest resource needs; retain existing recovery approval/resource gates.
+
+27. **Track disk, memory and swap pressure** (`host_resource_trend`). Done when: Bounded hourly observations identify competing load without stopping other apps or relaxing the existing admission thresholds.
+
+28. **Review storage reserve and growth alerts** (`storage_alert_thresholds`). Done when: Derive warning thresholds from measured growth and existing reserves; report predicted exhaustion without lowering hard safety limits.
+
+29. **Verify hours-long shell supervision** (`shell_supervisor_soak`). Done when: Observe multiple timed ticks, deadline and lock ownership; no duplicate supervisor, unattended worker heartbeat or false completion.
+
+30. **Exercise supervisor outage recovery** (`shell_reconnect_drill`). Done when: Fixture tests retry classified connection failures, preserve completed jobs and refuse integrity-failure retries or gated guest starts.
+
+31. **Document measured storage and recovery procedures** (`storage_runbook_refresh`). Done when: Update existing repository documentation with verified formats, entrypoints, reserves, migration/rollback order and unresolved blockers.
+
+32. **Compare final storage with the baseline** (`storage_final_comparison`). Done when: Report measured physical savings, logical sizes, retained backups and open blockers; staged candidates and apparent clone sizes are not savings.
+
+### Compressed-write rollback order
+
+Rollback must convert the **current closed compressed overlay**, including writes
+made since activation. Restoring an older raw overlay would discard those writes.
+The original full VM disk remains preserved separately.
+
+1. Use the authorized test-VM maintenance window. Pass the current action guard,
+   save watchdog state, shut down the guest cleanly, release its VM object, and
+   unload the managed NBD service. Confirm its process and overlay lock are closed.
+2. Preserve the current config, state directory, helper target and overlay. Keep
+   the shared base and immutable seed identities unchanged. Pending WAL or journal
+   data must be resolved through a clean backend close, never deleted manually.
+3. Run `compressed_write_overlay.convert_copy` with `to_compressed=False` into a
+   new private file, retaining the compressed source. Use the default 10 GiB
+   reserve. Verify logical block fingerprints and counts; the saved pre-migration
+   raw overlay is historical evidence, not a substitute for this conversion.
+4. Publish only the verified raw result in a fresh managed state directory. Remove
+   `writeFormat` from the restored raw configuration, restore the previously proven
+   helper target, and prepare/start its NBD service. Keep old state and config
+   together; the helper correctly refuses a mismatched existing `disk.json`.
+5. Pass fresh VM admission: at least 14 GiB disk free, 50% memory free, swap below
+   8 GiB and load below CPU count. Start only the test guest, review its fresh
+   desktop and input, restore the watchdog, and check the relay. Preserve the
+   production and Linux processes throughout.
+6. If any check fails, retain both representations and recover with the matching
+   codec/config/helper. Release generated intermediates only after verification.
+   Neither rollback nor preview cleanup authorizes deleting the preserved original.
+
+The local rollback drill now writes a new block *after* conversion to compressed
+storage and proves that reverse conversion retains it. Live activation remains
+subject to the existing resource and maintenance guards.
+
+
+### Verified storage state and operating limits — 2026-10-21
+
+Continue through the same two no-argument `.sh` entrypoints above. The worker
+reconciles the durable queue; the observer reports fresh measurements. Neither
+launches a coding model or renews an unattended agent lease. The supervisor's
+current deadline remains 2026-10-22 19:30 UTC (3:30 p.m. Toronto).
+
+| Item | Measured bytes | Interpretation |
+| --- | ---: | --- |
+| Immutable VM seed | 1,192,714,240 | Active read-only seed; 34,475 changed blocks represent 2,259,353,600 raw bytes. |
+| Live raw write database | 987,734,016 | Latest measured live format remains raw; logical write limit is 2 GiB. |
+| Compressed preview | 417,488,896 | Round-trip verified, then removed; never installed as the live disk. |
+| Temporary preview allocation released | 419,495,936 | Mini allocation reclaimed after source/identity/open-file checks. |
+| Operator history allocation released | 33,566,720 | Full log retained in a SHA-256-verified gzip archive, plus a recent hot tail. |
+| Private OCR runtime allocation | 211,062,784 | Latest byte-inventory verifier, 32 signatures and sandboxed help passed. |
+| Offloaded model weight backup | 6,140,392,672 | Operator backup retained; all five backup files freshly hash-verified. |
+
+The compressed-write candidate passed the prior 55 Mini checks and disk-plane
+self-test. Six additional local integrity, real conversion-SIGKILL and rollback
+tests passed. The small fixture cost comparison stored the same 3 MiB of writes
+in 1,097,728 bytes compressed versus 3,186,688 raw; this is not a guest performance
+benchmark. The source and immutable seed remain unchanged during conversions.
+
+Current physical-volume alerts are separate from the logical overlay budget.
+A fresh sample compares free disk with the existing 10 GiB reserve and 14 GiB
+VM-start disk reference. Stale samples report unknown readiness. These references
+never replace execution-time memory, swap, CPU, capacity and approval checks.
+Do not lower guards to continue a migration. At the latest pressure audit, swap
+was above 14 GiB and disk was below the restart requirement.
+
+The observer log archive retains every original byte and was independently
+expanded and hash-checked before retaining the latest 4 MiB as the hot log.
+Monitoring gaps and context restarts remain disclosed; an elapsed 24-hour soak
+is not claimed. Forecasts use only fresh contiguous measurements, never outage
+intervals. The complete acceptance receipts and private evidence remain retained.
+
+The live disk service still uses the proven previous backend package, its exact
+seed pin and a 2 GiB write limit. The compressed-write codec is opt-in and has not
+been activated. Production and Linux stay running; the preserved original full
+disk remains closed and unchanged. Closed-snapshot pruning also waits for enough
+space to preserve its 10 GiB reserve. Conversion interruption can leave unpublished
+temporary files; retain the source and review exact owned paths before cleanup.
+
+The remaining large global model blob is shared by two installed aliases.
+Unknown cache last use and opaque maintenance/rollback references prevented
+further deletion. The executable called “Google Chrome for Testing” belongs to
+the live Moats Browser application. Its pages, profile and automation must not
+be interrupted without the user's explicit answer to the pending close request.
+No Moats quit action has been executed.
+
+The existing shell supervisor now dispatches one additional fixed job:
+`storage_pruning_job.py` checks the closed-snapshot audit every five minutes.
+It waits for at least 50% free memory, swap below 8 GiB, load below CPU count,
+and enough disk for its snapshot while preserving the 10 GiB reserve. It checks
+pressure during backup and comparison and removes its own temporary snapshot.
+Verified success is bound to the exact source hashes; integrity failures stop
+for review. This job cannot stop guests, close apps, change the live overlay or
+activate compressed writes. It neither claims nor renews an agent work lease.
+The supervisor deadline remains unchanged. The audit has not yet run on the
+real overlay; current resource pressure still blocks it.
+
+A fresh read-only R2 audit verified the manifest and one chunk, matched the archive
+size and found no pending multipart uploads in either relevant bucket. The
+22,266,108,635-byte archive and 22,267,132,894 bytes of referenced compressed chunk
+objects remain retained. A full raw readback is already verified; independent
+cold guest boot is still gated and has not been substituted by a sample read.
+See the recovery-cost plan receipt for cache bounds, transfer estimates and the
+separate recovery approval/resource requirements.

@@ -1,0 +1,122 @@
+{
+  "observed_at": "2026-10-21T19:56:16.128176+00:00",
+  "state": "collecting_multi_hour_evidence",
+  "complete": false,
+  "live_samples": [
+    {
+      "allocated_bytes": 973144064,
+      "changed_blocks": 14705,
+      "codec": "raw",
+      "database_bytes": 972361728,
+      "logical_changed_bytes": 963706880,
+      "logical_limit_bytes": 2147483648,
+      "observed_at_unix": 1792612531.787337,
+      "read_only": true,
+      "reusable_page_bytes": 65536,
+      "wal_bytes": 2583272
+    },
+    {
+      "allocated_bytes": 973144064,
+      "changed_blocks": 14707,
+      "codec": "raw",
+      "database_bytes": 972427264,
+      "logical_changed_bytes": 963837952,
+      "logical_limit_bytes": 2147483648,
+      "observed_at_unix": 1792612563.0000472,
+      "read_only": true,
+      "reusable_page_bytes": 65536,
+      "wal_bytes": 1639792
+    }
+  ],
+  "source_sha256": {
+    "tools/cloud-disk-observe.sh": "9e1b930830433b731011ed076666b558dc0b292487f94f38fd97c1e849f52179",
+    "tools/test_cloud_disk_observe.py": "1ebd1b5f10f9c0fd2d36cf4461c199c5f07daecd8ba7c33b00bd03a14c2e0563"
+  },
+  "observer_pid": 96563,
+  "supervisor": {
+    "agent_control": {
+      "blocked": {
+        "compressed_mutable_overlay": [
+          "resources"
+        ],
+        "host_hardening": [
+          "approval",
+          "resources"
+        ],
+        "native_supervisor_activation": [
+          "dependency:recovery_boot",
+          "approval",
+          "resources"
+        ],
+        "ocr_finder": [
+          "resources"
+        ],
+        "overlay_boot_soak": [
+          "dependency:compressed_mutable_overlay"
+        ],
+        "recovery_boot": [
+          "approval",
+          "resources"
+        ],
+        "resource_readiness": [
+          "approval",
+          "resources"
+        ],
+        "storage_final_comparison": [
+          "dependency:storage_runbook_refresh"
+        ],
+        "storage_reclaim_plan": [
+          "dependency:cache_candidate_inventory",
+          "dependency:artifact_reference_inventory",
+          "dependency:log_growth_inventory"
+        ],
+        "storage_reclamation": [
+          "error"
+        ]
+      },
+      "completed": [
+        "archive_conversion",
+        "r2_readback",
+        "controller_improvement",
+        "maintenance_readiness",
+        "compact_fleet_default",
+        "compact_overlay_writes",
+        "offline_overlay_compaction",
+        "sparse_failed_linux_disk",
+        "current_machine_footprint",
+        "compressed_readonly_delta",
+        "vm_a_compressed_migration",
+        "post_boot_storage_reduction",
+        "storage_baseline_refresh",
+        "storage_evidence_refresh"
+      ],
+      "executes_arbitrary_commands": false,
+      "next_task": {
+        "acceptance": "Bounded read-only samples report rows, allocated bytes, WAL bytes and growth rate; no VM restarts or model inference.",
+        "id": "overlay_growth_profile",
+        "status": "active",
+        "title": "Measure write-overlay growth over several hours"
+      },
+      "receipt_errors": {},
+      "revision": 4297,
+      "stale_leases": 0,
+      "worker": {
+        "expires_at": 1792612831.3548958,
+        "owner": "codex-worker",
+        "task": "overlay_growth_profile"
+      }
+    },
+    "archive_action": "observe",
+    "archive_state": "failed",
+    "deadline": 1792697430.417424,
+    "linux_state": "verified",
+    "pid": 82805,
+    "recovery_state": "recovery_requires_attention",
+    "state": "supervising",
+    "updated_at": 1792612547.584595
+  },
+  "controller_observer_tests_passed": 42,
+  "storage_tests_passed": 55,
+  "unchanged_logical_write_limit_bytes": 2147483648,
+  "migration_activation": "deferred_after_resource_guard_refusal"
+}

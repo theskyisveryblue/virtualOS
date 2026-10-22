@@ -1,0 +1,19 @@
+{
+  "bucket_retention_configuration_freshly_inspected": false,
+  "console_disclosure_deployed_by_review": false,
+  "console_privacy_disclosure_corrected_in_source": true,
+  "existing_fleet_behavior": {
+    "browser_cache_policy_does_not_delete_r2_object": true,
+    "http_cache_control": "private, no-store",
+    "latest_frame_retained_in_private_r2": true,
+    "r2_key": "fleet/frames/<vm>.jpg",
+    "same_key_overwritten_per_capture": true
+  },
+  "new_screenshots_requested_by_review": false,
+  "r2_objects_deleted": false,
+  "reviewed_at": "2026-10-19T03:37:21.267150+00:00",
+  "schema": "virtualos-relay-frame-retention-review/v1",
+  "source_sha256": {
+    "tools/cloudflare/worker/src/index.ts": "1fa2cd8f68410570de2aeb9bbf50759c3fc8add24252ecdc1dee8a0c0885bcac"
+  }
+}

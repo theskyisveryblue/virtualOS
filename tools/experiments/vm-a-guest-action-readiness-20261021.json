@@ -1,0 +1,39 @@
+{
+  "tools/fleet/guest_unlock.py": {
+    "exists": true,
+    "resolved": "/Users/ai/vos-fleet/tools/fleet/guest_unlock.py",
+    "sha256": "7d6ba23f66e2c8e9fb17b6aaaa9bf134990423f4ef790f7c1ba5ef845939da62"
+  },
+  "tools/fleet/brain.py": {
+    "exists": true,
+    "resolved": "/Users/ai/vos-fleet/tools/fleet/brain.py",
+    "sha256": "3bea981e2a37bff9a4f2af65c537c219573c4c932c556679649d1455920ec375"
+  },
+  "tools/fleet/guest_text.py": {
+    "exists": true,
+    "resolved": "/Users/ai/vos-fleet/tools/fleet/guest_text.py",
+    "sha256": "aa0b3b4c004077fd53ea39d6d4c427c449e9f76587da405eff183142d786a4e6"
+  },
+  "tools/fleet/ocr_budget.py": {
+    "exists": false,
+    "resolved": "/Users/ai/vos-fleet/tools/fleet/ocr_budget.py"
+  },
+  "tools/virtualos_stream_server/inputctl": {
+    "exists": true,
+    "resolved": "/Users/ai/vos-fleet/tools/virtualos_stream_server/inputctl",
+    "sha256": "59b3caeb3e694a40efeec5e45ae3d9f0118a733e5437defd7c5fbf638c64e2de"
+  },
+  "single_action_guard": {
+    "code": 0,
+    "report": {
+      "background_work": "allowed",
+      "cpu_count": 10,
+      "disk_free_kib": 19182776,
+      "load_one": 6.64,
+      "memory_free_percent": 34,
+      "offline_single_action": "allowed",
+      "reasons": [],
+      "swap_used_mib": 5830
+    }
+  }
+}

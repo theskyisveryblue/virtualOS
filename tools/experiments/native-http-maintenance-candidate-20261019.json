@@ -1,0 +1,53 @@
+{
+  "active_binary_sha256": "e326458b651e982ad03fed7f2b339113af9a80a06c435fc6f45b53b1d09c997f",
+  "active_binary_unchanged": true,
+  "candidate_activated": false,
+  "candidate_bytes": 243552,
+  "candidate_path": "/Users/ai/vos-fleet/.local/maintenance/native-http-20261019/supervisor.candidate",
+  "candidate_sha256": "262a53ea51283ef00c7c8a8c4e6e4de0a41138ed521934ffe587841a4576f1db",
+  "earlier_candidate_overwritten": false,
+  "guest_or_vm_actions_invoked": false,
+  "http_server_started": false,
+  "keyboard_selftest_passed": true,
+  "launchagent_plists_unchanged": true,
+  "launchagents_checked": 6,
+  "pids_preserved": [
+    440,
+    2503,
+    2499,
+    35688
+  ],
+  "private_stage": true,
+  "process_identities_unchanged": true,
+  "schema": "virtualos-native-http-maintenance-candidate/v1",
+  "services_restarted": false,
+  "source_files": {
+    "/private/tmp/vos-fleet-http-boundary-20261019": {
+      "bytes": 243552,
+      "sha256": "262a53ea51283ef00c7c8a8c4e6e4de0a41138ed521934ffe587841a4576f1db"
+    },
+    "tools/fleet/FleetSupervisor.swift": {
+      "bytes": 43960,
+      "sha256": "9691bec50bf63ba59b0463bf8e1fc7245dd8636cf967d03dbbb6830764c9dfea"
+    },
+    "tools/fleet/fleet.entitlements": {
+      "bytes": 353,
+      "sha256": "2326352f239ebc33029b53d7c3e53d349da7ce0affb96c112a59d202e75d6f7e"
+    },
+    "tools/fleet/native_http_boundary_test.py": {
+      "bytes": 7108,
+      "sha256": "18d6c882657e4b32bad18ee13e49d4cbbf80d2c769a1eb9f0becd6f5f29410dd"
+    },
+    "virtualOS/Model/HostScreenshotServer.swift": {
+      "bytes": 8518,
+      "sha256": "1eb44658997bc21940cb53978ec97fab84abaf8da61ac641d9f7d407d9590635"
+    },
+    "virtualOS/Model/VMCommandServer.swift": {
+      "bytes": 43392,
+      "sha256": "3db087903c2e31a2de7413562cea6ac5db747f14e8a42620a59ee6e38fc21c27"
+    }
+  },
+  "strict_codesign_verified": true,
+  "verified_at": "2026-10-19T01:58:48.582811+00:00",
+  "watchdog_pid": 1756
+}

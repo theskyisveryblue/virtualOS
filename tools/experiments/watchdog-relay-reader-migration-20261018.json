@@ -1,0 +1,79 @@
+{
+  "schema": "virtualos-watchdog-relay-reader-migration/v1",
+  "verified_at": "2026-10-19T00:02:26.294425+00:00",
+  "backup_directory": "/Users/ai/vos-fleet/.local/relay-reader-migration-azzv2mip",
+  "private_backups": true,
+  "watchdog_label": "com.virtualos.fleet-watchdog",
+  "watchdog_pid_before": 2502,
+  "watchdog_pid_after": 64358,
+  "watchdog_state": "running",
+  "watchdog_reloaded": true,
+  "rolled_back": false,
+  "strict_heartbeat_parser": true,
+  "hashes": {
+    "fleet-watchdog.sh": "efb19774ce80a15d7fbded18e87b16c5eed0530567af1629f1dbf1569efaecf0",
+    "go-live.sh": "c2ae06adc11d64ac9bd5b3d46e322461e2e6ff9301c91430a010d8d11e2a0db3",
+    "relay_read.py": "d3d6fbf687cdc353756437be144a4ce17e7944877315efbb8f424aa992480a0a",
+    "watchdog_state.py": "6cabf396c4e6ad18d50992394a796fe7474e9e47ef3065ee6f11e17ba93c7f97"
+  },
+  "isolated_tests_count": 10,
+  "isolated_tests_returncode": 0,
+  "monitor_only_once_returncode": 0,
+  "resource_guard_refused_guest_actions": true,
+  "guest_pids_before": {
+    "fleet": [
+      2503
+    ],
+    "linux": [
+      2499
+    ],
+    "production": [
+      440
+    ]
+  },
+  "guest_pids_after": {
+    "fleet": [
+      2503
+    ],
+    "linux": [
+      2499
+    ],
+    "production": [
+      440
+    ]
+  },
+  "fresh_before": {
+    "relay_age": 3,
+    "relay_live": true,
+    "vm_a_running_ready": true
+  },
+  "fresh_after": {
+    "relay_age": 5,
+    "relay_live": true,
+    "vm_a_running_ready": true
+  },
+  "launchagent_plist_unchanged": true,
+  "candidate_supervisor_activated": false,
+  "stream_processes_changed": false,
+  "model_processes_changed": false,
+  "source_patch_scope": "Only credential, heartbeat parsing, guarded convergence, and private rate-state blocks changed; unrelated Mini wrapper code was preserved.",
+  "remote_proof": "/Users/ai/vos-fleet/.local/relay-reader-migration-azzv2mip/monitor-reload-proof.json",
+  "private_rate_state_live_check": {
+    "verified_at": "2026-10-19T01:11:57.556262+00:00",
+    "fleet_home": "/Users/ai/vos-fleet",
+    "fleet_home_real_owned_nonshared_write": true,
+    "fleet_home_mode": "0755",
+    "directory": "/Users/ai/vos-fleet/.watchdog",
+    "directory_mode": "0700",
+    "preexisted": false,
+    "lock_mode": "0600",
+    "state_mode": "0600",
+    "files_regular_owned_nlink1": true,
+    "direct_admit_maximum": 10,
+    "direct_admit_result": true,
+    "count_after": 1,
+    "converge_invoked": false,
+    "service_or_guest_actions": false,
+    "remote_proof": "/Users/ai/vos-fleet/.local/relay-reader-migration-azzv2mip/private-state-live-proof.json"
+  }
+}

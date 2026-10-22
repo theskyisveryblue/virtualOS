@@ -1,0 +1,19 @@
+{
+  "observed_at": "2026-10-21T20:46:11.966780+00:00",
+  "read_only": true,
+  "homebrew_downloads": [],
+  "open_file_review": {
+    "all_closed": false,
+    "reason": "no regular downloads directory"
+  },
+  "active_build_tools": [],
+  "browser_roots": [
+    {
+      "pid": 424,
+      "ppid": 1,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/MacOS/Google Chrome for Testing"
+    }
+  ],
+  "no_files_deleted": true,
+  "directory_mtime_not_used_as_proof_of_last_use": true
+}

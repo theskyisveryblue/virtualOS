@@ -1,0 +1,8 @@
+{
+  "observed_at": "2026-10-21T16:41:53.661439+00:00",
+  "base": "/Users/ai/vos-fleet/vm-a-base-20261021.bundle/Disk.img",
+  "logical_bytes": 32212254720,
+  "source_was_cloned_with_apfs_cow": true,
+  "guest_consistent_machine_snapshot": false,
+  "guest_and_services_changed": false
+}

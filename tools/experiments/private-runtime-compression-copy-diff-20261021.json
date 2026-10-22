@@ -1,0 +1,28 @@
+{
+  "differences": [
+    {
+      "path": "mlx_metal_v3/._mlx.metallib",
+      "source": {
+        "mode": 384,
+        "uid": 501,
+        "kind": "file",
+        "bytes": 9663,
+        "sha256": "fe7f8d95b7d782b31650e24a984f9114e269648f40cbf5b57b4a186212aa0425"
+      },
+      "candidate": null
+    },
+    {
+      "path": "mlx_metal_v4/._mlx.metallib",
+      "source": {
+        "mode": 384,
+        "uid": 501,
+        "kind": "file",
+        "bytes": 9662,
+        "sha256": "d1175064560f439b03521960e25ff787005b8c1e73a475a4c4eb932209621702"
+      },
+      "candidate": null
+    }
+  ],
+  "source_allocated_bytes": 566071296,
+  "candidate_allocated_bytes": 229675008
+}

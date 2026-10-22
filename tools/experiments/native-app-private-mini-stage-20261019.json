@@ -1,0 +1,25 @@
+{
+  "app_launched": false,
+  "bundle_inventory_sha256": "5b9907a3b1124305f4e14976f139a7c773f59f717d8dca305ab52731078c0f7d",
+  "deep_strict_codesign_verified": true,
+  "exact_bundle_entries_verified": 28,
+  "file_bytes": 2580300,
+  "guest_service_actions": false,
+  "metadata_resources": {
+    "cpu_count": 10,
+    "load_one": 7.20947265625,
+    "potentially_available_bytes": 3441049600,
+    "swapouts": 19302887
+  },
+  "preserved_processes": [
+    "  440 Sun Oct 18 10:31:36 2026     /Applications/virtualOS.app/Contents/MacOS/virtualOS",
+    " 1756 Sun Oct 18 21:16:18 2026     bash",
+    " 2499 Sun Oct 18 10:32:15 2026     ./tools/fleet/linux-guest",
+    " 2503 Sun Oct 18 10:32:15 2026     /Users/ai/vos-fleet/tools/fleet/fleet-supervisor",
+    "35688 Sun Oct 18 19:20:44 2026     /Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+  ],
+  "private_candidate_path": "/Users/ai/vos-fleet/.local/maintenance/native-app-20261019/virtualOS.app",
+  "production_app_replaced": false,
+  "schema": "virtualos-private-native-app-mini-stage/v1",
+  "verified_at": "2026-10-19T04:14:26.551391+00:00"
+}

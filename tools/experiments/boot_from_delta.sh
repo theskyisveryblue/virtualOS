@@ -1,144 +1,172 @@
 #!/usr/bin/env bash
-# Boot a machine from ONE shared base image plus its small per-machine delta.
-#
-# ISOLATED experiment: reads the base and machine images read-only, writes only
-# to /private/tmp, and never references the production machine store. Serving is
-# delegated to the stable disk plane as a black-box NBD server.
+# Verify a real guest through the managed shared-disk boot path. Sources must
+# be stopped-disk snapshots in this isolated fleet, never live disks.
 set -euo pipefail
-
 HERE="$(cd "$(dirname "$0")" && pwd)"
-FLEET_HOME="${VOS_FLEET_HOME:-$HOME/vos-fleet}"
+FLEET_HOME="${VOS_FLEET_HOME:-$HOME/vos-shared-fleet}"
 FLEET_TOOLS="${VOS_FLEET_TOOLS:-$FLEET_HOME/tools}"
-SUPERVISOR="${VOS_SUPERVISOR:-$FLEET_TOOLS/fleet/fleet-supervisor}"
-CS="$FLEET_TOOLS/computer-space.sh"
-
-BASE_BUNDLE="${VOS_EXP_BASE_BUNDLE:-$FLEET_HOME/vm-clone.bundle}"
-MACHINE_BUNDLE="${VOS_EXP_MACHINE_BUNDLE:-$FLEET_HOME/vm-clone2.bundle}"
-NAME="${VOS_EXP_NAME:-vm-from-delta}"
-OUT="${VOS_EXP_OUT:-/private/tmp/vos-exp-shared-base}"
-HTTP_PORT="${VOS_EXP_HTTP_PORT:-9250}"
-TMO="${VOS_EXP_TMO:-240}"
-
-[[ -f "$BASE_BUNDLE/Disk.img" ]] || { echo "no base disk: $BASE_BUNDLE" >&2; exit 1; }
-[[ -f "$MACHINE_BUNDLE/Disk.img" ]] || { echo "no machine disk: $MACHINE_BUNDLE" >&2; exit 1; }
-[[ -x "$CS" && -x "$SUPERVISOR" ]] || { echo "fleet tools not built" >&2; exit 1; }
-
-mkdir -p "$OUT"
-DELTA_DIR="$OUT/delta"
-OVERLAY_DIR="/private/tmp/vos-nbd-bundle-$NAME"
-rm -rf "$OVERLAY_DIR"; mkdir -p "$OVERLAY_DIR"
-
-echo "== 1. diff machine vs base (read-only) =="
-python3 "$HERE/shared_base.py" diff "$BASE_BUNDLE/Disk.img" "$MACHINE_BUNDLE/Disk.img" "$DELTA_DIR"
-
-echo "== 2. bind an overlay to the base, then seed the machine's delta into it =="
-# Pick a free port.
-PORT=""
-for p in $(seq 40950 40990); do
-  lsof -nP -iTCP:"$p" -sTCP:LISTEN >/dev/null 2>&1 || { PORT="$p"; break; }
-done
-[[ -n "$PORT" ]] || { echo "no free port" >&2; exit 1; }
-
-# Create the overlay with the identity the base server will expect (RawDisk binds
-# an overlay to the base image's path+inode+size+mtime), then seed the delta.
-python3 - "$FLEET_TOOLS" "$BASE_BUNDLE/Disk.img" "$OVERLAY_DIR/overlay.sqlite" "$DELTA_DIR/delta.sqlite" <<'PY'
-import sqlite3, sys
-sys.path.insert(0, sys.argv[1])
-from cloud_disk import RawDisk
-base_disk, overlay, delta = sys.argv[2], sys.argv[3], sys.argv[4]
-disk = RawDisk(base_disk, overlay, overlay_limit_bytes=2 * 1024**3, min_host_free_bytes=0)
-disk.close()
-db = sqlite3.connect(overlay)
-rows = list(sqlite3.connect(delta).execute("SELECT idx, data FROM blocks"))
-for idx, data in rows:
-    db.execute("INSERT OR REPLACE INTO blocks VALUES (?,?)", (idx, data))
-db.commit(); db.close()
-print("seeded %d delta blocks into the base overlay" % len(rows))
-PY
-
-serve() {
-  VOS_NBD_BUNDLE_ROOT="$FLEET_HOME" VOS_NBD_BUNDLE_NAME="$(basename "$BASE_BUNDLE" .bundle)" \
-    VOS_NBD_BUNDLE_OVERLAY="$OVERLAY_DIR/overlay.sqlite" VOS_NBD_BUNDLE_PORT="$PORT" \
-    bash "$CS" --nbd-bundle-serve > "$OVERLAY_DIR/server.log" 2>&1 &
-  echo $! > "$OVERLAY_DIR/server.pid"
-  for _ in $(seq 1 60); do grep -q '"ready"' "$OVERLAY_DIR/server.log" 2>/dev/null && return 0; sleep 0.2; done
-  return 1
-}
-stop_serve() {
-  kill "$(cat "$OVERLAY_DIR/server.pid")" 2>/dev/null || true
-  pkill -f "cloud_disk.py bundle-serve $FLEET_HOME " 2>/dev/null || true
-  sleep 1
-}
-
-echo "== 3. serve base + delta and boot a machine from it =="
-serve || { echo "serve failed (bind)"; cat "$OVERLAY_DIR/server.log"; exit 1; }
-
-DST="$FLEET_HOME/$NAME.bundle"
-rm -rf "$DST"; mkdir -p "$DST" "$FLEET_HOME/machines"
-for f in HardwareModel MachineIdentifier AuxiliaryStorage; do
-  cp -c "$BASE_BUNDLE/$f" "$DST/$f" 2>/dev/null || cp "$BASE_BUNDLE/$f" "$DST/$f"
-done
-python3 - "$DST/Parameters.txt" "$PORT" <<'PY'
-import json, sys
-open(sys.argv[1], "w").write(json.dumps({
-    "cpuCount": 3, "memorySizeInGB": 4, "screenWidth": 1500, "screenHeight": 900,
-    "nbdURL": "nbd://127.0.0.1:%s/virtualos-test" % sys.argv[2]}, indent=2))
-PY
-ln -sfn "$DST" "$FLEET_HOME/machines/$NAME.bundle"
-
+BASE_BUNDLE="${VOS_EXP_BASE_BUNDLE:-$FLEET_HOME/vm-base.bundle}"
+MACHINE_BUNDLE="${VOS_EXP_MACHINE_BUNDLE:-$FLEET_HOME/vm-machine.bundle}"
+NAME="${VOS_EXP_NAME:-vm-shared}"
+OUT="${VOS_EXP_OUT:-$FLEET_HOME/deltas/$NAME}"
+HTTP_PORT="${VOS_EXP_HTTP_PORT:-9254}"
+NBD_PORT="${VOS_EXP_NBD_PORT:-40994}"
+TMO="${VOS_EXP_TMO:-300}"
+RELEASE_VM="${VOS_EXP_RELEASE_VM:-}"
+OLD_PORT="${VOS_EXP_EXISTING_SUP_PORT:-9225}"
+WATCHDOG="${VOS_EXP_WATCHDOG_LABEL:-com.virtualos.fleet-watchdog}"
 LABEL="com.virtualos.exp.$NAME"
-PLIST="$HOME/Library/LaunchAgents/$LABEL.plist"
-cat > "$PLIST" <<PLIST
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0"><dict>
-  <key>Label</key><string>$LABEL</string>
-  <key>ProgramArguments</key><array>
-    <string>$SUPERVISOR</string>
-    <string>--root</string><string>$FLEET_HOME/machines</string>
-    <string>--names</string><string>$NAME</string>
-    <string>--http-port</string><string>$HTTP_PORT</string>
-    <string>--base-port</string><string>9150</string>
-    <string>--start</string>
-  </array>
-  <key>RunAtLoad</key><true/>
-  <key>StandardOutPath</key><string>$OVERLAY_DIR/boot.log</string>
-  <key>StandardErrorPath</key><string>$OVERLAY_DIR/boot.log</string>
-</dict></plist>
-PLIST
-launchctl unload "$PLIST" 2>/dev/null || true; sleep 1
-launchctl load "$PLIST"
+DOMAIN="gui/$(id -u)"
+RELEASED=0
+WATCHDOG_PAUSED=0
+STARTED=0
+[[ "$NAME" =~ ^[A-Za-z0-9][A-Za-z0-9_-]*$ ]] || { echo invalid_machine_name >&2; exit 1; }
+[[ -f "$BASE_BUNDLE/Disk.img" && -f "$MACHINE_BUNDLE/Disk.img" ]] || { echo missing_snapshots >&2; exit 1; }
+[[ -x "$FLEET_TOOLS/fleet/fleet-supervisor" ]] || { echo missing_supervisor >&2; exit 1; }
 
-OUT_JPG="/tmp/vos-$NAME-desktop.jpg"; WAITED=0; BYTES=0
-while [[ $WAITED -lt $TMO ]]; do
-  CODE="$(curl -s -o "$OUT_JPG.tmp" -w '%{http_code}' "http://127.0.0.1:$HTTP_PORT/fleet/frame/$NAME" || true)"
-  if [[ "$CODE" == 200 ]]; then
-    BYTES="$(wc -c <"$OUT_JPG.tmp" | tr -d ' ')"
-    [[ "$BYTES" -gt 100000 ]] && { mv "$OUT_JPG.tmp" "$OUT_JPG"; break; }
+cleanup() {
+  local result=$?
+  if (( STARTED )); then
+    python3 "$FLEET_TOOLS/fleet/fleet.py" --supervisor "http://127.0.0.1:$HTTP_PORT" stop "$NAME" >/dev/null 2>&1 || true
+    sleep 2
+    launchctl bootout "$DOMAIN/$LABEL" 2>/dev/null || true
+    launchctl bootout "$DOMAIN/com.virtualos.disk.$NAME" 2>/dev/null || true
   fi
-  rm -f "$OUT_JPG.tmp"; sleep 10; WAITED=$((WAITED + 10))
-done
-launchctl unload "$PLIST" 2>/dev/null || true; rm -f "$PLIST"
-stop_serve
+  if (( RELEASED )); then
+    python3 "$FLEET_TOOLS/fleet/fleet.py" --supervisor "http://127.0.0.1:$OLD_PORT" start "$RELEASE_VM" || result=1
+    for _ in $(seq 1 30); do
+      restored="$(curl -fsS "http://127.0.0.1:$OLD_PORT/fleet/status" | python3 -c 'import json,sys;print(next((m["state"] for m in json.load(sys.stdin)["instances"] if m["name"]==sys.argv[1]),"missing"))' "$RELEASE_VM")" || restored=unknown
+      [[ "$restored" == running ]] && break
+      sleep 1
+    done
+    [[ "$restored" == running ]] || result=1
+  fi
+  if (( WATCHDOG_PAUSED )); then
+    launchctl bootstrap "$DOMAIN" "$HOME/Library/LaunchAgents/$WATCHDOG.plist" || result=1
+  fi
+  trap - EXIT
+  exit "$result"
+}
+trap cleanup EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
+trap 'exit 129' HUP
 
-DELTA_BYTES="$(python3 -c "import json;print(json.load(open('$DELTA_DIR/delta.json'))['delta_bytes'])" 2>/dev/null || echo 0)"
-BASE_BYTES="$(stat -f %z "$BASE_BUNDLE/Disk.img" 2>/dev/null || echo 0)"
-python3 - "$DELTA_BYTES" "$BASE_BYTES" "$BYTES" "$OVERLAY_DIR/server.log" <<'PY'
-import json, sys
-delta, base, frame = int(sys.argv[1]), int(sys.argv[2]), int(sys.argv[3])
-rows = [json.loads(l) for l in open(sys.argv[4]) if l.strip().startswith('{')]
-conn = [r['bundle_nbd_connection'] for r in rows if 'bundle_nbd_connection' in r]
-reads = conn[-1]['reads'] if conn else 0
-rb = conn[-1]['metrics']['read']['request_bytes_total'] if conn else 0
-print(json.dumps({
-    "shared_base_boot": "verified" if frame > 100000 else "no_desktop",
-    "base_bytes": base,
-    "machine_delta_bytes": delta,
-    "delta_pct_of_disk": round(100.0 * delta / max(1, base), 4),
-    "one_machine_cost_bytes": base + delta,
-    "vs_full_copy_bytes": 2 * base,
-    "frame_bytes": frame,
-    "nbd_reads": reads, "nbd_read_bytes": rb,
-}, sort_keys=True))
+echo '== diff and verify stopped snapshots =='
+if [[ ! -f "$OUT/delta.sqlite" ]]; then
+  python3 "$HERE/shared_base.py" diff "$BASE_BUNDLE/Disk.img" "$MACHINE_BUNDLE/Disk.img" "$OUT"
+fi
+VOS_EXP_RECEIPT="$OUT/base-delta-verify.json" python3 "$HERE/shared_base.py" verify "$BASE_BUNDLE/Disk.img" "$MACHINE_BUNDLE/Disk.img" "$OUT"
+python3 - "$BASE_BUNDLE/Disk.img" "$MACHINE_BUNDLE/Disk.img" "$OUT/source-pins.json" <<'PY'
+import json, os, sys
+pins = {}
+for path in sys.argv[1:3]:
+    info = os.stat(path)
+    pins[path] = [info.st_dev, info.st_ino, info.st_size, info.st_mtime_ns, info.st_ctime_ns]
+open(sys.argv[3], "w").write(json.dumps(pins))
 PY
-echo "experiment artefacts under $OUT"
+mkdir -p "$FLEET_HOME/shared-disks"
+python3 - "$FLEET_HOME" "$BASE_BUNDLE" "$MACHINE_BUNDLE" "$NAME" "$OUT/delta.sqlite" "$NBD_PORT" <<'PY'
+import json, pathlib, sys
+root, base, machine, name, delta, port = sys.argv[1:]
+root = pathlib.Path(root).resolve()
+for source in (base, machine):
+    if pathlib.Path(source).resolve().parent != root:
+        raise SystemExit("snapshot bundles must be inside the isolated fleet root")
+config = {"baseName": pathlib.Path(base).stem, "platformName": pathlib.Path(machine).stem,
+          "delta": str(pathlib.Path(delta).resolve()), "port": int(port)}
+path = root / "shared-disks" / (name + ".json")
+if path.exists() and json.loads(path.read_text()) != config:
+    raise SystemExit("refusing to replace existing shared-disk configuration")
+path.write_text(json.dumps(config, indent=2))
+PY
+export VOS_FLEET_HOME="$FLEET_HOME" VOS_FLEET_TOOLS="$FLEET_TOOLS"
+export VOS_SUP_PORT="$HTTP_PORT" VOS_FLEET_HTTP_PORT="$HTTP_PORT"
+export VOS_FLEET_BASE_PORT=9160 VOS_FLEET_AGENT_LABEL="$LABEL"
+export VOS_DESKTOP_MIN_BYTES="${VOS_DESKTOP_MIN_BYTES:-30000}"
+bash "$FLEET_TOOLS/fleet/runbook.sh" live "$NAME" --prepare-only
+
+if [[ -n "$RELEASE_VM" ]]; then
+  echo "== temporarily release fleet slot: $RELEASE_VM =="
+  if launchctl print "$DOMAIN/$WATCHDOG" >/dev/null 2>&1; then
+    launchctl bootout "$DOMAIN/$WATCHDOG"
+    WATCHDOG_PAUSED=1
+  fi
+  RELEASED=1
+  python3 "$FLEET_TOOLS/fleet/fleet.py" --supervisor "http://127.0.0.1:$OLD_PORT" stop "$RELEASE_VM"
+  for _ in $(seq 1 30); do
+    state="$(curl -fsS "http://127.0.0.1:$OLD_PORT/fleet/status" | python3 -c 'import json,sys;print(next((m["state"] for m in json.load(sys.stdin)["instances"] if m["name"]==sys.argv[1]),"missing"))' "$RELEASE_VM")"
+    [[ "$state" == idle ]] && break
+    sleep 1
+  done
+  [[ "$state" == idle ]] || { echo fleet_slot_not_released >&2; exit 1; }
+fi
+
+echo '== managed shared-disk guest boot =='
+STARTED=1
+bash "$FLEET_TOOLS/fleet/runbook.sh" live "$NAME" --boot-only
+bash "$FLEET_TOOLS/fleet/runbook.sh" desktop "$NAME" "$TMO"
+cp "/tmp/vos-$NAME-desktop.jpg" "$OUT/boot-1.jpg"
+bash "$FLEET_TOOLS/fleet/runbook.sh" live "$NAME" --boot-only
+python3 "$FLEET_TOOLS/fleet/fleet.py" --supervisor "http://127.0.0.1:$HTTP_PORT" stop "$NAME"
+sleep 3
+echo '== restart the disk service and boot from the retained overlay =='
+launchctl bootout "$DOMAIN/com.virtualos.disk.$NAME"
+sleep 1
+bash "$FLEET_TOOLS/fleet/runbook.sh" live "$NAME" --boot-only
+bash "$FLEET_TOOLS/fleet/runbook.sh" desktop "$NAME" "$TMO"
+cp "/tmp/vos-$NAME-desktop.jpg" "$OUT/boot-2.jpg"
+python3 "$FLEET_TOOLS/fleet/fleet.py" --supervisor "http://127.0.0.1:$HTTP_PORT" stop "$NAME"
+sleep 3
+python3 - "$FLEET_HOME" "$NAME" "$OUT" <<'PY'
+import hashlib, json, os, pathlib, sqlite3, sys, time
+sys.path.insert(0, os.environ["VOS_FLEET_TOOLS"])
+from cloud_disk_r2_delegate import fingerprint
+root, name, out = pathlib.Path(sys.argv[1]), sys.argv[2], pathlib.Path(sys.argv[3])
+log = root / ".virtualos-nbd" / name / "server.log"
+sessions = []
+ready = []
+for line in log.read_text().splitlines():
+    try:
+        row = json.loads(line)
+    except ValueError:
+        continue
+    if "base_delta_nbd_connection" in row and row["base_delta_nbd_connection"]["reads"]:
+        sessions.append(row["base_delta_nbd_connection"])
+    if row.get("base_delta_listener") == "ready":
+        ready.append(row)
+assert len(sessions) >= 2, "two completed guest boots required"
+assert len(ready) >= 2 and ready[-1]["delta_seeded"] == 0, "restart reseeded guest storage"
+for path, pin in json.loads((out / "source-pins.json").read_text()).items():
+    info = os.stat(path)
+    assert [info.st_dev, info.st_ino, info.st_size, info.st_mtime_ns, info.st_ctime_ns] == pin, "source disk changed"
+frame = pathlib.Path("/tmp/vos-" + name + "-desktop.jpg")
+assert frame.stat().st_size > int(os.environ["VOS_DESKTOP_MIN_BYTES"])
+boot_frames = []
+for number in (1, 2):
+    captured = out / ("boot-%d.jpg" % number)
+    data = captured.read_bytes()
+    assert len(data) > int(os.environ["VOS_DESKTOP_MIN_BYTES"])
+    boot_frames.append({"boot": number, "file": captured.name, "bytes": len(data),
+                        "sha256": hashlib.sha256(data).hexdigest()})
+overlay = root / ".virtualos-nbd" / name / "overlay.sqlite"
+with sqlite3.connect(overlay) as db:
+    blocks = db.execute("SELECT COUNT(*) FROM blocks").fetchone()[0]
+receipt = {"managed_shared_disk_boot": "verified", "verified_at_unix": int(time.time()),
+           "machine": name, "local_machine_disk": "absent", "writes_to_base": 0,
+           "guest_boots_verified": 2, "disk_service_restart_verified": True,
+           "frame_size_gate_bytes": int(os.environ["VOS_DESKTOP_MIN_BYTES"]),
+           "restart_blocks_reseeded": ready[-1]["delta_seeded"], "source_disks_unchanged": True,
+           "frame_bytes": frame.stat().st_size, "frame_sha256": hashlib.sha256(frame.read_bytes()).hexdigest(),
+           "boot_frames": boot_frames,
+           "nbd_reads": sum(s["reads"] for s in sessions), "nbd_writes": sum(s["writes"] for s in sessions),
+           "nbd_metrics_scope": "retained server log",
+           "overlay_blocks": blocks, "overlay_allocated_bytes": overlay.stat().st_blocks * 512,
+           "initial_delta_bytes": json.loads((out / "base-delta-verify.json").read_text())["delta_bytes"],
+           "initial_delta_sha256": fingerprint(out / "delta.sqlite")["source_delta_sha256"]}
+assert not (root / (name + ".bundle") / "Disk.img").exists()
+assert all(s["negotiated"] for s in sessions)
+assert sum(s["metrics"]["read"]["errors"] + s["metrics"]["write"]["errors"] for s in sessions) == 0
+(out / "managed-boot-receipt.json").write_text(json.dumps(receipt, indent=2))
+print(json.dumps(receipt, sort_keys=True))
+PY

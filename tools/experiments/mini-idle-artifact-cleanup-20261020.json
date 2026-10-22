@@ -1,0 +1,72 @@
+{
+  "apply": true,
+  "disk_free_after_bytes": 9688178688,
+  "disk_free_before_bytes": 6845792256,
+  "focused_tests_passed": 3,
+  "measured_free_bytes_gained": 2842386432,
+  "observed_at": "2026-10-20T23:50:32.856698+00:00",
+  "schema": "virtualos-idle-artifact-reclamation/v1",
+  "source_sha256": "447fbda123a1ac77e635015e8b9b59324dfc093298d8b3c01f4d65b182bc97f9",
+  "targets": [
+    {
+      "allocated_bytes": 217657344,
+      "eligible": true,
+      "path": "/private/tmp/xcanvas-browser.64iKcF",
+      "removed": true
+    },
+    {
+      "allocated_bytes": 213127168,
+      "eligible": true,
+      "path": "/private/tmp/xcanvas-browser.Br2BJM",
+      "removed": true
+    },
+    {
+      "allocated_bytes": 232587264,
+      "eligible": true,
+      "path": "/private/tmp/xcanvas-browser.EFCcAE",
+      "removed": true
+    },
+    {
+      "allocated_bytes": 576495616,
+      "eligible": true,
+      "path": "/private/tmp/xcanvas-browser.HwwyUp",
+      "removed": true
+    },
+    {
+      "allocated_bytes": 210042880,
+      "eligible": true,
+      "path": "/private/tmp/xcanvas-browser.LdB29p",
+      "removed": true
+    },
+    {
+      "allocated_bytes": 210993152,
+      "eligible": true,
+      "path": "/private/tmp/xcanvas-browser.W4pdkH",
+      "removed": true
+    },
+    {
+      "allocated_bytes": 7774208,
+      "eligible": true,
+      "path": "/private/tmp/xcanvas-browser.ikEcGI",
+      "removed": true
+    },
+    {
+      "allocated_bytes": 214192128,
+      "eligible": true,
+      "path": "/private/tmp/xcanvas-browser.jgT2sv",
+      "removed": true
+    },
+    {
+      "allocated_bytes": 179232768,
+      "eligible": true,
+      "path": "/private/tmp/xcanvas-browser.xiR6Sv",
+      "removed": true
+    },
+    {
+      "allocated_bytes": 901468160,
+      "eligible": true,
+      "path": "/Users/ai/Library/Caches/pen-updater",
+      "removed": true
+    }
+  ]
+}

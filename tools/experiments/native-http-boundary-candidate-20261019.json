@@ -1,0 +1,32 @@
+{
+  "activated_on_mini": false,
+  "candidate_binary": "/private/tmp/vos-fleet-http-boundary-20261019",
+  "candidate_sha256": "262a53ea51283ef00c7c8a8c4e6e4de0a41138ed521934ffe587841a4576f1db",
+  "full_fleet_selftest_passed": true,
+  "guardrails": {
+    "absolute_request_deadline_seconds": 5,
+    "ambiguous_framing_refused": true,
+    "browser_origin_refused": true,
+    "max_body_bytes": 1048576,
+    "max_clients_per_service": 8,
+    "max_header_bytes": 8192,
+    "socket_sigpipe_option_failure_closes_connection": true,
+    "unexpected_host_refused": true,
+    "wildcard_cors_removed": true
+  },
+  "guest_usability_verified": false,
+  "guests_restarted": false,
+  "keyboard_selftest_passed": true,
+  "native_tcp_tests_passed": 10,
+  "schema": "virtualos-native-http-boundary-candidate/v1",
+  "source_sha256": {
+    "tools/fleet/FleetSupervisor.swift": "9691bec50bf63ba59b0463bf8e1fc7245dd8636cf967d03dbbb6830764c9dfea",
+    "tools/fleet/native_http_boundary_test.py": "18d6c882657e4b32bad18ee13e49d4cbbf80d2c769a1eb9f0becd6f5f29410dd",
+    "virtualOS/Model/HostScreenshotServer.swift": "1eb44658997bc21940cb53978ec97fab84abaf8da61ac641d9f7d407d9590635",
+    "virtualOS/Model/VMCommandServer.swift": "3db087903c2e31a2de7413562cea6ac5db747f14e8a42620a59ee6e38fc21c27"
+  },
+  "strict_codesign_verified": true,
+  "unsigned_app_build_succeeded": true,
+  "verified_at": "2026-10-19T01:56:37.061913+00:00",
+  "virtualization_entitlements_applied": true
+}

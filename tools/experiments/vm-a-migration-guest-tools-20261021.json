@@ -1,0 +1,11 @@
+{
+  "stage": "/Users/ai/vos-fleet/.local/maintenance/vm-a-migration-20261021",
+  "source_sha256": {
+    "tools/fleet/guest_unlock.py": "b71ba2d877305e2dd6a5bfeb47e00188b743d2214188d8627e3b781555106537",
+    "tools/fleet/brain.py": "3e5ff56d7d45487a7deea8488c76a76079f6b475465c698cf17ee0d1aac0719e",
+    "tools/fleet/guest_text.py": "aa0b3b4c004077fd53ea39d6d4c427c449e9f76587da405eff183142d786a4e6",
+    "tools/fleet/ocr_budget.py": "48b319aa1d44bbd78b3168fe9ceef199c94a9932ea41ea4f668b2d5a66896604",
+    "tools/computer-resources.sh": "62f1d214e1256c98f7f07d456c752c177a0863324ec3f4bfd6d6304ef456e0e0"
+  },
+  "existing_guest_services_changed": false
+}

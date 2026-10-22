@@ -1,0 +1,19 @@
+{
+  "schema": "virtualos-guest-post-reboot/v1",
+  "date": "2026-10-18",
+  "machine": "vm-a",
+  "relay_liveness_verified": true,
+  "browser_wake_space_completed": true,
+  "post_action_frame_verified": true,
+  "unlock_route": "Mini-local loopback protected credential",
+  "password_attempts": 1,
+  "automatic_password_retry": false,
+  "unlock_helper_result": "unverified",
+  "desktop_visually_verified": true,
+  "private_frame_sha256": "591e6de39fb036c1a439e62381dd355924722033c1aaf2e3706f21602e81fb34",
+  "frame_captured_at": 1792335360127,
+  "chrome_update_warning_observed": true,
+  "browser_version_audited": false,
+  "archive_conversion_complete": false,
+  "guest_restarted_by_this_check": false
+}

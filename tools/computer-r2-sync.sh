@@ -32,18 +32,26 @@ if [[ "${1:-}" == cloud-disk-preflight && $# -eq 1 ]]; then
   exit 0
 fi
 
-if [[ $# -ne 1 || ! "$1" =~ ^(status|archive|audit|prune|vm-probe|vm-backup|vm-backup-detached|vm-monitor|vm-monitor-detached|vm-monitor-stop|vm-stop|vm-audit|vm-publish-manifest|vm-abort|vm-usage|vm-account-usage|vm-estimate|vm-speed|vm-range-probe|vm-inventory|vm-prune-probes)$ ]]; then
-  echo 'Usage: ./tools/computer-r2-sync.sh cloud-disk-preflight|status|archive|audit|prune|vm-probe|vm-backup|vm-backup-detached|vm-monitor|vm-monitor-detached|vm-monitor-stop|vm-audit|vm-publish-manifest|vm-abort|vm-usage|vm-account-usage|vm-estimate|vm-speed|vm-range-probe|vm-inventory|vm-prune-probes' >&2
+if [[ $# -ne 1 || ! "$1" =~ ^(status|archive|audit|prune|vm-probe|vm-backup|vm-backup-detached|vm-resume|vm-resume-detached|vm-monitor|vm-monitor-detached|vm-monitor-stop|vm-stop|vm-halt-preserve|vm-audit|vm-publish-manifest|vm-abort|vm-usage|vm-account-usage|vm-estimate|vm-speed|vm-range-probe|vm-inventory|vm-prune-probes)$ ]]; then
+  echo 'Usage: ./tools/computer-r2-sync.sh cloud-disk-preflight|status|archive|audit|prune|vm-probe|vm-backup|vm-backup-detached|vm-resume|vm-resume-detached|vm-monitor|vm-monitor-detached|vm-monitor-stop|vm-stop|vm-halt-preserve|vm-audit|vm-publish-manifest|vm-abort|vm-usage|vm-account-usage|vm-estimate|vm-speed|vm-range-probe|vm-inventory|vm-prune-probes' >&2
   exit 2
 fi
 
 bucket=mac-mini-computer-use-backups
 vm_bucket=virtualos-vm-backups
 vm_receipt="$HOME/.config/virtualos/vm-r2-receipt.json"
+vm_pending_receipt="$HOME/.config/virtualos/vm-r2-pending.json"
 account_id=c24a3fb4bedba669785c18c834f51921
-remote_script=/Users/ai/Documents/GitHub/virtualOS/tools/computer-r2.sh
+# The staged Mini tools live on local storage; its Documents checkout can block.
+remote_script=/Users/ai/vos-fleet/tools/computer-r2.sh
 local_script="$(cd "$(dirname "$0")" && pwd)/computer-r2.sh"
 sync_script="$(cd "$(dirname "$0")" && pwd)/computer-r2-sync.sh"
+mini_host="${VOS_VM_SSH_HOST:-mac-mini-ai}"
+[[ "$mini_host" =~ ^[[:alnum:]][[:alnum:]_.@:-]*$ && ${#mini_host} -le 255 ]] || {
+  echo 'vm_backup=refused: invalid VOS_VM_SSH_HOST' >&2; exit 2;
+}
+export VOS_VM_SSH_HOST="$mini_host"
+vm_monitor_stop="$HOME/.config/virtualos/vm-backup-monitor-stop"
 mode="$1"
 credential_file="${VOS_R2_CREDENTIAL_FILE:-/Users/theone/Documents/GitHub/terraform-ai/cloudflare-credentials.local/terraform-ai-ai-inventory-2026-08-23.env}"
 
@@ -170,10 +178,12 @@ PY
 
 case "$mode" in
   vm-monitor-stop)
+    mkdir -p "$(dirname "$vm_monitor_stop")"
+    touch "$vm_monitor_stop"
     monitor_pid="$(pgrep -f '[c]omputer-r2-sync.sh vm-monitor$' | head -1 || true)"
     if [[ -n "$monitor_pid" ]]; then
       monitor_pgid="$(ps -p "$monitor_pid" -o pgid= | tr -d ' ')"
-      backup_pid="$(pgrep -f '[c]omputer-r2-sync.sh vm-backup$' | head -1 || true)"
+      backup_pid="$(pgrep -f '[c]omputer-r2-sync.sh (vm-backup|vm-resume)$' | head -1 || true)"
       backup_pgid=''
       if [[ -n "$backup_pid" ]]; then
         backup_pgid="$(ps -p "$backup_pid" -o pgid= | tr -d ' ')"
@@ -188,8 +198,10 @@ case "$mode" in
     screen -S virtualos-vm-monitor -X quit >/dev/null 2>&1 || true
     echo 'vm_monitor_stop=complete: backup remains active'
     ;;
-  vm-stop)
-    backup_pid="$(pgrep -f '[c]omputer-r2-sync.sh vm-backup$' | head -1 || true)"
+  vm-stop|vm-halt-preserve)
+    mkdir -p "$(dirname "$vm_monitor_stop")"
+    touch "$vm_monitor_stop"
+    backup_pid="$(pgrep -f '[c]omputer-r2-sync.sh (vm-backup|vm-resume)$' | head -1 || true)"
     if [[ -n "$backup_pid" ]]; then
       backup_pgid="$(ps -p "$backup_pid" -o pgid= | tr -d ' ')"
       own_pgid="$(ps -p "$$" -o pgid= | tr -d ' ')"
@@ -198,18 +210,22 @@ case "$mode" in
       }
       kill -TERM -- "-$backup_pgid"
       for (( attempt=0; attempt<15; attempt++ )); do
-        if ! pgrep -f '[c]omputer-r2-sync.sh vm-backup$' >/dev/null 2>&1; then break; fi
+        if ! pgrep -f '[c]omputer-r2-sync.sh (vm-backup|vm-resume)$' >/dev/null 2>&1; then break; fi
         sleep 1
       done
-      if pgrep -f '[c]omputer-r2-sync.sh vm-backup$' >/dev/null 2>&1; then
+      if pgrep -f '[c]omputer-r2-sync.sh (vm-backup|vm-resume)$' >/dev/null 2>&1; then
         echo 'vm_stop=failed: uploader did not stop' >&2; exit 1
       fi
     fi
     screen -S virtualos-vm-backup -X quit >/dev/null 2>&1 || true
+    if [[ "$mode" == vm-halt-preserve ]]; then
+      echo 'vm_halt_preserve=complete: uploader stopped; multipart and local clone retained'
+      exit 0
+    fi
     "$sync_script" vm-abort
     drop_ok=0
     for (( attempt=0; attempt<5; attempt++ )); do
-      if ssh -o BatchMode=yes -o ControlMaster=no -o ControlPath=none mac-mini-ai \
+      if ssh -o BatchMode=yes -o ControlMaster=no -o ControlPath=none "$mini_host" \
         "$remote_script vm-clone-drop"; then drop_ok=1; break; fi
       sleep 5
     done
@@ -218,7 +234,7 @@ case "$mode" in
     ;;
   vm-estimate)
     python3 - "$HOME/.config/virtualos/r2-usage.jsonl" <<'PY'
-import json, pathlib, subprocess, sys
+import json, os, pathlib, subprocess, sys
 
 path = pathlib.Path(sys.argv[1])
 rows = []
@@ -243,7 +259,7 @@ sample_ratio = 0.6756
 source_offset = None
 try:
     result = subprocess.run(['ssh', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=8',
-        '-o', 'ControlMaster=no', '-o', 'ControlPath=none', 'mac-mini-ai',
+        '-o', 'ControlMaster=no', '-o', 'ControlPath=none', os.environ['VOS_VM_SSH_HOST'],
         'lsof -nP -o -F pfon /Users/ai/VirtualOSMachines/.virtualOS-r2-staging.bundle/Disk.img'],
         capture_output=True, text=True, timeout=12)
     if result.returncode == 0:
@@ -275,6 +291,12 @@ PY
       echo 'vm_monitor=refused: monitor already running' >&2; exit 1
     fi
     monitor_log="$HOME/Library/Logs/virtualos-vm-monitor.log"
+    mkdir -p "$(dirname "$vm_monitor_stop")"
+    python3 - "$vm_monitor_stop" <<'PY'
+from pathlib import Path
+import sys
+Path(sys.argv[1]).unlink(missing_ok=True)
+PY
     screen -dmS virtualos-vm-monitor bash -c '"$1" vm-monitor >> "$2" 2>&1' _ "$sync_script" "$monitor_log"
     for (( attempt=0; attempt<10; attempt++ )); do
       if pgrep -f '[c]omputer-r2-sync.sh vm-monitor$' >/dev/null 2>&1; then
@@ -294,22 +316,32 @@ PY
     }
     end_at="$(( $(date +%s) + hours * 3600 ))"
     cycle=0
+    recovery_restarts=0
+    max_restarts="${VOS_VM_MONITOR_RESTARTS:-5}"
+    [[ "$max_restarts" =~ ^[1-9][0-9]*$ ]] || {
+      echo 'vm_monitor=failed: invalid recovery restart limit' >&2; exit 2;
+    }
     while (( $(date +%s) < end_at )); do
+      if [[ -e "$vm_monitor_stop" ]]; then
+        echo 'vm_monitor=stopped: explicit stop marker'
+        exit 0
+      fi
       printf 'vm_monitor_at=%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
       "$sync_script" vm-usage || echo 'vm_monitor=usage_query_failed'
       if (( cycle % 12 == 0 )); then
         "$sync_script" vm-account-usage || echo 'vm_monitor=account_query_failed'
       fi
-      free_kib="$(ssh -o BatchMode=yes -o ControlMaster=no -o ControlPath=none mac-mini-ai \
+      free_kib="$(ssh -o BatchMode=yes -o ConnectTimeout=8 -o ServerAliveInterval=5 \
+        -o ServerAliveCountMax=2 -o ControlMaster=no -o ControlPath=none "$mini_host" \
         'df -Pk /System/Volumes/Data | awk '\''NR==2 {print $4}'\''' 2>/dev/null)" \
         || free_kib=''
       printf 'vm_host_free_kib=%s\n' "${free_kib:-unknown}"
       if [[ "$free_kib" =~ ^[0-9]+$ ]] && (( free_kib < 10485760 )); then
-        echo 'vm_monitor=low_disk_abort: stopping upload and releasing snapshot'
-        "$sync_script" vm-stop || echo 'vm_monitor=stop_failed'
+        echo 'vm_monitor=low_disk_halt: stopping upload and preserving multipart and clone'
+        "$sync_script" vm-halt-preserve || echo 'vm_monitor=stop_failed'
         exit 1
       fi
-      if pgrep -f '[c]omputer-r2-sync.sh vm-backup$' >/dev/null; then
+      if pgrep -f '[c]omputer-r2-sync.sh (vm-backup|vm-resume)$' >/dev/null; then
         echo 'vm_backup_state=running'
       elif [[ -r "$vm_receipt" ]]; then
         echo 'vm_backup_state=finished_receipt_present'
@@ -317,7 +349,26 @@ PY
         exit 0
       else
         echo 'vm_backup_state=stopped_without_receipt'
-        exit 1
+        if ! python3 "$(dirname "$local_script")/vm_backup_recovery.py" can-retry \
+          "$HOME/Library/Logs/virtualos-vm-backup.log"; then
+          echo 'vm_monitor=recovery_refused: uploader reported an integrity failure'
+          exit 1
+        fi
+        probe_status=0
+        python3 "$(dirname "$local_script")/vm_backup_recovery.py" probe "$mini_host" || probe_status=$?
+        if (( probe_status == 75 )); then
+          echo 'vm_monitor=waiting_for_ssh: multipart and clone retained'
+        elif (( probe_status != 0 )); then
+          echo 'vm_monitor=recovery_refused: clone or resource gate failed'
+          exit 1
+        elif (( recovery_restarts >= max_restarts )); then
+          echo 'vm_monitor=recovery_refused: bounded restart limit reached'
+          exit 1
+        else
+          [[ ! -e "$vm_monitor_stop" ]] || { echo 'vm_monitor=stopped: explicit stop marker'; exit 0; }
+          recovery_restarts=$((recovery_restarts + 1))
+          "$sync_script" vm-resume-detached || echo 'vm_monitor=resume_start_failed'
+        fi
       fi
       cycle=$((cycle + 1))
       sleep "$interval"
@@ -452,18 +503,20 @@ PY
     cmp "$vm_receipt" "$scratch/manifest.json"
     echo "vm_manifest=published_and_checked key=$manifest_key"
     ;;
-  vm-backup-detached)
+  vm-backup-detached|vm-resume-detached)
     command -v screen >/dev/null || { echo 'vm_backup=failed: screen unavailable' >&2; exit 1; }
-    if pgrep -f '[c]omputer-r2-sync.sh vm-backup$' >/dev/null 2>&1; then
+    if pgrep -f '[c]omputer-r2-sync.sh (vm-backup|vm-resume)$' >/dev/null 2>&1; then
       echo 'vm_backup=refused: detached backup already running' >&2
       exit 1
     fi
     log="$HOME/Library/Logs/virtualos-vm-backup.log"
+    backup_mode=vm-backup
+    [[ "$mode" == vm-resume-detached ]] && backup_mode=vm-resume
     mkdir -p "$(dirname "$log")"
-    screen -dmS virtualos-vm-backup bash -c '"$1" vm-backup >> "$2" 2>&1' _ "$sync_script" "$log"
+    screen -dmS virtualos-vm-backup bash -c '"$1" "$3" >> "$2" 2>&1' _ "$sync_script" "$log" "$backup_mode"
     started=0
     for (( attempt=0; attempt<10; attempt++ )); do
-      if pgrep -f '[c]omputer-r2-sync.sh vm-backup$' >/dev/null 2>&1; then
+      if pgrep -f '[c]omputer-r2-sync.sh (vm-backup|vm-resume)$' >/dev/null 2>&1; then
         started=1
         break
       fi
@@ -549,15 +602,20 @@ import json, os, pathlib, subprocess, sys, time
 
 bucket, endpoint, log_path = sys.argv[1:]
 def call(*args):
-    command = ['aws', 's3api', *args, '--bucket', bucket, '--endpoint-url', endpoint]
-    for attempt in range(3):
-        result = subprocess.run(command, capture_output=True, text=True)
-        if result.returncode == 0:
-            return json.loads(result.stdout)
-        if attempt < 2:
-            time.sleep(2 ** attempt)
-    raise SystemExit(f'vm_usage=failed operation={args[0]} status={result.returncode} '
-                     f'error={result.stderr[-300:]}')
+    command = ['aws', 's3api', *args, '--bucket', bucket, '--endpoint-url', endpoint,
+               '--cli-connect-timeout', '5', '--cli-read-timeout', '10']
+    failure = 'unknown'
+    for attempt in range(2):
+        try:
+            result = subprocess.run(command, capture_output=True, text=True, timeout=18)
+            if result.returncode == 0:
+                return json.loads(result.stdout)
+            failure = f'status={result.returncode} error={result.stderr[-300:]}'
+        except subprocess.TimeoutExpired:
+            failure = 'timeout_after_18_seconds'
+        if attempt == 0:
+            time.sleep(1)
+    raise SystemExit(f'vm_usage=failed operation={args[0]} {failure}')
 
 objects = call('list-objects-v2').get('Contents', [])
 pending = call('list-multipart-uploads').get('Uploads', [])
@@ -609,26 +667,20 @@ for item in uploads:
 print(f'vm_abort=passed aborted_uploads={count}')
 PY
     ;;
-  vm-backup|vm-audit)
+  vm-backup|vm-resume|vm-audit)
     if ! r2 head-bucket --bucket "$vm_bucket" >/dev/null; then
       echo "vm_backup=failed: private bucket $vm_bucket is unavailable" >&2
       exit 1
     fi
     if [[ "$mode" == vm-backup ]]; then
       echo 'vm_backup=preparing_consistent_clone'
-      scp -o ControlMaster=no -o ControlPath=none "$local_script" "mac-mini-ai:$remote_script"
-      ssh -o ControlMaster=no -o ControlPath=none mac-mini-ai "$remote_script vm-clone"
-      backup_verified=0
-      cleanup_unverified_clone() {
-        if (( ! backup_verified )); then
-          ssh -o BatchMode=yes -o ConnectTimeout=8 mac-mini-ai \
-            "$remote_script vm-clone-drop" || echo 'vm_backup=clone_cleanup_failed' >&2
-        fi
-      }
-      trap cleanup_unverified_clone EXIT
+      scp -o ControlMaster=no -o ControlPath=none "$local_script" "$mini_host:$remote_script"
+      ssh -o ControlMaster=no -o ControlPath=none "$mini_host" "$remote_script vm-clone"
+      # Preserve the local stopped-disk clone on any upload, audit, or VM
+      # restart failure. It is the only recovery copy until R2 is verified.
       vm_ready=0
       for (( attempt=0; attempt<60; attempt++ )); do
-        if ssh -o BatchMode=yes -o ControlMaster=no -o ControlPath=none mac-mini-ai \
+        if ssh -o BatchMode=yes -o ControlMaster=no -o ControlPath=none "$mini_host" \
           'curl -fsS --max-time 3 http://127.0.0.1:8845/vm/health' \
           | python3 -c 'import json,sys; s=json.load(sys.stdin); sys.exit(0 if s.get("ready") and s.get("state")=="running" else 1)' 2>/dev/null; then
           vm_ready=1
@@ -640,12 +692,12 @@ PY
       echo 'vm_backup=guest_running_after_clone'
       key="vm-backups/$(date -u +%Y%m%dT%H%M%SZ)-$$/virtualOS.bundle.tar.gz"
       python3 - "$key" "$vm_bucket" "$CLOUDFLARE_R2_ENDPOINT" "$scratch/upload.json" <<'PY'
-import hashlib, json, subprocess, sys, time
+import hashlib, json, os, subprocess, sys, time
 
 key, bucket, endpoint, result_path = sys.argv[1:]
 def check_host_space():
     result = subprocess.run([
-        'ssh', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=8', 'mac-mini-ai',
+        'ssh', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=8', os.environ['VOS_VM_SSH_HOST'],
         "df -Pk /System/Volumes/Data | awk 'NR==2 {print $4}'"
     ], capture_output=True, text=True, timeout=15)
     try:
@@ -657,7 +709,7 @@ def check_host_space():
 
 check_host_space()
 source = subprocess.Popen([
-    'ssh', '-o', 'BatchMode=yes', '-o', 'ControlMaster=no', '-o', 'ControlPath=none', 'mac-mini-ai',
+    'ssh', '-o', 'BatchMode=yes', '-o', 'ControlMaster=no', '-o', 'ControlPath=none', os.environ['VOS_VM_SSH_HOST'],
     'bash -o pipefail -c \'tar -cf - -C "$HOME/VirtualOSMachines/.virtualOS-r2-staging.bundle" . | gzip -1 -n\''
 ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 sink = subprocess.Popen([
@@ -700,6 +752,26 @@ with open(result_path, 'w') as stream:
 print(f'vm_backup=uploaded compressed_gib={size / 2**30:.2f} sha256={digest.hexdigest()}')
 PY
       cp "$scratch/upload.json" "$scratch/pending-receipt.json"
+    elif [[ "$mode" == vm-resume ]]; then
+      mkdir -p "$(dirname "$vm_pending_receipt")"
+      chmod 700 "$(dirname "$vm_pending_receipt")"
+      # Recover a completion that was interrupted before its full GET audit.
+      completed_pending=0
+      if [[ -r "$vm_pending_receipt" ]]; then
+        pending_fields="$(python3 "$(dirname "$local_script")/vm_backup_resume.py" \
+          --check-pending "$vm_pending_receipt")"
+        read -r pending_key pending_bytes <<< "$pending_fields"
+        if actual_bytes="$(r2 head-object --bucket "$vm_bucket" --key "$pending_key" \
+          --query ContentLength --output text 2>/dev/null)" && [[ "$actual_bytes" == "$pending_bytes" ]]; then
+          completed_pending=1
+          echo 'vm_resume=completed_object_found; proceeding to full audit'
+        fi
+      fi
+      if (( completed_pending == 0 )); then
+        python3 "$(dirname "$local_script")/vm_backup_resume.py" \
+          "$vm_bucket" "$CLOUDFLARE_R2_ENDPOINT" "$vm_pending_receipt"
+      fi
+      cp "$vm_pending_receipt" "$scratch/pending-receipt.json"
     else
       [[ -r "$vm_receipt" ]] || { echo 'vm_audit=failed: no receipt' >&2; exit 1; }
       cp "$vm_receipt" "$scratch/pending-receipt.json"
@@ -727,15 +799,22 @@ if code or size != receipt['bytes'] or digest.hexdigest() != receipt['sha256']:
                      f'error={source.stderr.read().decode(errors="replace")[-1000:]}')
 print(f'vm_audit=passed bytes={size} sha256={digest.hexdigest()}')
 PY
-    if [[ "$mode" == vm-backup ]]; then
+    if [[ "$mode" == vm-backup || "$mode" == vm-resume ]]; then
       mkdir -p "$(dirname "$vm_receipt")"
       chmod 700 "$(dirname "$vm_receipt")"
       cp "$scratch/pending-receipt.json" "$vm_receipt"
       chmod 600 "$vm_receipt"
-      ssh -o ControlMaster=no -o ControlPath=none mac-mini-ai "$remote_script vm-clone-drop"
       "$sync_script" vm-publish-manifest
-      backup_verified=1
-      trap - EXIT
+      ssh -o ControlMaster=no -o ControlPath=none "$mini_host" "$remote_script vm-clone-drop"
+      # The candidate is no longer needed after verified publication and clone
+      # release. Leaving it could associate a future clone with an older archive.
+      if [[ "$mode" == vm-resume ]]; then
+        python3 - "$vm_pending_receipt" <<'PY'
+from pathlib import Path
+import sys
+Path(sys.argv[1]).unlink(missing_ok=True)
+PY
+      fi
       echo "vm_backup=verified receipt=$vm_receipt"
     fi
     ;;

@@ -37,9 +37,13 @@ cleanup() {
 pass() { echo "  PASS  $1"; }
 fail() { echo "  FAIL  $1"; exit 1; }
 
+echo "[preflight] boot preparation and per-machine start (isolated fixtures)"
+bash "$FLEET_DIR/go-live.sh" --self-test && pass "boot preparation" || fail "boot preparation"
+
 echo "[1/11] build supervisor"
 swiftc -O -framework Virtualization -framework AppKit "$FLEET_DIR/FleetSupervisor.swift" -o "$BIN" >/dev/null 2>&1
 [[ -x "$BIN" ]] && pass "compiled" || fail "compile"
+"$BIN" --keyboard-self-test && pass "ASCII keyboard mapping" || fail "keyboard mapping"
 
 # Fake bundles so the supervisor has something to enumerate.
 mkdir -p "$TMP_ROOT/vm-a.bundle" "$TMP_ROOT/vm-b.bundle"
@@ -66,6 +70,37 @@ echo "[5/11] per-VM control routes"
 python3 "$PY" --supervisor "$SUP_URL" start vm-a | grep -Eq '"ok": ?true' && pass "start vm-a accepted" || fail "start vm-a"
 python3 "$PY" --supervisor "$SUP_URL" stop vm-a | grep -Eq '"ok": ?true' && pass "stop vm-a accepted" || fail "stop vm-a"
 
+echo "[5b] register a prepared machine without restarting the supervisor"
+mkdir -p "$TMP_ROOT/vm-c.bundle"
+python3 - "$SUP_URL" "$FLEET_DIR/runbook.sh" <<'PY' && pass "dynamic machine registration" || fail "dynamic registration"
+import concurrent.futures, json, os, subprocess, sys, urllib.request, urllib.error
+base, runbook = sys.argv[1:]
+port = base.rsplit(":", 1)[1]
+env = dict(os.environ, VOS_SUP_PORT=port)
+result = subprocess.run(["bash", runbook, "start", "vm-c"], env=env, capture_output=True, text=True)
+assert result.returncode == 0, result.stdout + result.stderr
+def start(_):
+    req = urllib.request.Request(base + "/fleet/start/vm-c", method="POST")
+    with urllib.request.urlopen(req) as response:
+        assert json.load(response)["ok"]
+with concurrent.futures.ThreadPoolExecutor(max_workers=8) as pool:
+    list(pool.map(start, range(12)))
+with urllib.request.urlopen(base + "/fleet/status") as response:
+    status = json.load(response)
+assert status["count"] == 3
+assert sum(m["name"] == "vm-c" for m in status["instances"]) == 1
+assert len({m["controlPort"] for m in status["instances"]}) == 3
+try:
+    urllib.request.urlopen(base + "/fleet/start/vm-c")
+    raise AssertionError("GET changed VM state")
+except urllib.error.HTTPError as exc:
+    assert exc.code == 405
+for name in ("missing-machine", ".."):
+    req = urllib.request.Request(base + "/fleet/start/" + name, method="POST")
+    with urllib.request.urlopen(req) as response:
+        assert not json.load(response)["ok"]
+PY
+
 echo "[6/11] frame endpoint"
 CODE_SUP="$(curl -s -o /dev/null -w '%{http_code}' "$SUP_URL/fleet/frame/vm-a")"
 [[ "$CODE_SUP" == "503" ]] && pass "supervisor frame route (503 no running vm)" || fail "supervisor frame route ($CODE_SUP)"
@@ -90,7 +125,9 @@ CODE_BAD="$(curl -s -o /dev/null -w '%{http_code}' -X POST -H 'Content-Type: app
 echo "[8/11] brain action normalizer (offline, no model)"
 python3 - "$FLEET_DIR/brain.py" <<'PY' && pass "normalizer validates key/type/click" || fail "brain normalizer"
 import importlib.util, json, sys
+from pathlib import Path
 path = sys.argv[1]
+sys.path.insert(0, str(Path(path).parent))
 spec = importlib.util.spec_from_file_location("brain", path)
 brain = importlib.util.module_from_spec(spec)
 sys.modules["brain"] = brain
@@ -129,7 +166,9 @@ PY
 echo "[9/11] fleet_push control loop survives a transient failure (offline)"
 python3 - "$FLEET_DIR/fleet_push.py" <<'PY' && pass "control loop is unkillable" || fail "control loop"
 import importlib.util, threading, sys, time
+from pathlib import Path
 path = sys.argv[1]
+sys.path.insert(0, str(Path(path).parent))
 spec = importlib.util.spec_from_file_location("fleet_push", path)
 fp = importlib.util.module_from_spec(spec)
 sys.modules["fleet_push"] = fp

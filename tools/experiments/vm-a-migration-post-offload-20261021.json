@@ -1,0 +1,106 @@
+{
+  "observed_at": "2026-10-21T16:33:01.952442+00:00",
+  "resources": {
+    "background_work": "allowed",
+    "cpu_count": 10,
+    "disk_free_kib": 18138820,
+    "families": {
+      "ai_agents": {
+        "processes": 2,
+        "sum_rss_mib": 1023.6
+      },
+      "browser_apps": {
+        "processes": 24,
+        "sum_rss_mib": 454.1
+      },
+      "browser_engines": {
+        "processes": 113,
+        "sum_rss_mib": 3658.0
+      },
+      "simulator_runtime": {
+        "processes": 154,
+        "sum_rss_mib": 1225.6
+      },
+      "terminal": {
+        "processes": 1,
+        "sum_rss_mib": 9.1
+      },
+      "virtualos": {
+        "processes": 4,
+        "sum_rss_mib": 875.0
+      }
+    },
+    "load_one": 4.26,
+    "memory_free_percent": 41,
+    "reasons": [],
+    "rss_note": "RSS sums can count shared pages more than once and omit paged-out memory",
+    "swap_used_mib": 6519,
+    "top_executables": [
+      {
+        "name": "Google Chrome",
+        "processes": 68,
+        "sum_rss_mib": 2857.4
+      },
+      {
+        "name": "ollama",
+        "processes": 2,
+        "sum_rss_mib": 1023.6
+      },
+      {
+        "name": "com.apple.Virtualization.VirtualMachine",
+        "processes": 3,
+        "sum_rss_mib": 841.1
+      },
+      {
+        "name": "com.apple.WebKit.WebContent",
+        "processes": 7,
+        "sum_rss_mib": 549.2
+      },
+      {
+        "name": "Figma",
+        "processes": 9,
+        "sum_rss_mib": 192.8
+      },
+      {
+        "name": "Paper",
+        "processes": 7,
+        "sum_rss_mib": 150.8
+      },
+      {
+        "name": "Google Chrome for Testing",
+        "processes": 8,
+        "sum_rss_mib": 132.7
+      },
+      {
+        "name": "ScreenTimeAgent",
+        "processes": 1,
+        "sum_rss_mib": 99.5
+      }
+    ]
+  },
+  "processes": "  440 /Applications/virtualOS.app/Contents/MacOS/virtualOS\n 2499 ./tools/fleet/linux-guest\n 2503 /Users/ai/vos-fleet/tools/fleet/fleet-supervisor\n",
+  "fleet": {
+    "instances": [
+      {
+        "state": "running",
+        "name": "vm-a",
+        "bundle": "/Users/ai/vos-fleet/machines/vm-a.bundle",
+        "controlPort": 9125,
+        "ready": true,
+        "error": ""
+      }
+    ],
+    "ok": true,
+    "root": "/Users/ai/vos-fleet/machines",
+    "basePort": 9125,
+    "capability": {
+      "nestedVirtualizationReason": "supported",
+      "platform": "macOS Version 26.2 (Build 25C56)",
+      "nestedVirtualizationSupported": true
+    },
+    "count": 1
+  },
+  "disk_helper_sha256": "654d08b35eebc57f8ec34e51a34d0bb30df8e4a2f27fc02c92b669d2b3a80281",
+  "compressed_delta_sha256": "e62350e1b2003f8ccc7b8d8b9a0053f8d57ccefc6ee8b2bf3ea52959fccdacc6",
+  "wake_status": 200
+}

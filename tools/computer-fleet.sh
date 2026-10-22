@@ -145,8 +145,8 @@ push() {
   local relay="${1:-}"
   [[ -n "$relay" ]] || die "push requires a relay URL"
   [[ -n "${VOS_AUTH_TOKEN:-}" ]] || die "push requires VOS_AUTH_TOKEN"
-  python3 "$PUSH_PY" --relay "$relay" --supervisor "$SUPERVISOR_URL" \
-    --token "$VOS_AUTH_TOKEN" ${VOS_FLEET_PUSH_WATCH:+--watch} --verbose
+  VOS_AUTH_TOKEN="$VOS_AUTH_TOKEN" python3 "$PUSH_PY" --relay "$relay" --supervisor "$SUPERVISOR_URL" \
+    ${VOS_FLEET_PUSH_WATCH:+--watch} --verbose
 }
 
 usage() { sed -n '2,/^set -euo/p' "$0" | sed '$d' | sed 's/^# \{0,1\}//'; }

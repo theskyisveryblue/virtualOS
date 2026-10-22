@@ -1,0 +1,32 @@
+{
+  "observed_at": "2026-10-21T19:28:34.320567+00:00",
+  "source": "/Users/ai/vos-fleet/.virtualos-nbd/vm-a/overlay.sqlite",
+  "candidate": "/Users/ai/vos-fleet/.local/maintenance/compressed-writes-20261021/real-overlay-preview/compressed-preview.sqlite",
+  "forward": {
+    "source_bytes": 958599168,
+    "destination_bytes": 417488896,
+    "blocks": 14497,
+    "logical_fingerprint": "659a6b41a37a47eb4c634d5656f41dff7d6e554ac17cd5a7781b69ffff2f560d",
+    "output_format": "virtualos-compressed-writes/v1",
+    "source_unchanged": true
+  },
+  "reverse": {
+    "source_bytes": 417488896,
+    "destination_bytes": 957538304,
+    "blocks": 14497,
+    "logical_fingerprint": "659a6b41a37a47eb4c634d5656f41dff7d6e554ac17cd5a7781b69ffff2f560d",
+    "output_format": "raw",
+    "source_unchanged": true
+  },
+  "round_trip_verified": true,
+  "live_services_changed": false,
+  "vm_stop_requested": false,
+  "original_live_overlay_preserved": true,
+  "elapsed_seconds": 60.503,
+  "candidate_allocated_bytes": 419495936,
+  "raw_snapshot_allocated_bytes": 971599872,
+  "projected_saving_bytes": 541110272,
+  "actual_live_saving_bytes": 0,
+  "generated_raw_copies_released": true,
+  "free_bytes_after": 17437949952
+}

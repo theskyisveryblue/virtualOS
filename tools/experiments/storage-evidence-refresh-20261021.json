@@ -1,0 +1,54 @@
+{
+  "observed_at": "2026-10-21T19:54:03.457260+00:00",
+  "refreshed": [
+    {
+      "task": "compact_fleet_default",
+      "receipt": "tools/experiments/compact-provisioning-verification-20261020.json",
+      "changed_source_bindings": [
+        "tools/cloud_disk.py",
+        "tools/fleet/shared_disk.py",
+        "tools/fleet/test_go_live.py"
+      ]
+    },
+    {
+      "task": "compact_overlay_writes",
+      "receipt": "tools/experiments/compact-overlay-verification-20261020.json",
+      "changed_source_bindings": [
+        "tools/cloud_disk.py",
+        "tools/fleet/shared_disk.py",
+        "tools/fleet/test_go_live.py"
+      ]
+    },
+    {
+      "task": "offline_overlay_compaction",
+      "receipt": "tools/experiments/offline-overlay-compaction-20261020.json",
+      "changed_source_bindings": [
+        "tools/cloud_disk.py"
+      ]
+    },
+    {
+      "task": "compressed_readonly_delta",
+      "receipt": "tools/experiments/compressed-readonly-delta-verification-20261020.json",
+      "changed_source_bindings": [
+        "tools/cloud_disk.py",
+        "tools/fleet/shared_disk.py",
+        "tools/fleet/test_go_live.py",
+        "tools/test_compressed_delta_nbd.py"
+      ]
+    },
+    {
+      "task": "vm_a_compressed_migration",
+      "receipt": "tools/experiments/vm-a-compressed-migration-verification-20261021.json",
+      "changed_source_bindings": [
+        "tools/cloud_disk.py",
+        "tools/fleet/shared_disk.py",
+        "tools/fleet/test_go_live.py",
+        "tools/test_compressed_delta_nbd.py"
+      ]
+    }
+  ],
+  "mini_tests_passed": 55,
+  "historical_deployment_hashes_retained": true,
+  "new_codec_activated": false,
+  "live_baseline": "tools/experiments/storage-baseline-refresh-20261021.json"
+}

@@ -1,0 +1,105 @@
+{
+  "shutdown_confirmation_clicked": true,
+  "fleet": {
+    "basePort": 9125,
+    "root": "/Users/ai/vos-fleet/machines",
+    "ok": true,
+    "count": 1,
+    "capability": {
+      "nestedVirtualizationReason": "supported",
+      "platform": "macOS Version 26.2 (Build 25C56)",
+      "nestedVirtualizationSupported": true
+    },
+    "instances": [
+      {
+        "error": "",
+        "bundle": "/Users/ai/vos-fleet/machines/vm-a.bundle",
+        "ready": true,
+        "name": "vm-a",
+        "controlPort": 9125,
+        "state": "running"
+      }
+    ]
+  },
+  "original_disk_open_files": "p2657\nf7\nn/Users/ai/vos-fleet/vm-a.bundle/Disk.img\n",
+  "lsof_code": 0,
+  "resources": {
+    "background_work": "allowed",
+    "cpu_count": 10,
+    "disk_free_kib": 20198420,
+    "families": {
+      "ai_agents": {
+        "processes": 2,
+        "sum_rss_mib": 996.2
+      },
+      "browser_apps": {
+        "processes": 24,
+        "sum_rss_mib": 382.8
+      },
+      "browser_engines": {
+        "processes": 113,
+        "sum_rss_mib": 2564.9
+      },
+      "simulator_runtime": {
+        "processes": 148,
+        "sum_rss_mib": 3170.0
+      },
+      "terminal": {
+        "processes": 1,
+        "sum_rss_mib": 6.1
+      },
+      "virtualos": {
+        "processes": 4,
+        "sum_rss_mib": 1176.4
+      }
+    },
+    "load_one": 4.77,
+    "memory_free_percent": 30,
+    "reasons": [],
+    "rss_note": "RSS sums can count shared pages more than once and omit paged-out memory",
+    "swap_used_mib": 5069,
+    "top_executables": [
+      {
+        "name": "Google Chrome",
+        "processes": 68,
+        "sum_rss_mib": 2037.3
+      },
+      {
+        "name": "com.apple.Virtualization.VirtualMachine",
+        "processes": 3,
+        "sum_rss_mib": 1147.1
+      },
+      {
+        "name": "ollama",
+        "processes": 2,
+        "sum_rss_mib": 996.2
+      },
+      {
+        "name": "com.apple.WebKit.WebContent",
+        "processes": 7,
+        "sum_rss_mib": 325.5
+      },
+      {
+        "name": "Figma",
+        "processes": 9,
+        "sum_rss_mib": 172.4
+      },
+      {
+        "name": "NewsToday2",
+        "processes": 1,
+        "sum_rss_mib": 155.2
+      },
+      {
+        "name": "Paper",
+        "processes": 7,
+        "sum_rss_mib": 149.6
+      },
+      {
+        "name": "ScreenTimeWidgetExtension",
+        "processes": 1,
+        "sum_rss_mib": 108.8
+      }
+    ]
+  },
+  "frame_likely_blank": false
+}

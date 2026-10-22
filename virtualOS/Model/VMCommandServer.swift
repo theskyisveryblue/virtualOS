@@ -14,6 +14,74 @@ import AppKit
 import Virtualization
 import OSLog
 
+// Keep this native-client boundary identical to the standalone fleet version.
+enum LocalHTTPPolicy {
+    static let maxHeaderBytes = 8192
+    static let maxBodyBytes = 1_048_576
+
+    static func bodyLength(header: String, port: UInt16) -> Int? {
+        guard header.utf8.count <= maxHeaderBytes else { return nil }
+        let lines = header.components(separatedBy: "\r\n")
+        let first = (lines.first ?? "").split(separator: " ", omittingEmptySubsequences: false)
+        guard first.count == 3, ["GET", "POST"].contains(String(first[0])),
+              first[1].hasPrefix("/"), !first[1].hasPrefix("//"),
+              ["HTTP/1.0", "HTTP/1.1"].contains(String(first[2])) else { return nil }
+        var fields: [String: String] = [:]
+        for line in lines.dropFirst() where !line.isEmpty {
+            guard !line.hasPrefix(" "), !line.hasPrefix("\t"),
+                  let colon = line.firstIndex(of: ":") else { return nil }
+            let key = String(line[..<colon]).lowercased()
+            guard !key.isEmpty, key.utf8.allSatisfy({
+                (97...122).contains($0) || (48...57).contains($0) || $0 == 45
+            }), fields[key] == nil else { return nil }
+            fields[key] = String(line[line.index(after: colon)...]).trimmingCharacters(in: .whitespaces)
+        }
+        guard let host = fields["host"]?.lowercased(),
+              ["127.0.0.1:\(port)", "localhost:\(port)", "[::1]:\(port)"].contains(host),
+              fields["origin"] == nil, fields["transfer-encoding"] == nil,
+              fields["sec-fetch-site"] == nil || fields["sec-fetch-site"] == "none" else { return nil }
+        let raw = fields["content-length"] ?? "0"
+        guard !raw.isEmpty, raw.utf8.allSatisfy({ (48...57).contains($0) }),
+              let length = Int(raw), length <= maxBodyBytes else { return nil }
+        return length
+    }
+
+    static func readRequest(_ fd: Int32, port: UInt16) -> (data: Data?, status: Int) {
+        let deadline = DispatchTime.now().uptimeNanoseconds + 5_000_000_000
+        var buffer = [UInt8](repeating: 0, count: 4096)
+        var request = Data()
+        func receive(_ maximum: Int) -> Int {
+            let now = DispatchTime.now().uptimeNanoseconds
+            guard now < deadline else { return 0 }
+            let remaining = deadline - now
+            var timeout = timeval(tv_sec: Int(remaining / 1_000_000_000),
+                                  tv_usec: Int32(max(1, (remaining % 1_000_000_000) / 1000)))
+            guard Darwin.setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &timeout,
+                                    socklen_t(MemoryLayout<timeval>.size)) == 0 else { return 0 }
+            return Darwin.read(fd, &buffer, maximum)
+        }
+        var headerEnd: Range<Data.Index>?
+        while headerEnd == nil {
+            let count = receive(buffer.count)
+            if count <= 0 { return (nil, 400) }
+            request.append(contentsOf: buffer[0..<count])
+            headerEnd = request.range(of: Data("\r\n\r\n".utf8))
+            if headerEnd == nil && request.count > maxHeaderBytes { return (nil, 403) }
+        }
+        guard let end = headerEnd, let expected = bodyLength(
+            header: String(decoding: request.prefix(end.lowerBound), as: UTF8.self), port: port) else {
+            return (nil, 403)
+        }
+        let total = end.upperBound + expected
+        while request.count < total {
+            let count = receive(min(buffer.count, total - request.count))
+            if count <= 0 { return (nil, 400) }
+            request.append(contentsOf: buffer[0..<count])
+        }
+        return (Data(request.prefix(total)), 200)
+    }
+}
+
 final class VMCommandServer {
     static let shared = VMCommandServer()
     let port: UInt16 = 8845
@@ -115,37 +183,21 @@ final class VMCommandServer {
         // TCP is a byte stream: a POST body can arrive in several reads.
         // Cap input so command transport cannot grow an unbounded buffer.
         var timeout = timeval(tv_sec: 5, tv_usec: 0)
-        Darwin.setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &timeout, socklen_t(MemoryLayout<timeval>.size))
-        Darwin.setsockopt(fd, SOL_SOCKET, SO_SNDTIMEO, &timeout, socklen_t(MemoryLayout<timeval>.size))
-        var request = Data()
-        var headerEnd: Int?
-        var expectedLength: Int?
-        let maxBody = 1_048_576
-        while request.count <= maxBody + 8192 {
-            var buffer = [UInt8](repeating: 0, count: 8192)
-            let n = Darwin.read(fd, &buffer, buffer.count)
-            if n <= 0 { break }
-            request.append(contentsOf: buffer[0..<n])
-            if headerEnd == nil, let end = request.range(of: Data("\r\n\r\n".utf8))?.upperBound {
-                headerEnd = end
-                let header = String(decoding: request.prefix(end), as: UTF8.self)
-                let lengthLine = header.components(separatedBy: "\r\n").first {
-                    $0.lowercased().hasPrefix("content-length:")
-                }
-                expectedLength = lengthLine.flatMap {
-                    Int($0.dropFirst("content-length:".count).trimmingCharacters(in: .whitespaces))
-                } ?? 0
-                if expectedLength! < 0 || expectedLength! > maxBody { break }
-            }
-            if let end = headerEnd, let length = expectedLength, request.count >= end + length { break }
-        }
-        guard let end = headerEnd, let length = expectedLength,
-              length >= 0, length <= maxBody, request.count >= end + length else {
-            _ = writeAll(fd, data: Data("HTTP/1.1 400 Bad Request\r\nConnection: close\r\nContent-Length: 0\r\n\r\n".utf8))
+        var noSignal: Int32 = 1
+        guard Darwin.setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, &noSignal,
+                                socklen_t(MemoryLayout<Int32>.size)) == 0 else {
             Darwin.close(fd)
             return
         }
-        let raw = String(decoding: request.prefix(end + length), as: UTF8.self)
+        Darwin.setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &timeout, socklen_t(MemoryLayout<timeval>.size))
+        Darwin.setsockopt(fd, SOL_SOCKET, SO_SNDTIMEO, &timeout, socklen_t(MemoryLayout<timeval>.size))
+        let received = LocalHTTPPolicy.readRequest(fd, port: port)
+        guard let request = received.data else {
+            _ = writeAll(fd, data: Data("HTTP/1.1 \(received.status) Rejected\r\nConnection: close\r\nContent-Length: 0\r\n\r\n".utf8))
+            Darwin.close(fd)
+            return
+        }
+        let raw = String(decoding: request, as: UTF8.self)
         let (method, path, body) = parseHTTP(raw)
 
         // Handle screen capture separately (binary response)
@@ -155,7 +207,7 @@ final class VMCommandServer {
         }
 
         let (status, responseBody) = route(method: method, path: path, body: body)
-        let response = "HTTP/1.1 \(status)\r\nContent-Type: application/json\r\nConnection: close\r\nAccess-Control-Allow-Origin: *\r\n\r\n\(responseBody)"
+        let response = "HTTP/1.1 \(status)\r\nContent-Type: application/json\r\nConnection: close\r\n\r\n\(responseBody)"
         _ = writeAll(fd, data: Data(response.utf8))
         Darwin.close(fd)
     }
@@ -224,7 +276,7 @@ final class VMCommandServer {
             Darwin.close(fd)
             return
         }
-        let header = "HTTP/1.1 200 OK\r\nContent-Type: image/jpeg\r\nContent-Length: \(data.count)\r\nConnection: close\r\nCache-Control: no-cache\r\nX-Coord-Map: \(coordMap)\r\nX-Capture-Width: \(captureW)\r\nX-Capture-Height: \(captureH)\r\nX-Image-Width: \(imageW)\r\nX-Image-Height: \(imageH)\r\nAccess-Control-Allow-Origin: *\r\nAccess-Control-Expose-Headers: X-Coord-Map,X-Capture-Width,X-Capture-Height,X-Image-Width,X-Image-Height\r\n\r\n"
+        let header = "HTTP/1.1 200 OK\r\nContent-Type: image/jpeg\r\nContent-Length: \(data.count)\r\nConnection: close\r\nCache-Control: no-cache\r\nX-Coord-Map: \(coordMap)\r\nX-Capture-Width: \(captureW)\r\nX-Capture-Height: \(captureH)\r\nX-Image-Width: \(imageW)\r\nX-Image-Height: \(imageH)\r\n\r\n"
         guard writeAll(fd, data: Data(header.utf8)) else { Darwin.close(fd); return }
         _ = writeAll(fd, data: data)
         Darwin.close(fd)

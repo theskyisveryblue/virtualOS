@@ -1,0 +1,29 @@
+{
+  "additional_headroom_bytes": 134217728,
+  "archive_sha256": "b2b55434865a668decb494110d7fd970eed3ecc8837be2872f672ccbb95df974",
+  "focused_tests_passed": 25,
+  "global_store_modified": false,
+  "guest_input_applied": false,
+  "helper_files": {
+    "ollama_private_metadata.py": "22056f476b8e5c7518b453bbf284f2fd08edd4bdac4604913e60f93d31f57b90",
+    "test_ollama_private_metadata.py": "1548522ab08d2d4359a05995cc26f73cd01041c734090c9c124e37f729b5fde5"
+  },
+  "inference_requested": false,
+  "installed_global_runtime_version": "0.30.10",
+  "main_sha256": "69fcb23ae7b95af30b5184998751f6158df84d0071f930670ee5c22db667c2ff",
+  "manifest_sha256": "4ff64a7f502a08b7616edb8ca0a79eb1853fc363d842b7df4b46915d11a3fb09",
+  "minimum_post_stage_free_bytes": 10737418240,
+  "observed_at": "2026-10-19T01:39:19.374146+00:00",
+  "operator_free_bytes": 9288712192,
+  "private_model_store_created": false,
+  "private_runtime_copied": false,
+  "private_server_started": false,
+  "projected_post_stage_free_bytes": 8016243277,
+  "reason": "post_stage_disk_reserve_not_met",
+  "required_copy_budget_bytes": 1138251187,
+  "schema": "virtualos-private-ollama-metadata-preflight/v1",
+  "source_decoded_bytes": 565969764,
+  "source_inventory_entries": 59,
+  "source_runtime_version": "0.40.6",
+  "state": "waiting_for_resources"
+}

@@ -27,6 +27,117 @@ import Foundation
 import Virtualization
 import AppKit
 
+// Keep this native-client boundary identical to the standalone fleet version.
+enum LocalHTTPPolicy {
+    static let maxHeaderBytes = 8192
+    static let maxBodyBytes = 1_048_576
+
+    static func bodyLength(header: String, port: UInt16) -> Int? {
+        guard header.utf8.count <= maxHeaderBytes else { return nil }
+        let lines = header.components(separatedBy: "\r\n")
+        let first = (lines.first ?? "").split(separator: " ", omittingEmptySubsequences: false)
+        guard first.count == 3, ["GET", "POST"].contains(String(first[0])),
+              first[1].hasPrefix("/"), !first[1].hasPrefix("//"),
+              ["HTTP/1.0", "HTTP/1.1"].contains(String(first[2])) else { return nil }
+        var fields: [String: String] = [:]
+        for line in lines.dropFirst() where !line.isEmpty {
+            guard !line.hasPrefix(" "), !line.hasPrefix("\t"),
+                  let colon = line.firstIndex(of: ":") else { return nil }
+            let key = String(line[..<colon]).lowercased()
+            guard !key.isEmpty, key.utf8.allSatisfy({
+                (97...122).contains($0) || (48...57).contains($0) || $0 == 45
+            }), fields[key] == nil else { return nil }
+            fields[key] = String(line[line.index(after: colon)...]).trimmingCharacters(in: .whitespaces)
+        }
+        guard let host = fields["host"]?.lowercased(),
+              ["127.0.0.1:\(port)", "localhost:\(port)", "[::1]:\(port)"].contains(host),
+              fields["origin"] == nil, fields["transfer-encoding"] == nil,
+              fields["sec-fetch-site"] == nil || fields["sec-fetch-site"] == "none" else { return nil }
+        let raw = fields["content-length"] ?? "0"
+        guard !raw.isEmpty, raw.utf8.allSatisfy({ (48...57).contains($0) }),
+              let length = Int(raw), length <= maxBodyBytes else { return nil }
+        return length
+    }
+
+    static func readRequest(_ fd: Int32, port: UInt16) -> (data: Data?, status: Int) {
+        let deadline = DispatchTime.now().uptimeNanoseconds + 5_000_000_000
+        var buffer = [UInt8](repeating: 0, count: 4096)
+        var request = Data()
+        func receive(_ maximum: Int) -> Int {
+            let now = DispatchTime.now().uptimeNanoseconds
+            guard now < deadline else { return 0 }
+            let remaining = deadline - now
+            var timeout = timeval(tv_sec: Int(remaining / 1_000_000_000),
+                                  tv_usec: Int32(max(1, (remaining % 1_000_000_000) / 1000)))
+            guard Darwin.setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &timeout,
+                                    socklen_t(MemoryLayout<timeval>.size)) == 0 else { return 0 }
+            return Darwin.read(fd, &buffer, maximum)
+        }
+        var headerEnd: Range<Data.Index>?
+        while headerEnd == nil {
+            let count = receive(buffer.count)
+            if count <= 0 { return (nil, 400) }
+            request.append(contentsOf: buffer[0..<count])
+            headerEnd = request.range(of: Data("\r\n\r\n".utf8))
+            if headerEnd == nil && request.count > maxHeaderBytes { return (nil, 403) }
+        }
+        guard let end = headerEnd, let expected = bodyLength(
+            header: String(decoding: request.prefix(end.lowerBound), as: UTF8.self), port: port) else {
+            return (nil, 403)
+        }
+        let total = end.upperBound + expected
+        while request.count < total {
+            let count = receive(min(buffer.count, total - request.count))
+            if count <= 0 { return (nil, 400) }
+            request.append(contentsOf: buffer[0..<count])
+        }
+        return (Data(request.prefix(total)), 200)
+    }
+}
+
+
+struct GuestKeystroke {
+    let code: CGKeyCode
+    let shift: Bool
+
+    static func resolve(_ ch: Character) -> GuestKeystroke? {
+        let base: [Character: CGKeyCode] = [
+            "a":0,"s":1,"d":2,"f":3,"h":4,"g":5,"z":6,"x":7,"c":8,"v":9,
+            "b":11,"q":12,"w":13,"e":14,"r":15,"y":16,"t":17,
+            "1":18,"2":19,"3":20,"4":21,"6":22,"5":23,"=":24,"9":25,"7":26,
+            "-":27,"8":28,"0":29,"]":30,"o":31,"u":32,"[":33,"i":34,"p":35,
+            "l":37,"j":38,"'":39,"k":40,";":41,"\\":42,",":43,"/":44,"n":45,
+            "m":46,".":47," ":49,"`":50,"\n":36,"\r":36,"\t":48,
+        ]
+        if let code = base[ch] { return GuestKeystroke(code: code, shift: false) }
+        let shifted: [Character: Character] = [
+            "~":"`","!":"1","@":"2","#":"3","$":"4","%":"5","^":"6","&":"7",
+            "*":"8","(":"9",")":"0","_":"-","+":"=","{":"[","}":"]","|":"\\",
+            ":":";","\"":"'","<":",",">":".","?":"/",
+        ]
+        if let plain = shifted[ch], let code = base[plain] {
+            return GuestKeystroke(code: code, shift: true)
+        }
+        let scalars = String(ch).unicodeScalars
+        if scalars.count == 1, let scalar = scalars.first, (65...90).contains(scalar.value),
+           let lower = UnicodeScalar(scalar.value + 32), let code = base[Character(String(lower))] {
+            return GuestKeystroke(code: code, shift: true)
+        }
+        return nil
+    }
+}
+
+if CommandLine.arguments.contains("--keyboard-self-test") {
+    precondition(GuestKeystroke.resolve(":")?.code == 41 && GuestKeystroke.resolve(":")?.shift == true)
+    precondition(GuestKeystroke.resolve("A")?.code == 0 && GuestKeystroke.resolve("A")?.shift == true)
+    precondition(GuestKeystroke.resolve("a")?.shift == false)
+    precondition(GuestKeystroke.resolve("\n")?.code == 36)
+    precondition(GuestKeystroke.resolve("é") == nil && GuestKeystroke.resolve("🐼") == nil)
+    for value in 32...126 { precondition(GuestKeystroke.resolve(Character(String(UnicodeScalar(value)!))) != nil) }
+    print("guest keyboard: printable ASCII, shifts, controls and unsupported text verified")
+    exit(0)
+}
+
 // MARK: - Small JSON helpers
 
 func jsonLine(_ object: [String: Any]) -> String {
@@ -77,6 +188,7 @@ final class FleetInstance: NSObject {
     let log: (String) -> Void
 
     private let queue: DispatchQueue
+    private let keyboardLock = NSLock()
     private var vm: VZVirtualMachine?
     private var configuration: VZVirtualMachineConfiguration?
     private var state: String = "idle"
@@ -333,6 +445,14 @@ final class FleetInstance: NSObject {
         guard let machine, queue.sync(execute: { state == "running" }) else { return nil }
 
         return DispatchQueue.main.sync { [self] in
+            // stop/start constructs a new VZVirtualMachine. A cached view must
+            // follow that instance or it keeps showing the stopped guest.
+            if let view = headlessView, view.virtualMachine !== machine {
+                view.virtualMachine = nil
+                headlessWindow?.close()
+                headlessWindow = nil
+                headlessView = nil
+            }
             if headlessView == nil {
                 let view = VZVirtualMachineView()
                 view.virtualMachine = machine
@@ -441,19 +561,20 @@ final class FleetInstance: NSObject {
 
     /// Type a whole string into the guest, one character at a time.
     ///
-    /// Keystrokes are paced on the main run loop with `asyncAfter` rather than
-    /// blocked in a batch, so a long string neither stalls the HTTP handler
-    /// thread past the client's timeout nor freezes frame capture. Input is
-    /// fire-and-forget: the guest receives the keys just after the 200.
+    /// Pace keys from the HTTP worker thread, leaving the main run loop free
+    /// for frame capture. Success means every key was delivered, so a following
+    /// Return cannot overtake the unfinished text.
     @discardableResult
     func typeText(_ text: String) -> Bool {
-        let chars = Array(text.prefix(512))
-        guard !chars.isEmpty else { return true }
-        let codes = chars.map { (keyCode(for: $0), String($0)) }
-        for (i, pair) in codes.enumerated() {
-            DispatchQueue.main.asyncAfter(deadline: .now() + Double(i) * 0.02) { [self] in
-                _ = postKey(pair.0, characters: pair.1)
-            }
+        guard text.count <= 512, !Thread.isMainThread else { return false }
+        let strokes = text.map { GuestKeystroke.resolve($0) }
+        guard strokes.allSatisfy({ $0 != nil }) else { return false }
+        guard !strokes.isEmpty else { return true }
+        keyboardLock.lock()
+        defer { keyboardLock.unlock() }
+        for (character, stroke) in zip(text, strokes) {
+            guard let stroke, sendKey(stroke.code, characters: String(character), shift: stroke.shift) else { return false }
+            Thread.sleep(forTimeInterval: 0.02)
         }
         return true
     }
@@ -461,12 +582,15 @@ final class FleetInstance: NSObject {
     /// Send a named or single-character key to the guest.
     @discardableResult
     func key(named name: String) -> Bool {
+        keyboardLock.lock()
+        defer { keyboardLock.unlock() }
         let lowered = name.lowercased()
         if let code = specialKeyCodes[lowered] {
             return sendKey(code, characters: keyCharacters(lowered, code: code))
         }
         if name.count == 1 {
-            return sendKey(keyCode(for: Character(name)), characters: name)
+            guard let stroke = GuestKeystroke.resolve(Character(name)) else { return false }
+            return sendKey(stroke.code, characters: name, shift: stroke.shift)
         }
         return false
     }
@@ -482,18 +606,26 @@ final class FleetInstance: NSObject {
         }
     }
 
-    private func sendKey(_ code: CGKeyCode, characters: String) -> Bool {
-        DispatchQueue.main.sync { [self] in postKey(code, characters: characters) }
+    private func sendKey(_ code: CGKeyCode, characters: String, shift: Bool = false) -> Bool {
+        DispatchQueue.main.sync { [self] in postKey(code, characters: characters, shift: shift) }
     }
 
     /// Post a key down/up pair to the headless view. Must run on the main thread.
     @discardableResult
-    private func postKey(_ code: CGKeyCode, characters: String) -> Bool {
+    private func postKey(_ code: CGKeyCode, characters: String, shift: Bool = false) -> Bool {
         guard let view = headlessView, let window = headlessWindow else { return false }
+        func flags(_ held: Bool) {
+            if let event = NSEvent.keyEvent(with: .flagsChanged, location: .zero,
+                modifierFlags: held ? [.shift] : [], timestamp: ProcessInfo.processInfo.systemUptime,
+                windowNumber: window.windowNumber, context: nil, characters: "", charactersIgnoringModifiers: "",
+                isARepeat: false, keyCode: 56) { view.flagsChanged(with: event) }
+        }
+        if shift { flags(true) }
+        defer { if shift { flags(false) } }
         for isDown in [true, false] {
             if let ev = NSEvent.keyEvent(
                 with: isDown ? .keyDown : .keyUp,
-                location: .zero, modifierFlags: [],
+                location: .zero, modifierFlags: shift ? [.shift] : [],
                 timestamp: ProcessInfo.processInfo.systemUptime,
                 windowNumber: window.windowNumber, context: nil,
                 characters: characters, charactersIgnoringModifiers: characters,
@@ -512,18 +644,6 @@ final class FleetInstance: NSObject {
         ]
     }
 
-    /// Map a printable character to a US-ANSI virtual key code.
-    private func keyCode(for ch: Character) -> CGKeyCode {
-        let map: [Character: CGKeyCode] = [
-            "a": 0, "s": 1, "d": 2, "f": 3, "h": 4, "g": 5, "z": 6, "x": 7, "c": 8, "v": 9,
-            "b": 11, "q": 12, "w": 13, "e": 14, "r": 15, "y": 16, "t": 17,
-            "1": 18, "2": 19, "3": 20, "4": 21, "6": 22, "5": 23, "=": 24, "9": 25, "7": 26,
-            "-": 27, "8": 28, "0": 29, "]": 30, "o": 31, "u": 32, "[": 33, "i": 34, "p": 35,
-            "l": 37, "j": 38, "'": 39, "k": 40, ";": 41, "\\": 42, ",": 43, "/": 44, "n": 45,
-            "m": 46, ".": 47, " ": 49, "`": 50,
-        ]
-        return map[ch] ?? 0
-    }
 }
 
 // MARK: - Supervisor
@@ -533,6 +653,13 @@ final class FleetSupervisor {
     private let names: [String]
     private let basePort: UInt16
     private var instances: [FleetInstance] = []
+    private let instancesLock = NSLock()
+
+    private func snapshot() -> [FleetInstance] {
+        instancesLock.lock()
+        defer { instancesLock.unlock() }
+        return instances
+    }
 
     init(root: URL, names: [String], basePort: UInt16) {
         self.root = root
@@ -545,6 +672,8 @@ final class FleetSupervisor {
     }
 
     func buildInstances() {
+        instancesLock.lock()
+        defer { instancesLock.unlock() }
         for (index, name) in names.enumerated() {
             let bundle = root.appendingPathComponent(name).appendingPathExtension("bundle")
             let instance = FleetInstance(
@@ -559,6 +688,7 @@ final class FleetSupervisor {
 
     func capability() -> [String: Any] {
         var result: [String: Any] = ["platform": "macOS \(ProcessInfo.processInfo.operatingSystemVersionString)"]
+        result["guestTextASCII"] = true
         if #available(macOS 15.0, *) {
             let supported = VZGenericPlatformConfiguration.isNestedVirtualizationSupported
             result["nestedVirtualizationSupported"] = supported
@@ -573,23 +703,24 @@ final class FleetSupervisor {
     }
 
     func status() -> [String: Any] {
-        [
+        let current = snapshot()
+        return [
             "ok": true,
             "root": root.path,
             "basePort": Int(basePort),
             "capability": capability(),
-            "count": instances.count,
-            "instances": instances.map { $0.status() },
+            "count": current.count,
+            "instances": current.map { $0.status() },
         ]
     }
 
     func startAll() -> [String: Any] {
-        for instance in instances { instance.start() }
+        for instance in snapshot() { instance.start() }
         return status()
     }
 
     func start(name: String) -> [String: Any] {
-        guard let instance = instances.first(where: { $0.name == name }) else {
+        guard let instance = registerPreparedMachine(name: name) else {
             return ["ok": false, "error": "unknown vm \(name)"]
         }
         instance.start()
@@ -597,7 +728,7 @@ final class FleetSupervisor {
     }
 
     func stop(name: String) -> [String: Any] {
-        guard let instance = instances.first(where: { $0.name == name }) else {
+        guard let instance = instance(named: name) else {
             return ["ok": false, "error": "unknown vm \(name)"]
         }
         instance.stop()
@@ -605,7 +736,24 @@ final class FleetSupervisor {
     }
 
     func instance(named name: String) -> FleetInstance? {
-        instances.first { $0.name == name }
+        snapshot().first { $0.name == name }
+    }
+
+    private func registerPreparedMachine(name: String) -> FleetInstance? {
+        guard name.range(of: "^[A-Za-z0-9][A-Za-z0-9_-]*$", options: .regularExpression) != nil else { return nil }
+        instancesLock.lock()
+        defer { instancesLock.unlock() }
+        if let existing = instances.first(where: { $0.name == name }) { return existing }
+        let bundle = root.appendingPathComponent(name).appendingPathExtension("bundle")
+        var directory: ObjCBool = false
+        guard FileManager.default.fileExists(atPath: bundle.path, isDirectory: &directory),
+              directory.boolValue, instances.count < 128,
+              Int(basePort) + instances.count <= Int(UInt16.max) else { return nil }
+        let added = FleetInstance(name: name, bundleURL: bundle,
+                                  controlPort: basePort + UInt16(instances.count), log: log)
+        instances.append(added)
+        log("registered prepared machine \(name)")
+        return added
     }
 }
 
@@ -615,6 +763,7 @@ final class FleetHTTPServer {
     private let supervisor: FleetSupervisor
     private let port: UInt16
     private var serverSocket: Int32 = -1
+    private let clientSlots = DispatchSemaphore(value: 8)
 
     init(supervisor: FleetSupervisor, port: UInt16) {
         self.supervisor = supervisor
@@ -646,8 +795,16 @@ final class FleetHTTPServer {
 
         while true {
             let client = Darwin.accept(fd, nil, nil)
-            guard client >= 0 else { continue }
+            guard client >= 0 else {
+                if errno != EINTR { Thread.sleep(forTimeInterval: 0.1) }
+                continue
+            }
+            guard clientSlots.wait(timeout: .now()) == .success else {
+                Darwin.close(client)
+                continue
+            }
             DispatchQueue.global(qos: .utility).async { [self] in
+                defer { clientSlots.signal() }
                 handle(client)
             }
         }
@@ -655,40 +812,16 @@ final class FleetHTTPServer {
 
     private func handle(_ fd: Int32) {
         defer { Darwin.close(fd) }
-        var request = Data()
-        var buffer = [UInt8](repeating: 0, count: 4096)
-
-        // Read until the header terminator is present. A single read() may
-        // return only part of the headers (or headers split across segments),
-        // so loop rather than assuming one read gets them all.
-        func readMore() -> Int {
-            let got = Darwin.read(fd, &buffer, buffer.count)
-            if got > 0 { request.append(contentsOf: buffer[0..<got]) }
-            return got
-        }
-
-        var headerEnd: Range<Data.Index>?
-        while headerEnd == nil {
-            let got = readMore()
-            if got <= 0 { break }
-            headerEnd = request.range(of: Data("\r\n\r\n".utf8))
-        }
-
-        // Drain the body promised by Content-Length so JSON POSTs parse whole.
-        let raw0 = String(decoding: request, as: UTF8.self)
-        if let clRange = raw0.range(of: "Content-Length:", options: .caseInsensitive) {
-            let after = raw0[clRange.upperBound...]
-            let lenStr = after.prefix(while: { $0.isNumber || $0 == " " }).trimmingCharacters(in: .whitespaces)
-            if let expected = Int(lenStr), let he = headerEnd {
-                let have = request.distance(from: request.startIndex, to: he.upperBound)
-                var remaining = expected - (request.count - have)
-                while remaining > 0 {
-                    let got = Darwin.read(fd, &buffer, min(buffer.count, remaining))
-                    if got <= 0 { break }
-                    request.append(contentsOf: buffer[0..<got])
-                    remaining -= got
-                }
-            }
+        var noSignal: Int32 = 1
+        guard Darwin.setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, &noSignal,
+                                socklen_t(MemoryLayout<Int32>.size)) == 0 else { return }
+        var timeout = timeval(tv_sec: 5, tv_usec: 0)
+        Darwin.setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &timeout, socklen_t(MemoryLayout<timeval>.size))
+        Darwin.setsockopt(fd, SOL_SOCKET, SO_SNDTIMEO, &timeout, socklen_t(MemoryLayout<timeval>.size))
+        let received = LocalHTTPPolicy.readRequest(fd, port: port)
+        guard let request = received.data else {
+            writeAll(fd, Data("HTTP/1.1 \(received.status) Rejected\r\nConnection: close\r\nContent-Length: 0\r\n\r\n".utf8))
+            return
         }
         let raw = String(decoding: request, as: UTF8.self)
         let requestLine = raw.components(separatedBy: "\r\n").first ?? ""
@@ -702,23 +835,35 @@ final class FleetHTTPServer {
             guard let instance = supervisor.instance(named: name),
                   let frame = instance.captureFrame() else {
                 let body = jsonLine(["ok": false, "error": "no frame for \(name)"])
-                let response = "HTTP/1.1 503 Service Unavailable\r\nContent-Type: application/json\r\nConnection: close\r\nAccess-Control-Allow-Origin: *\r\n\r\n\(body)"
-                _ = response.withCString { Darwin.write(fd, $0, strlen($0)) }
+                let response = "HTTP/1.1 503 Service Unavailable\r\nContent-Type: application/json\r\nConnection: close\r\n\r\n\(body)"
+                writeAll(fd, Data(response.utf8))
                 return
             }
-            let header = "HTTP/1.1 200 OK\r\nContent-Type: image/jpeg\r\nContent-Length: \(frame.jpeg.count)\r\nConnection: close\r\nCache-Control: no-cache\r\nX-Image-Width: \(frame.width)\r\nX-Image-Height: \(frame.height)\r\nAccess-Control-Allow-Origin: *\r\nAccess-Control-Expose-Headers: X-Image-Width,X-Image-Height\r\n\r\n"
-            _ = header.withCString { Darwin.write(fd, $0, strlen($0)) }
-            frame.jpeg.withUnsafeBytes { ptr in
-                if let base = ptr.baseAddress {
-                    _ = Darwin.write(fd, base, frame.jpeg.count)
-                }
-            }
+            let header = "HTTP/1.1 200 OK\r\nContent-Type: image/jpeg\r\nContent-Length: \(frame.jpeg.count)\r\nConnection: close\r\nCache-Control: no-cache\r\nX-Image-Width: \(frame.width)\r\nX-Image-Height: \(frame.height)\r\n\r\n"
+            if writeAll(fd, Data(header.utf8)) { writeAll(fd, frame.jpeg) }
             return
         }
 
         let (status, body) = route(method: method, path: path, raw: raw)
-        let response = "HTTP/1.1 \(status)\r\nContent-Type: application/json\r\nConnection: close\r\nAccess-Control-Allow-Origin: *\r\n\r\n\(body)"
-        _ = response.withCString { ptr in Darwin.write(fd, ptr, strlen(ptr)) }
+        let completion = method == "POST" && path.hasPrefix("/fleet/input/") && status == "200 OK"
+            ? "X-VOS-Input-Completed: 1\r\n" : ""
+        let response = "HTTP/1.1 \(status)\r\nContent-Type: application/json\r\nConnection: close\r\n\(completion)\r\n\(body)"
+        writeAll(fd, Data(response.utf8))
+    }
+
+    @discardableResult
+    private func writeAll(_ fd: Int32, _ data: Data) -> Bool {
+        data.withUnsafeBytes { bytes in
+            guard let base = bytes.baseAddress else { return true }
+            var offset = 0
+            while offset < bytes.count {
+                let written = Darwin.write(fd, base.advanced(by: offset), bytes.count - offset)
+                if written > 0 { offset += written }
+                else if written < 0 && errno == EINTR { continue }
+                else { return false }
+            }
+            return true
+        }
     }
 
     private func route(method: String, path: String, raw: String) -> (String, String) {
@@ -735,10 +880,12 @@ final class FleetHTTPServer {
             return ("200 OK", jsonLine(supervisor.startAll()))
         }
         if path.hasPrefix("/fleet/start/") {
+            guard method == "POST" else { return ("405 Method Not Allowed", jsonLine(["ok": false])) }
             let name = String(path.dropFirst("/fleet/start/".count))
             return ("200 OK", jsonLine(supervisor.start(name: name)))
         }
         if path.hasPrefix("/fleet/stop/") {
+            guard method == "POST" else { return ("405 Method Not Allowed", jsonLine(["ok": false])) }
             let name = String(path.dropFirst("/fleet/stop/".count))
             return ("200 OK", jsonLine(supervisor.stop(name: name)))
         }

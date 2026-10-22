@@ -1,0 +1,16 @@
+{
+  "backup_sha256": "c2ae06adc11d64ac9bd5b3d46e322461e2e6ff9301c91430a010d8d11e2a0db3",
+  "observed_at": "2026-10-21T00:05:05.326331+00:00",
+  "private_dependency_directory": "/Users/ai/vos-fleet/.local/maintenance/compact-provisioning-20261020/tools",
+  "retain_dependency_directory_while_installed": true,
+  "services_changed": false,
+  "source_sha256": {
+    ".local/maintenance/compact-provisioning-20261020/tools/cloud_disk.py": "49cdb88f54c62baadc3ec2b0ef9e73c4a52061be563cac06d0c4f349de1147b6",
+    ".local/maintenance/compact-provisioning-20261020/tools/computer-space.sh": "d332647f9d941f58ae57490e04f96ccde79c7b34e66600f6f05959e27549362f",
+    "tools/fleet/go-live.sh": "162d0fa64eb41303d59f4e3094481f6b3ea3ae239322ad0b31f6273c07ef4271",
+    "tools/fleet/shared_disk.py": "b70433f702c607d5c233ac371aede722b0c4f0ccec085ba7c4148a417a2c1cc0"
+  },
+  "state": "installed",
+  "test_report": ".................\n----------------------------------------------------------------------\nRan 17 tests in 5.448s\n\nOK\n",
+  "tests_passed": 17
+}

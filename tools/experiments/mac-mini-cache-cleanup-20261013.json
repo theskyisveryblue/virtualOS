@@ -1,0 +1,14 @@
+{
+  "date": "2026-10-13",
+  "host": "mac-mini-ai",
+  "hostname": "ais-Mac-mini.local",
+  "operation": "computer-space.sh --reclaim-caches",
+  "reclaimed_kib_measured_by_df": 1435104,
+  "reclaimed_bytes_measured_by_df": 1469546496,
+  "free_kib_after": 24101180,
+  "swift_cache_kib_before": 2402076,
+  "swift_cache_kib_after": 13560,
+  "production_virtualos_pid_after": 94084,
+  "fleet_supervisor_pid_after": 2301,
+  "notes": "Guarded Swift package cache purge and obsolete MediaPipe artifact cleanup. No Swift or Xcode builds were observed. Cache allocation change differs from actual free-space gain because filesystem allocations can be shared and background activity can change free space. Running VM disks, Apple PCC downloads, other project checkouts and simulator data were preserved."
+}

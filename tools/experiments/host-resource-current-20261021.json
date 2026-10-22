@@ -1,0 +1,95 @@
+{
+  "observed_at": "2026-10-21T20:58:20.336674+00:00",
+  "read_only": true,
+  "resources": {
+    "background_work": "paused",
+    "cpu_count": 10,
+    "disk_free_kib": 8040912,
+    "families": {
+      "ai_agents": {
+        "processes": 2,
+        "sum_rss_mib": 993.0
+      },
+      "browser_apps": {
+        "processes": 23,
+        "sum_rss_mib": 286.9
+      },
+      "browser_engines": {
+        "processes": 215,
+        "sum_rss_mib": 7140.2
+      },
+      "simulator_runtime": {
+        "processes": 0,
+        "sum_rss_mib": 0.0
+      },
+      "terminal": {
+        "processes": 1,
+        "sum_rss_mib": 8.9
+      },
+      "virtualos": {
+        "processes": 4,
+        "sum_rss_mib": 66.4
+      }
+    },
+    "load_one": 39.25,
+    "memory_free_percent": 31,
+    "reasons": [
+      "swap_at_least_8_gib",
+      "load_at_least_2x_cpu"
+    ],
+    "rss_note": "RSS sums can count shared pages more than once and omit paged-out memory",
+    "swap_used_mib": 14902,
+    "top_executables": [
+      {
+        "name": "Google Chrome for Testing",
+        "processes": 100,
+        "sum_rss_mib": 4843.1
+      },
+      {
+        "name": "Google Chrome",
+        "processes": 77,
+        "sum_rss_mib": 1652.3
+      },
+      {
+        "name": "ollama",
+        "processes": 2,
+        "sum_rss_mib": 993.0
+      },
+      {
+        "name": "com.apple.WebKit.WebContent",
+        "processes": 7,
+        "sum_rss_mib": 516.3
+      },
+      {
+        "name": "Figma",
+        "processes": 9,
+        "sum_rss_mib": 121.9
+      },
+      {
+        "name": "Paper",
+        "processes": 7,
+        "sum_rss_mib": 113.4
+      },
+      {
+        "name": "com.apple.Virtualization.VirtualMachine",
+        "processes": 3,
+        "sum_rss_mib": 55.0
+      },
+      {
+        "name": "Pen",
+        "processes": 4,
+        "sum_rss_mib": 35.5
+      }
+    ]
+  },
+  "moats_process_count": 102,
+  "moats_sum_rss_bytes": 5066440704,
+  "rss_sums_are_not_unique_physical_memory": true,
+  "swapfile_metadata": [],
+  "swap_metadata_error": null,
+  "swapfile_allocated_bytes": null,
+  "no_apps_closed": true,
+  "no_system_settings_changed": true,
+  "swap_file_allocation_measured": false,
+  "swap_file_location_not_established": true
+}

@@ -1,0 +1,20 @@
+{
+  "observed_at": "2026-10-21T20:26:41.342102+00:00",
+  "consistent_live_sqlite_backup_verified": true,
+  "forward_reverse_raw_blocks_match": true,
+  "logical_fingerprint": "659a6b41a37a47eb4c634d5656f41dff7d6e554ac17cd5a7781b69ffff2f560d",
+  "blocks": 14497,
+  "source_untouched": true,
+  "reserve_bytes": 10737418240,
+  "vm_restart_requested": false,
+  "preview_receipt": "tools/experiments/compressed-writes-real-preview-20261021.json",
+  "release_receipt": "tools/experiments/compressed-overlay-preview-release-20261021.json",
+  "temporary_allocation_released_bytes": 419495936,
+  "live_vm_compression_saving_claimed": false,
+  "source_sha256": {
+    "tools/compressed_write_overlay.py": "eeb0cc47585535af2f3193440485924c26459f19b1edf855059c920c95d1e07d",
+    "tools/compressed_delta.py": "e62350e1b2003f8ccc7b8d8b9a0053f8d57ccefc6ee8b2bf3ea52959fccdacc6",
+    "tools/test_compressed_write_overlay.py": "16c3a16f884a7fd15e42a9ad5a853ae77be140991a634a70fa4b5e7689d15f4e",
+    "tools/.private/compressed-writes-maintenance-20261021/release-preview.py": "e94ea45629f4b3cd793dbe6895fd2bec20593e507f3882fe41694078b1e23bd6"
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "allocated_bytes": 22974464,
+  "apfs_copy_on_write_requested": true,
+  "default_linux_selection_changed": false,
+  "distinct_inode": true,
+  "full_copy_fallback": false,
+  "guest_input_applied": false,
+  "helper_sha256": {
+    "linux_boot_artifacts.py": "e664bdc6f08813e0c383e68b2e87e56ed9a6fedaf06411d583526721b1b576dc",
+    "linux_guest_selection.py": "fbab8f41165dff7dcd4aa5d52436f73d46be4e891f0aba74a87b97c557310ed9",
+    "linux_maintained_profile.py": "da19e1156b85876a159127430e1d6fc0d5f3ecca33d9c964affe16d799e5b882",
+    "linux_prepare_ext4.py": "28ba12711e1c68ede0c71c51e18264e8dd17ffed2ccf94fcbc20f5155b0badd2"
+  },
+  "launchagent_plists_unchanged": true,
+  "logical_bytes": 268435456,
+  "minimum_post_stage_free_bytes": 10737418240,
+  "pids_preserved": [
+    440,
+    2503,
+    2499,
+    35688
+  ],
+  "post_stage_free_bytes": 22912659456,
+  "private_files": true,
+  "process_identities_unchanged": true,
+  "proof_receipt_sha256": "c2cce39b8f44c9676a46b20fe633be307d82f7c9bcb9a4b10bb94b30ed097e79",
+  "runtime_disk": "/Users/ai/vos-fleet/.local/maintenance/linux-maintained-selection-q2finx58/root.img",
+  "runtime_sha256": "8f18656717e613bb4a02433d9b44478f99373c2ae5ca653c65c4cec388673c5e",
+  "schema": "virtualos-maintained-linux-selection-preparation/v1",
+  "sealed_proof_disk": "/Users/ai/vos-fleet/linux/maintained-3.24-5a6555b5a6514566/persistence-tests/run.VJz4hqnH/root.img",
+  "sealed_proof_sha256": "8f18656717e613bb4a02433d9b44478f99373c2ae5ca653c65c4cec388673c5e",
+  "sealed_proof_unchanged": true,
+  "selection_check": {
+    "activation_required": true,
+    "arguments": [
+      "--kernel",
+      "/Users/ai/vos-fleet/linux/maintained-3.24-5a6555b5a6514566/Image",
+      "--initrd",
+      "/Users/ai/vos-fleet/linux/maintained-3.24-5a6555b5a6514566/initramfs",
+      "--disk",
+      "/Users/ai/vos-fleet/.local/maintenance/linux-maintained-selection-q2finx58/root.img",
+      "--cmdline",
+      "console=hvc0 root=/dev/vda init=/init rw",
+      "--cpu",
+      "1",
+      "--memory",
+      "1"
+    ],
+    "default_selection_changed": false,
+    "disk_mutation_performed": false,
+    "mode": "maintained",
+    "schema": "virtualos-linux-selection/v1",
+    "state": "prepared_selection_verified",
+    "verification_scope": "initial artifacts and disk only; no running-guest or rollout claim"
+  },
+  "selection_config": "/Users/ai/vos-fleet/.local/maintenance/linux-maintained-selection-q2finx58/selection.json",
+  "selection_sha256": "98576bbf6aad0ada479a57fd0e91cd8985dcde3fcc5e80b7aa910356ea374fc2",
+  "stage_directory": "/Users/ai/vos-fleet/.local/maintenance/linux-maintained-selection-q2finx58",
+  "verified_at": "2026-10-19T02:02:35.633464+00:00",
+  "vm_activated": false,
+  "watchdog_pid": 1756
+}

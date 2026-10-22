@@ -1,0 +1,117 @@
+{
+  "read_only": true,
+  "resources": [
+    {
+      "observed_at": "2026-10-21T20:22:16.771364+00:00",
+      "disk_free_kib": 11572460,
+      "memory_free_percent": 35,
+      "swap_used_mib": 10737,
+      "load_one": 10.07,
+      "cpu_count": 10,
+      "background_work": "paused",
+      "browser_engine_rss_mib": 10936.2
+    },
+    {
+      "observed_at": "2026-10-21T20:22:46.899555+00:00",
+      "disk_free_kib": 11570580,
+      "memory_free_percent": 33,
+      "swap_used_mib": 10681,
+      "load_one": 8.6,
+      "cpu_count": 10,
+      "background_work": "paused",
+      "browser_engine_rss_mib": 10813.6
+    },
+    {
+      "observed_at": "2026-10-21T20:23:17.012841+00:00",
+      "disk_free_kib": 11522012,
+      "memory_free_percent": 32,
+      "swap_used_mib": 11108,
+      "load_one": 7.93,
+      "cpu_count": 10,
+      "background_work": "paused",
+      "browser_engine_rss_mib": 10303.5
+    },
+    {
+      "observed_at": "2026-10-21T20:23:48.056426+00:00",
+      "disk_free_kib": 10355092,
+      "memory_free_percent": 26,
+      "swap_used_mib": 12154,
+      "load_one": 11.45,
+      "cpu_count": 10,
+      "background_work": "paused",
+      "browser_engine_rss_mib": 11662.2
+    },
+    {
+      "observed_at": "2026-10-21T20:24:18.278283+00:00",
+      "disk_free_kib": 10348120,
+      "memory_free_percent": 32,
+      "swap_used_mib": 12177,
+      "load_one": 14.37,
+      "cpu_count": 10,
+      "background_work": "paused",
+      "browser_engine_rss_mib": 11814.7
+    },
+    {
+      "observed_at": "2026-10-21T20:24:48.913016+00:00",
+      "disk_free_kib": 10345556,
+      "memory_free_percent": 29,
+      "swap_used_mib": 11969,
+      "load_one": 15.75,
+      "cpu_count": 10,
+      "background_work": "paused",
+      "browser_engine_rss_mib": 12097.6
+    },
+    {
+      "observed_at": "2026-10-21T20:25:19.170334+00:00",
+      "disk_free_kib": 10343836,
+      "memory_free_percent": 28,
+      "swap_used_mib": 11803,
+      "load_one": 14.63,
+      "cpu_count": 10,
+      "background_work": "paused",
+      "browser_engine_rss_mib": 11605.1
+    },
+    {
+      "observed_at": "2026-10-21T20:25:49.558579+00:00",
+      "disk_free_kib": 10336552,
+      "memory_free_percent": 28,
+      "swap_used_mib": 12007,
+      "load_one": 20.71,
+      "cpu_count": 10,
+      "background_work": "paused",
+      "browser_engine_rss_mib": 12242.4
+    },
+    {
+      "observed_at": "2026-10-21T20:26:19.842418+00:00",
+      "disk_free_kib": 10746856,
+      "memory_free_percent": 31,
+      "swap_used_mib": 12100,
+      "load_one": 23.52,
+      "cpu_count": 10,
+      "background_work": "paused",
+      "browser_engine_rss_mib": 8225.3
+    },
+    {
+      "observed_at": "2026-10-21T20:26:50.076775+00:00",
+      "disk_free_kib": 10735584,
+      "memory_free_percent": 29,
+      "swap_used_mib": 11852,
+      "load_one": 22.46,
+      "cpu_count": 10,
+      "background_work": "paused",
+      "browser_engine_rss_mib": 8566.5
+    },
+    {
+      "observed_at": "2026-10-21T20:27:20.559594+00:00",
+      "disk_free_kib": 10726252,
+      "memory_free_percent": 29,
+      "swap_used_mib": 12410,
+      "load_one": 22.93,
+      "cpu_count": 10,
+      "background_work": "paused",
+      "browser_engine_rss_mib": 8570.9
+    }
+  ],
+  "elapsed_seconds": 300,
+  "host_workloads_stopped": false
+}

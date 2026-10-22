@@ -1,0 +1,22 @@
+{
+  "observed_at": "2026-10-21T20:28:53.952379+00:00",
+  "new_local_integrity_tests_passed": 3,
+  "previous_mini_codec_tests_passed": 9,
+  "previous_mini_receipt": "tools/experiments/compressed-writes-mini-verification-20261021.json",
+  "verified_cases": [
+    "malformed sizes and truncation",
+    "trailing compressed bytes",
+    "decompression expansion",
+    "unknown block mode",
+    "changed checksum with valid stream",
+    "changed payload with valid stream",
+    "unknown persistent overlay codec",
+    "atomic rollback preserving existing encoded rows"
+  ],
+  "live_services_changed": false,
+  "source_sha256": {
+    "tools/test_overlay_corruption_matrix.py": "ed4d3555af6cacccaf96a1ff0f6ef07a21fcfb6ecc25cefdbeb8236dcfe087ae",
+    "tools/test_compressed_write_overlay.py": "16c3a16f884a7fd15e42a9ad5a853ae77be140991a634a70fa4b5e7689d15f4e",
+    "tools/compressed_write_overlay.py": "eeb0cc47585535af2f3193440485924c26459f19b1edf855059c920c95d1e07d"
+  }
+}

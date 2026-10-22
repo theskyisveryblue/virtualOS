@@ -1,0 +1,14 @@
+{
+  "account_id": "c24a3fb4bedba669785c18c834f51921",
+  "bucket": "virtualos-cloud-disks",
+  "created": true,
+  "elapsed_seconds": 0.732,
+  "encoded_bytes": 69,
+  "manifest_written": false,
+  "new_account_token_created": false,
+  "object_key": "objects/8db8b9a9159e9cbc6d24e67854141a0f58e4bda29e8c2c53a5df58a2feaf5afd.z",
+  "object_prefix": "disks/archive-base-0073037110369885",
+  "schema": "virtualos-r2-write-check/v1",
+  "verified": true,
+  "verified_at": "2026-10-18T13:55:19.696234+00:00"
+}

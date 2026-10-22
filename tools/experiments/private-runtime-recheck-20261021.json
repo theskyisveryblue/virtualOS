@@ -1,0 +1,12 @@
+{
+  "observed_at": "2026-10-21T20:42:01.414579+00:00",
+  "pinned_private_stage_verifier_passed": true,
+  "strict_codesign_verified_files": 32,
+  "sandboxed_help_passed": true,
+  "runtime_allocated_bytes": 211062784,
+  "model_bytes_retained": 397821516,
+  "uncached_streaming_hashes": true,
+  "inference_requested": false,
+  "private_server_started": false,
+  "elapsed_seconds": 22.433526125
+}

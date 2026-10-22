@@ -1,0 +1,13 @@
+{
+  "existing_overlays_changed": false,
+  "mini_tests_passed": 7,
+  "observed_at": "2026-10-21T00:29:47.239494+00:00",
+  "report": ".......\n----------------------------------------------------------------------\nRan 7 tests in 0.078s\n\nOK\n",
+  "source_sha256": {
+    "tools/cloud_disk.py": "102c06226f3e2db7adb7405b0973f6acbf6be706e22b251092b7be2b7face0b1",
+    "tools/overlay_compact.py": "53e32d1fefc3f4a68ce127dbe3c7174040c5864e48a7e9cdd4dd933963ad9e21",
+    "tools/test_overlay_compact.py": "e803bf5725d79b4cd9305b936ce8d8c377f61fefd80df8ca34480d923511c80f"
+  },
+  "stage": "/Users/ai/vos-fleet/.local/maintenance/offline-overlay-compact-20261020",
+  "state": "verified"
+}

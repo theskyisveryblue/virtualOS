@@ -2,6 +2,43 @@
 
 Run a virtual macOS machine on your Apple Silicon computer.
 
+For the current Mac Mini continuation, run these two commands without arguments:
+
+```sh
+./tools/cloud-disk-observe.sh
+./tools/cloud-disk-archive.sh
+```
+
+The observer records completed health snapshots. The worker starts archive
+conversion, guarded Linux persistence checks, cloud recovery, and a 24-hour
+supervisor. Repeating either command reuses its existing jobs. The supervisor
+reconnects lost controllers and retries classified connection failures every
+minute; content-integrity failures require repair. It preserves running VMs and
+leaves active jobs running when its supervision window ends. Private state lives
+under `/private/tmp/virtualos-archive-conversion`. Only the archive operator loads
+the protected existing Ai R2 token and derives its current S3 identity in memory;
+credentials stay on the operator Mac. No new account token is created.
+The live Mini relay transport reads its token from the existing protected file;
+the token is absent from its process arguments. Private relay traffic refuses
+redirects and ignores ambient proxy settings.
+
+The observer also checks the relay independently of SSH. A private
+`ssh-route.json` in the job directory can select the verified local Mini route
+(`{"route":"pinned-lan"}`) when the Cloudflare SSH transport is unavailable.
+This retains the protected SSH configuration's identity and pinned host key.
+Remove that route file to use the Cloudflare transport again.
+
+New desktop VM configurations keep host clipboard forwarding disabled.
+Set `VOS_SHARE_CLIPBOARD=1` in the app's launch environment to opt in deliberately.
+This setting takes effect when creating the next VM instance; it does not change
+an already running guest.
+
+Guest typing now waits for delivery before the next action. Python clients also
+refuse shifted characters on older headless supervisors that would replace them
+with the wrong key. The replacement supervisor supports printable ASCII and
+Return/Tab; its compiled mapping tests pass. Its new keyboard mapping requires
+a controlled supervisor restart before it is available in existing fleet VMs.
+
 > One program. Many Macs. Every computer a stream. See [MANIFESTO.md](MANIFESTO.md) for what virtualOS is becoming and the terrain it stands on — virtualization and containerization, filesystems, Linux, arm64 binaries, and web assemblies.
 
 On first start, the latest macOS restore image can be downloaded from Apple servers. After installation has finished, you can start using the virtual machine by performing the initial operating system (OS) setup.
@@ -83,8 +120,8 @@ VOS_VM_URL=http://127.0.0.1:18845 ./tools/vosctl computer doctor
 `doctor` checks the guest screenshot without sending input. If the image is
 blank, model control stops before taking a task action. Wake or unlock the
 guest explicitly with `./tools/computer-wake.sh`, then run the check again. The
-wake script tries one Space key and, if the image remains blank, one bottom-left
-guest click before stopping.
+wake script tries one Space key, checks the image three times, and then stops
+if the display remains blank.
 `./tools/computer-unlock.sh` uses the configured local guest password only
 when OCR confirms the central password prompt and lock-screen clock.
 
@@ -102,6 +139,25 @@ The installed `qwen3.5:0.8b` vision model can run locally on the Mini through
 Ollama. Its click locations use normalized 0–1000 coordinates, which the
 adapter maps to the guest screenshot. Add `--act` only when the model should
 perform the bounded guest action; the default records a shadow proposal.
+The fleet brain also offers an optional OCR perception mode for small text
+models. It sends bounded detected text rather than the image and accepts clicks
+only on detected target indexes. The request limits CPU threads, context and
+output, requests no persistent model residency, and keeps the existing resource
+guard. Additional admission checks require an installed model at most 512 MiB,
+6 GiB available memory, no active swap-outs and a single VM/worker; a private
+lock prevents overlapping OCR sessions. Requests use the checked manifest's full
+local digest reference; unsupported servers must refuse instead of falling back
+to a mutable model tag. Every request rechecks resources and model residency.
+Frame byte and JPEG pixel bounds protect OCR admission; changed frames prevent
+input. Transport and trace failures retain action evidence without automatic
+replay. Its focused tests pass. A separate private signed runtime on the Mini
+has resolved the exact small-model manifest without loading weights, and its
+backend lifecycle and network sandbox checks pass. Every runtime file is
+checked against a pinned inventory derived from the archive matching
+[official release metadata](tools/experiments/private-runtime-provenance-20261019.json).
+Live OCR inference and
+independent task completion remain unverified while resource admission defers
+the trial. See [the readiness receipt](tools/experiments/ocr-runner-readiness-20261019.json).
 The host resource baseline and browser, terminal, agent, and VM optimization
 order are in [tools/OPTIMIZATION_WORK.md](tools/OPTIMIZATION_WORK.md). Use
 `./tools/computer-optimize.sh --status` for a read-only Mini snapshot and
@@ -257,22 +313,47 @@ allocated blocks that contain zeros, so it cannot estimate additional
 this metadata alone.
 
 The current VM backup workflow uses the existing shell tools:
+`./tools/computer-backup-status.sh` reports the detached backup, monitor,
+receipt, R2 progress, clone, and guest screen without changing the VM or archive.
 `./tools/computer-r2-sync.sh vm-backup-detached` takes a stopped APFS clone,
 restarts the VM, streams a gzip archive to the private Ai R2 bucket, then
 downloads the object and checks its SHA-256 before saving a local receipt and
-discarding the clone. `vm-usage` logs stored bytes, pending multipart bytes,
+discarding the clone. `vm-resume-detached` recovers one interrupted multipart
+archive from the existing clone without restarting the VM. It regenerates the
+archive on the Mini and checks every existing part's MD5 before uploading any new part;
+a mismatch stops without discarding the clone or uploaded parts. It then
+downloads the complete object and checks the full SHA-256. Its private pending
+receipt records the clone identity and survives an interruption between completion
+and audit, so a subsequent resume can retry the audit for that same clone.
+Only new archive bytes cross SSH. The part list travels over stdin rather than
+the command line, so large archives remain resumable within macOS command-length
+limits. One upcoming 8 MiB read overlaps the current R2 upload. `vm-usage` logs
+stored bytes, pending multipart bytes,
 and a gross 30-day storage estimate to
 `~/.config/virtualos/r2-usage.jsonl`; `vm-account-usage` logs account-wide
 Class A and B counts plus this bucket's upload and download bytes. These are
 usage measurements, not a Cloudflare bill. `vm-audit` repeats the full
 download check. `vm-abort` aborts incomplete VM uploads and leaves the clone
-in place; `vm-stop` also stops the uploader and releases the clone. The backup
+in place; `vm-halt-preserve` stops the uploader while retaining both the clone
+and incomplete multipart upload for resumption, and
+`vm-stop` also releases the clone. The backup
 log is `~/Library/Logs/virtualos-vm-backup.log` on the
 operator Mac. `vm-estimate` uses the R2 multipart progress and the Mini's
 current source read offset to estimate remaining time; the compression ratio
 can change later in the disk. `vm-monitor-detached` checks bucket usage and
-Mini free space for up to 16 hours, stopping the backup and releasing its clone
-if host free space falls below 10 GiB. These commands do not replace the
+Mini free space for up to 16 hours, stopping the upload while retaining its clone
+and multipart progress
+if host free space falls below 10 GiB. If SSH disappears, the monitor keeps
+waiting and resumes the existing transfer when the clone is complete, closed,
+and has at least 10 GiB of host disk reserve. Integrity failures refuse automatic
+recovery. Up to five restart attempts are allowed; `VOS_VM_MONITOR_RESTARTS`
+sets that bound. `VOS_VM_MONITOR_HOURS=48` starts a longer bounded watch.
+`vm-monitor-stop`, `vm-halt-preserve`, and `vm-stop` write an explicit monitor
+stop marker so automatic recovery does not undo an intentional pause. Starting
+`vm-monitor-detached` clears that marker. Guest `computer-stop` is separate.
+Set `VOS_VM_SSH_HOST` to an existing SSH alias or address for VM backup, resume,
+monitor, and status commands when the default LAN route is unavailable.
+These commands do not replace the
 Mini's live VM disk.
 
 Cloudflare R2 Standard storage includes 10 GB-month and one million Class A
@@ -413,12 +494,16 @@ required. The existing Ai account may be used with scoped credentials.
 Start and verify this NBD server before `start.sh` in R2 lab mode; `start.sh`
 does not launch the server. An established guest NBD socket now remains open
 while idle, so a quiet guest does not consume the bounded reconnect slots.
-The local-only `tools/cloud_disk_checkpoint.py` prototype snapshots up to
+The bounded `tools/cloud_disk_checkpoint.py` prototype snapshots up to
 16 MiB of overlay blocks against a pinned base manifest and restores them
-after verifying hashes and SQLite integrity. Its disposable roundtrip and
-corruption tests pass through `--cloud-disk-self-test`. It has no R2 upload or
-retention path, so writes made after a remote base image would still be lost
-with the local overlay if the host is lost.
+after verifying hashes and SQLite integrity. Its R2 path uploads immutable
+objects, verifies readbacks and publishes the manifest last; see the durability
+proof in `tools/CLOUD_DISK.md`. October 18 tests also proved that a checkpoint
+taken with an active SQLite connection restores earlier contents into a new
+overlay while preserving later edits in the current overlay. Checkpoint inputs
+refuse symlinks, FIFOs, hard links and shared-writable files. Scheduled retention
+and switching a running guest to an undo checkpoint remain unfinished; ordinary
+guest writes still need an explicit checkpoint to survive loss of the host.
 `./tools/computer-space.sh --cloud-disk-r2-upload-clone` is the matching
 opt-in pack/upload path for the stopped APFS staging clone. It compresses one
 4 MiB RAW chunk at a time, conditionally writes SHA-addressed objects, checks
@@ -492,7 +577,8 @@ alive and checks the private R2 receipt hourly for up to ten hours. It downloads
 and audits the archive when the receipt changes or six hours have passed since
 the last audit.
 `--once` checks one cycle; `~/.config/virtualos/computer-work-stop` ends the
-local loop. The archive audit waits while the operator Mac has less than 1 GiB
+local loop. `./tools/computer-work.sh --status` reports the detached worker and
+its latest log lines. The archive audit waits while the operator Mac has less than 1 GiB
 free. It never approves examples or uploads a new archive.
 
 The current small-model work has separate `.sh` entrypoints:
@@ -512,6 +598,12 @@ remain for offline inference. They use no private guest screenshots. The router 
 and 98/108 held-out within-design pairs. These scores do not establish
 general Xcode GUI control or overall UX judgment. See
 `tools/OPTIMIZATION_WORK.md` for provenance, commands, and limits.
+`./tools/computer-hf.sh --verify` audits the private Hub copies when the current
+token can read them; `./tools/computer-model-test.sh` checks both plain and
+bundled local API inference on loopback.
+`./tools/computer-train.sh --router|--design|--critique` reproduces each public
+training run in a private temporary directory and checks the output against the
+local served artifacts without replacing them.
 `./tools/computer-model-api.sh --start-mini` serves these compact models on the
 Mini's private VM bridge with bearer authentication. The running API exposes
 route advice, written-critique ratings, and design variant comparison. See

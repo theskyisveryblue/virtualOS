@@ -1,0 +1,52 @@
+{
+  "current_dependency_package_receipt": "tools/experiments/compressed-shared-disk-mini-20261020.json",
+  "current_dependency_regressions_passed": 43,
+  "current_dependency_tests_passed": 28,
+  "default_requires_shared_storage": true,
+  "evaluator_review_passed": true,
+  "existing_live_disks_migrated": false,
+  "existing_live_disks_retired": false,
+  "full_local_clone_requires_explicit_opt_in": true,
+  "installed_path_verified": true,
+  "mini_tests_passed": 17,
+  "operator_tests_passed": 17,
+  "private_dependency_package_retained": true,
+  "receipts": [
+    "tools/experiments/compact-provisioning-mini-20261020.json",
+    "tools/experiments/compact-provisioning-installed-check-20261020.json"
+  ],
+  "schema": "virtualos-compact-provisioning-verification/v1",
+  "services_changed": false,
+  "source_sha256": {
+    "PLAN.md": "8f7ff3a6ab3e720cd7dad984d71534e151fbb6a484be740e95b820c78f1c7997",
+    "tools/CLOUD_DISK.md": "8a1acaeda665c04f61c419ab10bf8d9e93b06e15025c57dd6c50bbae857d6153",
+    "tools/FLEET.md": "99c2eaf04597f182777535549572db3f5c337895e51971edab93ca2ec8c726ff",
+    "tools/cloud_disk.py": "023104b7c41a6d4dee2cd44ce489c1bd6544b61056a6926517d396bf743c4e3c",
+    "tools/computer-space.sh": "d332647f9d941f58ae57490e04f96ccde79c7b34e66600f6f05959e27549362f",
+    "tools/fleet/go-live.sh": "162d0fa64eb41303d59f4e3094481f6b3ea3ae239322ad0b31f6273c07ef4271",
+    "tools/fleet/shared_disk.py": "f3a594f415724fd10189ab65867367544ec897e7d5f17b304e79b334d1f2befd",
+    "tools/fleet/test_go_live.py": "04e196cad5beaa825988fe79c19da3814387f32c02bc2fc6f4e2bb7d9594d19e"
+  },
+  "verified_at": "2026-10-21T00:58:02.290873+00:00",
+  "historical_source_sha256": {
+    "PLAN.md": "8f7ff3a6ab3e720cd7dad984d71534e151fbb6a484be740e95b820c78f1c7997",
+    "tools/CLOUD_DISK.md": "8a1acaeda665c04f61c419ab10bf8d9e93b06e15025c57dd6c50bbae857d6153",
+    "tools/FLEET.md": "99c2eaf04597f182777535549572db3f5c337895e51971edab93ca2ec8c726ff",
+    "tools/cloud_disk.py": "2b273187a7608d7de56f4f25c70cd54d122229576a837dd6d32b6562ae50ce75",
+    "tools/computer-space.sh": "d332647f9d941f58ae57490e04f96ccde79c7b34e66600f6f05959e27549362f",
+    "tools/fleet/go-live.sh": "162d0fa64eb41303d59f4e3094481f6b3ea3ae239322ad0b31f6273c07ef4271",
+    "tools/fleet/shared_disk.py": "654d08b35eebc57f8ec34e51a34d0bb30df8e4a2f27fc02c92b669d2b3a80281",
+    "tools/fleet/test_go_live.py": "8952bcadead791284b0ac6a1187abbd38f375512b88047c5401cb99a65daf53e"
+  },
+  "current_source_validation": {
+    "observed_at": "2026-10-21T19:54:03.418308+00:00",
+    "regression_receipt": "tools/experiments/compressed-writes-mini-verification-20261021.json",
+    "regression_receipt_sha256": "8ec62484911d2ed4ae1bb7bc229ddd3a49b6cac235ee3e18bbe499565f40b515",
+    "mini_tests_passed": 55,
+    "mini_disk_self_test_passed": true,
+    "default_raw_write_format_preserved": true,
+    "new_compressed_write_format_is_opt_in": true,
+    "historical_deployment_evidence_retained": true,
+    "activation_of_new_write_codec_claimed": false
+  }
+}

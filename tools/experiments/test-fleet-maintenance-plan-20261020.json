@@ -1,0 +1,100 @@
+{
+  "candidate": {
+    "active_binary_sha256": "e326458b651e982ad03fed7f2b339113af9a80a06c435fc6f45b53b1d09c997f",
+    "candidate_path": "/Users/ai/vos-fleet/.local/maintenance/native-http-20261019/supervisor.candidate",
+    "candidate_sha256": "262a53ea51283ef00c7c8a8c4e6e4de0a41138ed521934ffe587841a4576f1db"
+  },
+  "current_recovery_constraints": {
+    "minimum_free_disk_gib": 14,
+    "minimum_free_memory_percent": 50,
+    "observed_free_disk_bytes": 9687748608,
+    "resource_and_test_fleet_approval_pending": true,
+    "two_macos_slots_occupied": true
+  },
+  "failure_handling": [
+    "never stop production or Linux to obtain capacity or memory",
+    "never retire either running local disk based on this maintenance",
+    "on candidate failure restore the original verified supervisor and test fleet under resource admission",
+    "an integrity failure stops recovery and requires investigation rather than publishing success"
+  ],
+  "host_firewall_or_filevault_changes_included": false,
+  "live_ocr_inference_included": false,
+  "observed_service_configuration": {
+    "stream_can_start_or_stop_guests": false,
+    "test_fleet_keep_alive_present": false,
+    "test_fleet_label": "com.virtualos.fleet",
+    "test_fleet_launch_arguments_start_vm": true,
+    "test_fleet_run_at_load": true,
+    "watchdog_keep_alive": true,
+    "watchdog_label": "com.virtualos.fleet-watchdog"
+  },
+  "prepared_at": "2026-10-20T23:51:49.042048+00:00",
+  "prerequisite_state": {
+    "fresh_vm_start_admission_checked": false,
+    "independent_full_r2_readback_verified": true,
+    "readback_receipt": "tools/experiments/r2-independent-base-readback-20261019.json",
+    "test_fleet_maintenance_explicitly_approved": false
+  },
+  "prerequisites": [
+    "completed independent full R2 raw-disk SHA-256 audit",
+    "explicit approval to stop and restart only the test fleet VM/supervisor",
+    "fresh identity, binary checksum, configuration and resource checks",
+    "retain a private verified original supervisor backup"
+  ],
+  "preserve": [
+    "production virtualOS process and machine disk",
+    "existing Linux guest and disk",
+    "all global model processes and stores",
+    "archive objects, published manifest and current audit",
+    "existing LaunchAgent plist contents"
+  ],
+  "purpose": [
+    "free one macOS slot for the independent R2 recovery boot proof",
+    "activate the tested keyboard and native HTTP supervisor candidate afterwards"
+  ],
+  "r2_manifest_sha256": "40f4506a2a21af31d82bca6c900e5d197842d9dd777cc130aa227e29336f6963",
+  "readiness_receipt": "tools/experiments/maintenance-readiness-20261020.json",
+  "recovery_ownership_hardening": {
+    "active_readback_job_restarted": false,
+    "future_control_requires_own_pid_loopback_listener": true,
+    "mini_fixture_receipt": "tools/experiments/recovery-private-fixtures-20261019.json",
+    "mini_python39_focused_tests_passed": 26,
+    "operator_focused_tests_passed": 26,
+    "source_sha256": {
+      "tools/cloud_disk_recovery.py": "5e5d74b0ac6ee3e4ab5e91549870ace283edc39ab9ae3f1649ce2c0b7106269f",
+      "tools/test_cloud_disk_recovery.py": "a3f4f0647de30d15f7c4adb7d9913be5599d5e881dfc197bcf8aae8eab90d481"
+    }
+  },
+  "schema": "virtualos-test-fleet-maintenance-plan/v1",
+  "sequence": [
+    "verify actual com.virtualos.fleet and com.virtualos.fleet-watchdog identities and saved plist hashes",
+    "unload only com.virtualos.fleet-watchdog through launchd; its KeepAlive means killing its PID alone is insufficient",
+    "stop only vm-a and require completed idle state with no lastError; retain its bundle and supervisor while the recovery watcher observes the free slot",
+    "allow the resource-guarded disposable R2 proof to attempt two boots and verify overlay persistence plus disk-service restart",
+    "review both fresh boot frames independently; frames_ready_for_visual_review does not establish guest_boot_verified",
+    "confirm every disposable proof process has stopped before reusing the macOS slot",
+    "atomically install the checksum-pinned supervisor candidate with a verified backup",
+    "check fresh guest admission before bootstrapping com.virtualos.fleet, whose --start arguments launch vm-a",
+    "verify fresh guest frames, input parity and origin/framing refusal",
+    "bootstrap the saved watchdog service and verify fresh relay heartbeats"
+  ],
+  "services_changed_by_preparation": false,
+  "source_sha256": {
+    "tools/fleet/FleetSupervisor.swift": "9691bec50bf63ba59b0463bf8e1fc7245dd8636cf967d03dbbb6830764c9dfea",
+    "tools/fleet/fleet.entitlements": "2326352f239ebc33029b53d7c3e53d349da7ce0affb96c112a59d202e75d6f7e",
+    "tools/fleet/native_http_boundary_test.py": "18d6c882657e4b32bad18ee13e49d4cbbf80d2c769a1eb9f0becd6f5f29410dd",
+    "virtualOS/Model/HostScreenshotServer.swift": "1eb44658997bc21940cb53978ec97fab84abaf8da61ac641d9f7d407d9590635",
+    "virtualOS/Model/VMCommandServer.swift": "3db087903c2e31a2de7413562cea6ac5db747f14e8a42620a59ee6e38fc21c27"
+  },
+  "state": "refreshed_verified_not_authorized_or_activated",
+  "work_control": {
+    "controller_tests_passed": 40,
+    "controller_verification_receipt": "tools/experiments/agent-control-verification.json",
+    "current_task": "maintenance_readiness",
+    "does_not_grant_vm_or_host_approval": true,
+    "entrypoints": [
+      "./tools/cloud-disk-observe.sh",
+      "./tools/cloud-disk-archive.sh"
+    ]
+  }
+}

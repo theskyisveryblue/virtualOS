@@ -1,0 +1,27 @@
+{
+  "observed_at": "2026-10-21T20:32:11.242129+00:00",
+  "post_migration_write_rollback_tests_passed": 1,
+  "post_migration_writes_preserved": true,
+  "older_raw_backup_not_used_as_current_state": true,
+  "compressed_and_original_raw_sources_unchanged": true,
+  "raw_backend_full_fixture_readback_verified": true,
+  "real_snapshot_round_trip_receipt": "tools/experiments/compressed-overlay-snapshot-verification-20261021.json",
+  "restore_order_documented": "tools/OPTIMIZATION_WORK.md",
+  "live_services_changed": false,
+  "source_sha256": {
+    "tools/OPTIMIZATION_WORK.md": "9389246ffd0ae42bd9e8ef24c09b4451951b7f8225c8735b141ca0fa77991276",
+    "tools/compressed_delta.py": "e62350e1b2003f8ccc7b8d8b9a0053f8d57ccefc6ee8b2bf3ea52959fccdacc6",
+    "tools/compressed_write_overlay.py": "eeb0cc47585535af2f3193440485924c26459f19b1edf855059c920c95d1e07d",
+    "tools/test_overlay_rollback.py": "5093c1e0a8b3b379736586b63c938fa0547190cede34e75a0807527ad63fe8f1"
+  },
+  "prior_runbook_sha256": "0362c0a62852292ee4e319e742b9a445807e0948273a0856ca59cb4e66ec9397",
+  "runbook_append_preserved_existing_rollback_order": true,
+  "historical_source_sha256": {
+    "tools/OPTIMIZATION_WORK.md": "8cbac4dc5b62e2edcf28d5fd883a7f34e7353512caec4f05c62ae7a076fb43de",
+    "tools/compressed_delta.py": "e62350e1b2003f8ccc7b8d8b9a0053f8d57ccefc6ee8b2bf3ea52959fccdacc6",
+    "tools/compressed_write_overlay.py": "eeb0cc47585535af2f3193440485924c26459f19b1edf855059c920c95d1e07d",
+    "tools/test_overlay_rollback.py": "5093c1e0a8b3b379736586b63c938fa0547190cede34e75a0807527ad63fe8f1"
+  },
+  "source_reviewed_at": "2026-10-21T21:38:39.059287+00:00",
+  "source_review": "Existing growth algorithm and six-step rollback instructions unchanged. Additive fixed snapshot-audit dispatch and documentation reviewed; current applicable tests passed. Historical observations retained."
+}

@@ -1,0 +1,23 @@
+{
+  "block_count": 25404,
+  "block_readback_source": "completed transfer before manifest size-limit failure",
+  "delta_manifest_sha256": "cb3b06e85a39a8fc875af693da227d214bca641e66d73ea780b17fa73c5ca8f4",
+  "highest_changed_byte": 26842693632,
+  "manifest_bytes": 5124493,
+  "manifest_publication_resumed": true,
+  "readback_verified": true,
+  "reused_bytes": 70363656,
+  "signing": "operator_only",
+  "source_blocks": 25404,
+  "source_delta_sha256": "06750008529cc97d08070bf516d8664e8780995b47d92c52a1f6f72a4b63e4f0",
+  "source_raw_bytes": 1664876544,
+  "uploaded_bytes": 749523494,
+  "r2_machine_upload": "verified",
+  "scope": "real-machine delta upload; recovery recorded separately",
+  "verified_at": "2026-10-13T00:02:45.544904+00:00",
+  "account_id": "c24a3fb4bedba669785c18c834f51921",
+  "bucket": "virtualos-cloud-disks",
+  "object_prefix": "fleet/vm-shared-20261012-verified",
+  "required_base_sha256": "b8d7a8499d279c74f3f9c9fa13f91fb498f95f14a08c79c403adf4edd3548321",
+  "required_base_bytes": 32212254720
+}

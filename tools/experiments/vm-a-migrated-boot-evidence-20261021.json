@@ -1,0 +1,118 @@
+{
+  "observed_at": "2026-10-21T18:29:06.717818+00:00",
+  "fleet": {
+    "count": 1,
+    "instances": [
+      {
+        "ready": true,
+        "error": "",
+        "bundle": "/Users/ai/vos-fleet/machines/vm-a.bundle",
+        "name": "vm-a",
+        "controlPort": 9125,
+        "state": "running"
+      }
+    ],
+    "ok": true,
+    "basePort": 9125,
+    "root": "/Users/ai/vos-fleet/machines",
+    "capability": {
+      "nestedVirtualizationSupported": true,
+      "nestedVirtualizationReason": "supported",
+      "platform": "macOS Version 26.2 (Build 25C56)"
+    }
+  },
+  "parameters": {
+    "cpuCount": 4,
+    "memorySizeInGB": 4,
+    "screenWidth": 1500,
+    "screenHeight": 900,
+    "nbdURL": "nbd://127.0.0.1:40991/virtualos-test"
+  },
+  "runtime_overlay_blocks": 4490,
+  "runtime_overlay_bytes": 296861696,
+  "runtime_overlay_wal_bytes": 304912,
+  "original_disk_retained": true,
+  "original_disk_closed": true,
+  "preserved_processes": "  440 /Applications/virtualOS.app/Contents/MacOS/virtualOS\n 2499 ./tools/fleet/linux-guest\n",
+  "resources": {
+    "background_work": "allowed",
+    "cpu_count": 10,
+    "disk_free_kib": 16874048,
+    "families": {
+      "ai_agents": {
+        "processes": 2,
+        "sum_rss_mib": 1503.0
+      },
+      "browser_apps": {
+        "processes": 23,
+        "sum_rss_mib": 320.7
+      },
+      "browser_engines": {
+        "processes": 122,
+        "sum_rss_mib": 3307.1
+      },
+      "simulator_runtime": {
+        "processes": 0,
+        "sum_rss_mib": 0.0
+      },
+      "terminal": {
+        "processes": 1,
+        "sum_rss_mib": 5.9
+      },
+      "virtualos": {
+        "processes": 4,
+        "sum_rss_mib": 859.3
+      }
+    },
+    "load_one": 12.83,
+    "memory_free_percent": 28,
+    "reasons": [],
+    "rss_note": "RSS sums can count shared pages more than once and omit paged-out memory",
+    "swap_used_mib": 5600,
+    "top_executables": [
+      {
+        "name": "Google Chrome",
+        "processes": 78,
+        "sum_rss_mib": 2651.1
+      },
+      {
+        "name": "ollama",
+        "processes": 2,
+        "sum_rss_mib": 1503.0
+      },
+      {
+        "name": "com.apple.Virtualization.VirtualMachine",
+        "processes": 3,
+        "sum_rss_mib": 848.3
+      },
+      {
+        "name": "com.apple.WebKit.WebContent",
+        "processes": 7,
+        "sum_rss_mib": 489.1
+      },
+      {
+        "name": "Paper",
+        "processes": 7,
+        "sum_rss_mib": 137.6
+      },
+      {
+        "name": "Figma",
+        "processes": 9,
+        "sum_rss_mib": 132.8
+      },
+      {
+        "name": "Google Chrome for Testing",
+        "processes": 8,
+        "sum_rss_mib": 46.1
+      },
+      {
+        "name": "Pen",
+        "processes": 4,
+        "sum_rss_mib": 37.9
+      }
+    ]
+  },
+  "supervisor_binary_sha256": "e326458b651e982ad03fed7f2b339113af9a80a06c435fc6f45b53b1d09c997f",
+  "frame_path": "/Users/theone/Documents/GitHub/virtualOS/tools/.private/vm-a-migration-20261021/boot-desktop-final.jpg",
+  "frame_sha256": "36f313512bf381329880d97f04e61205fd3a7116ca4501f94c8b3d56ca76b4b6"
+}

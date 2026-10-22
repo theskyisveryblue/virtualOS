@@ -1,0 +1,390 @@
+{
+  "/Users/ai/vos-fleet/.local": [
+    {
+      "bytes": 1166790656,
+      "path": "/Users/ai/vos-fleet/.local"
+    },
+    {
+      "bytes": 1166622720,
+      "path": "/Users/ai/vos-fleet/.local/maintenance"
+    },
+    {
+      "bytes": 1138524160,
+      "path": "/Users/ai/vos-fleet/.local/maintenance/ollama-metadata-20261019"
+    },
+    {
+      "bytes": 23040000,
+      "path": "/Users/ai/vos-fleet/.local/maintenance/linux-maintained-selection-q2finx58"
+    },
+    {
+      "bytes": 2633728,
+      "path": "/Users/ai/vos-fleet/.local/maintenance/native-app-20261019"
+    },
+    {
+      "bytes": 647168,
+      "path": "/Users/ai/vos-fleet/.local/maintenance/ocr-readiness-20261019"
+    },
+    {
+      "bytes": 487424,
+      "path": "/Users/ai/vos-fleet/.local/maintenance/native-http-20261019"
+    },
+    {
+      "bytes": 364544,
+      "path": "/Users/ai/vos-fleet/.local/maintenance/compressed-shared-disk-20261020"
+    },
+    {
+      "bytes": 327680,
+      "path": "/Users/ai/vos-fleet/.local/maintenance/compact-overlay-20261020"
+    },
+    {
+      "bytes": 208896,
+      "path": "/Users/ai/vos-fleet/.local/maintenance/compact-provisioning-20261020"
+    },
+    {
+      "bytes": 135168,
+      "path": "/Users/ai/vos-fleet/.local/maintenance/recovery-review-20261019"
+    },
+    {
+      "bytes": 102400,
+      "path": "/Users/ai/vos-fleet/.local/maintenance/offline-overlay-compact-20261020"
+    },
+    {
+      "bytes": 98304,
+      "path": "/Users/ai/vos-fleet/.local/maintenance/legacy-relay-review-20261019"
+    },
+    {
+      "bytes": 69632,
+      "path": "/Users/ai/vos-fleet/.local/relay-reader-migration-azzv2mip"
+    },
+    {
+      "bytes": 57344,
+      "path": "/Users/ai/vos-fleet/.local/watchdog-vm-budget-m4t60iij"
+    },
+    {
+      "bytes": 32768,
+      "path": "/Users/ai/vos-fleet/.local/watchdog-vm-budget-m4t60iij/isolated-tests"
+    },
+    {
+      "bytes": 28672,
+      "path": "/Users/ai/vos-fleet/.local/maintenance/fleet-mux-review-20261019"
+    },
+    {
+      "bytes": 24576,
+      "path": "/Users/ai/vos-fleet/.local/poller-session-security-s4s9db7m"
+    }
+  ],
+  "/Users/ai/Library/Caches/pen-updater": [
+    {
+      "bytes": 905859072,
+      "path": "/Users/ai/Library/Caches/pen-updater"
+    },
+    {
+      "bytes": 453750784,
+      "path": "/Users/ai/Library/Caches/pen-updater/pending"
+    }
+  ],
+  "/Users/ai/Library/Caches/com.figma.Desktop.ShipIt": [
+    {
+      "bytes": 639320064,
+      "path": "/Users/ai/Library/Caches/com.figma.Desktop.ShipIt"
+    },
+    {
+      "bytes": 319950848,
+      "path": "/Users/ai/Library/Caches/com.figma.Desktop.ShipIt/update.mcnF8xU/Figma.app"
+    },
+    {
+      "bytes": 319950848,
+      "path": "/Users/ai/Library/Caches/com.figma.Desktop.ShipIt/update.mcnF8xU"
+    },
+    {
+      "bytes": 319361024,
+      "path": "/Users/ai/Library/Caches/com.figma.Desktop.ShipIt/update.rif0ZJE/Figma.app"
+    },
+    {
+      "bytes": 319361024,
+      "path": "/Users/ai/Library/Caches/com.figma.Desktop.ShipIt/update.rif0ZJE"
+    }
+  ],
+  "/Users/ai/Library/Caches/com.todesktop.2601167vjw8xe.ShipIt": [
+    {
+      "bytes": 358305792,
+      "path": "/Users/ai/Library/Caches/com.todesktop.2601167vjw8xe.ShipIt"
+    },
+    {
+      "bytes": 358297600,
+      "path": "/Users/ai/Library/Caches/com.todesktop.2601167vjw8xe.ShipIt/update.CGBmw8m/Paper.app"
+    },
+    {
+      "bytes": 358297600,
+      "path": "/Users/ai/Library/Caches/com.todesktop.2601167vjw8xe.ShipIt/update.CGBmw8m"
+    }
+  ],
+  "/Users/ai/Documents/GitHub/xcanvas": [
+    {
+      "bytes": 10937679872,
+      "path": "/Users/ai/Documents/GitHub/xcanvas"
+    },
+    {
+      "bytes": 9290485760,
+      "path": "/Users/ai/Documents/GitHub/xcanvas/.local"
+    },
+    {
+      "bytes": 5009887232,
+      "path": "/Users/ai/Documents/GitHub/xcanvas/.local/extended-fleets"
+    },
+    {
+      "bytes": 3392221184,
+      "path": "/Users/ai/Documents/GitHub/xcanvas/.local/model-intake"
+    },
+    {
+      "bytes": 887435264,
+      "path": "/Users/ai/Documents/GitHub/xcanvas/.local/fleet-recovery"
+    },
+    {
+      "bytes": 659976192,
+      "path": "/Users/ai/Documents/GitHub/xcanvas/figma-clone"
+    },
+    {
+      "bytes": 653250560,
+      "path": "/Users/ai/Documents/GitHub/xcanvas/figma-clone/audit"
+    },
+    {
+      "bytes": 318816256,
+      "path": "/Users/ai/Documents/GitHub/xcanvas/node_modules"
+    },
+    {
+      "bytes": 194732032,
+      "path": "/Users/ai/Documents/GitHub/xcanvas/framer-clone"
+    },
+    {
+      "bytes": 147910656,
+      "path": "/Users/ai/Documents/GitHub/xcanvas/dist"
+    },
+    {
+      "bytes": 146186240,
+      "path": "/Users/ai/Documents/GitHub/xcanvas/dist/dataset-review"
+    },
+    {
+      "bytes": 146149376,
+      "path": "/Users/ai/Documents/GitHub/xcanvas/public/dataset-review"
+    },
+    {
+      "bytes": 146149376,
+      "path": "/Users/ai/Documents/GitHub/xcanvas/public"
+    },
+    {
+      "bytes": 141619200,
+      "path": "/Users/ai/Documents/GitHub/xcanvas/node_modules/@cloudflare"
+    },
+    {
+      "bytes": 137973760,
+      "path": "/Users/ai/Documents/GitHub/xcanvas/framer-clone/reference"
+    },
+    {
+      "bytes": 96702464,
+      "path": "/Users/ai/Documents/GitHub/xcanvas/docs"
+    },
+    {
+      "bytes": 96464896,
+      "path": "/Users/ai/Documents/GitHub/xcanvas/docs/clone-fleet"
+    },
+    {
+      "bytes": 56225792,
+      "path": "/Users/ai/Documents/GitHub/xcanvas/framer-clone/node_modules"
+    }
+  ],
+  "/Users/ai/Documents/GitHub/new-logic-editor": [
+    {
+      "bytes": 5910081536,
+      "path": "/Users/ai/Documents/GitHub/new-logic-editor"
+    },
+    {
+      "bytes": 2189324288,
+      "path": "/Users/ai/Documents/GitHub/new-logic-editor/.git"
+    },
+    {
+      "bytes": 2154590208,
+      "path": "/Users/ai/Documents/GitHub/new-logic-editor/.git/objects"
+    },
+    {
+      "bytes": 2036039680,
+      "path": "/Users/ai/Documents/GitHub/new-logic-editor/node_modules"
+    },
+    {
+      "bytes": 405569536,
+      "path": "/Users/ai/Documents/GitHub/new-logic-editor/packages"
+    },
+    {
+      "bytes": 152793088,
+      "path": "/Users/ai/Documents/GitHub/new-logic-editor/node_modules/@cloudflare"
+    },
+    {
+      "bytes": 149630976,
+      "path": "/Users/ai/Documents/GitHub/new-logic-editor/cdn"
+    },
+    {
+      "bytes": 134213632,
+      "path": "/Users/ai/Documents/GitHub/new-logic-editor/cdn/themes"
+    },
+    {
+      "bytes": 132878336,
+      "path": "/Users/ai/Documents/GitHub/new-logic-editor/packages/cf-extractor"
+    },
+    {
+      "bytes": 123273216,
+      "path": "/Users/ai/Documents/GitHub/new-logic-editor/node_modules/miniflare"
+    },
+    {
+      "bytes": 119394304,
+      "path": "/Users/ai/Documents/GitHub/new-logic-editor/node_modules/workerd"
+    },
+    {
+      "bytes": 110981120,
+      "path": "/Users/ai/Documents/GitHub/new-logic-editor/packages/backend"
+    },
+    {
+      "bytes": 100757504,
+      "path": "/Users/ai/Documents/GitHub/new-logic-editor/emergency-response-coordination"
+    },
+    {
+      "bytes": 100749312,
+      "path": "/Users/ai/Documents/GitHub/new-logic-editor/create-an-institutional"
+    },
+    {
+      "bytes": 100749312,
+      "path": "/Users/ai/Documents/GitHub/new-logic-editor/build-a-clinical"
+    },
+    {
+      "bytes": 100737024,
+      "path": "/Users/ai/Documents/GitHub/new-logic-editor/inventory-operations-command"
+    },
+    {
+      "bytes": 100732928,
+      "path": "/Users/ai/Documents/GitHub/new-logic-editor/inventory-operations-command-2"
+    },
+    {
+      "bytes": 100732928,
+      "path": "/Users/ai/Documents/GitHub/new-logic-editor/fleet-maintenance-control"
+    }
+  ],
+  "/Users/ai/Documents/GitHub/openeditor-pages-release": [
+    {
+      "bytes": 2344759296,
+      "path": "/Users/ai/Documents/GitHub/openeditor-pages-release"
+    },
+    {
+      "bytes": 493912064,
+      "path": "/Users/ai/Documents/GitHub/openeditor-pages-release/41f1ed9b"
+    },
+    {
+      "bytes": 493117440,
+      "path": "/Users/ai/Documents/GitHub/openeditor-pages-release/8483b04c"
+    },
+    {
+      "bytes": 492081152,
+      "path": "/Users/ai/Documents/GitHub/openeditor-pages-release/485a25d1"
+    },
+    {
+      "bytes": 441622528,
+      "path": "/Users/ai/Documents/GitHub/openeditor-pages-release/64f4fdb7"
+    },
+    {
+      "bytes": 424026112,
+      "path": "/Users/ai/Documents/GitHub/openeditor-pages-release/27400a41"
+    },
+    {
+      "bytes": 160575488,
+      "path": "/Users/ai/Documents/GitHub/openeditor-pages-release/27400a41/packages"
+    },
+    {
+      "bytes": 160575488,
+      "path": "/Users/ai/Documents/GitHub/openeditor-pages-release/41f1ed9b/packages"
+    },
+    {
+      "bytes": 160567296,
+      "path": "/Users/ai/Documents/GitHub/openeditor-pages-release/8483b04c/packages"
+    },
+    {
+      "bytes": 160555008,
+      "path": "/Users/ai/Documents/GitHub/openeditor-pages-release/485a25d1/packages"
+    },
+    {
+      "bytes": 149630976,
+      "path": "/Users/ai/Documents/GitHub/openeditor-pages-release/485a25d1/cdn"
+    },
+    {
+      "bytes": 149630976,
+      "path": "/Users/ai/Documents/GitHub/openeditor-pages-release/8483b04c/cdn"
+    },
+    {
+      "bytes": 149630976,
+      "path": "/Users/ai/Documents/GitHub/openeditor-pages-release/64f4fdb7/cdn"
+    },
+    {
+      "bytes": 149630976,
+      "path": "/Users/ai/Documents/GitHub/openeditor-pages-release/27400a41/cdn"
+    },
+    {
+      "bytes": 149630976,
+      "path": "/Users/ai/Documents/GitHub/openeditor-pages-release/41f1ed9b/cdn"
+    },
+    {
+      "bytes": 108273664,
+      "path": "/Users/ai/Documents/GitHub/openeditor-pages-release/64f4fdb7/packages"
+    },
+    {
+      "bytes": 69115904,
+      "path": "/Users/ai/Documents/GitHub/openeditor-pages-release/64f4fdb7/dist"
+    },
+    {
+      "bytes": 69099520,
+      "path": "/Users/ai/Documents/GitHub/openeditor-pages-release/8483b04c/dist"
+    }
+  ],
+  "/Users/ai/Library/Developer/CoreSimulator": [
+    {
+      "bytes": 4778250240,
+      "path": "/Users/ai/Library/Developer/CoreSimulator/Devices"
+    },
+    {
+      "bytes": 4778250240,
+      "path": "/Users/ai/Library/Developer/CoreSimulator"
+    },
+    {
+      "bytes": 4686536704,
+      "path": "/Users/ai/Library/Developer/CoreSimulator/Devices/0F92165B-EFE9-4F39-B46A-7D0064BD3C22"
+    },
+    {
+      "bytes": 18341888,
+      "path": "/Users/ai/Library/Developer/CoreSimulator/Devices/427413A0-7D7F-4A67-9749-F016799E3763"
+    },
+    {
+      "bytes": 18341888,
+      "path": "/Users/ai/Library/Developer/CoreSimulator/Devices/90C51B5A-B1E7-4474-9EC1-DAEEC16A9443"
+    },
+    {
+      "bytes": 18341888,
+      "path": "/Users/ai/Library/Developer/CoreSimulator/Devices/3AC0C93A-B730-419D-B740-906F82EDC5C5"
+    },
+    {
+      "bytes": 18341888,
+      "path": "/Users/ai/Library/Developer/CoreSimulator/Devices/92237F91-6081-40DA-83B6-3CC9A636A78B"
+    },
+    {
+      "bytes": 18341888,
+      "path": "/Users/ai/Library/Developer/CoreSimulator/Devices/1F0DE28B-F50C-4138-95B9-2899D61966B8"
+    },
+    {
+      "bytes": 0,
+      "path": "/Users/ai/Library/Developer/CoreSimulator/Temp/BackgroundDelete"
+    },
+    {
+      "bytes": 0,
+      "path": "/Users/ai/Library/Developer/CoreSimulator/Temp"
+    },
+    {
+      "bytes": 0,
+      "path": "/Users/ai/Library/Developer/CoreSimulator/Caches"
+    }
+  ]
+}

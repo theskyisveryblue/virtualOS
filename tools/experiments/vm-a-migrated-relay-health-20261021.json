@@ -1,0 +1,12 @@
+{
+  "isStale": false,
+  "lastHeartbeatAgeSec": 6,
+  "instances": [
+    {
+      "name": "vm-a",
+      "ready": true,
+      "state": "running"
+    }
+  ],
+  "observed_at": "2026-10-21T18:28:37.579726+00:00"
+}

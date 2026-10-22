@@ -1,0 +1,18 @@
+{
+  "activation_authorized": false,
+  "future_proof_directory": "/Users/ai/vos-fleet/.local/maintenance/ocr-readiness-20261019/finder-documents-oneclick",
+  "guard_path": "/Users/ai/vos-fleet/tools/computer-resources.sh",
+  "guest_input_applied": false,
+  "inference_requested": false,
+  "mini_fixture_tests_passed": 13,
+  "prepared_at": "2026-10-19T03:32:52.382099+00:00",
+  "private_inference_server_started": false,
+  "private_model_stage": "/Users/ai/vos-fleet/.local/maintenance/ollama-metadata-20261019",
+  "schema": "virtualos-finder-documents-experiment-readiness/v1",
+  "source_path": "/Users/ai/vos-fleet/.local/maintenance/ocr-readiness-20261019/tools/fleet/finder_documents_proof.py",
+  "source_sha256": "7e7ee391ecf58c48bd73f98bfccc7a7a19e4107178b25b72abd2b2c3b5223511",
+  "task_verified": false,
+  "test_sha256": "30f4cbd56dfb149922eb1a8c72c6f5148e91018b2b691c5035097b618082c09a",
+  "ui_preconditions_verified": false,
+  "visual_review_required": true
+}

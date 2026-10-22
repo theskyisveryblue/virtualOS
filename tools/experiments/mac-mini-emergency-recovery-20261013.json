@@ -1,0 +1,46 @@
+{
+  "verified_at": "2026-10-13T20:02:13.875861+00:00",
+  "host_access_available": true,
+  "working_route": "emergency-cloudflare",
+  "hostname": "mac-mini.oto.house",
+  "remote_hostname": "ais-Mac-mini.local",
+  "ssh_host_key_alias": "192.168.1.123",
+  "strict_host_key_checking": true,
+  "ssh_config": "~/Documents/GitHub/realestate-machine/.local/mini-remote-20260915/ssh_config",
+  "existing_host_tunnel_account": "627fc76ba5e77537eb144fbb8b3eac2a",
+  "existing_host_tunnel_resources_changed": false,
+  "virtualos_cloud_account": "c24a3fb4bedba669785c18c834f51921",
+  "ai_tunnel_inventory": {"credential_source": "CloudScope credential vault", "credential_active": true, "tunnel_count": 0},
+  "guest_relay_live": true,
+  "fleet_vm_state": {"vm-a": "running"},
+  "production_virtualos_pid": 94084,
+  "fleet_supervisor_pid": 2301,
+  "cache_budget_fix": {
+    "deployed": true,
+    "path": "/Users/ai/vos-shared-fleet/tools/cloud_disk.py",
+    "previous_sha256": "46212566dedaf275ea28f150436799dfc86ef68935fe69d819d4fda2b297835d",
+    "deployed_sha256": "49cdb88f54c62baadc3ec2b0ef9e73c4a52061be563cac06d0c4f349de1147b6",
+    "previous_version_retained": true,
+    "mini_storage_self_test": "passed",
+    "test_temp_bytes_before_automatic_cleanup": 16203988,
+    "running_vm_disks_migrated": false
+  },
+  "cleanup_candidates_preserved": [
+    {"path": "/private/tmp/oe-git-fleet-mini-20261011", "reason": "running processes use checkout and dependencies"},
+    {"path": "/private/tmp/oe-mini-runtime-20261010", "reason": "running frontend processes use checkout and dependencies"},
+    {"path": "~/Library/Developer/CoreSimulator/Devices/0F92165B-EFE9-4F39-B46A-7D0064BD3C22", "reason": "simulator is booted"},
+    {"path": "~/Library/Caches/Contacts Network News Browser/Default/Cache", "reason": "open browser file detected; cleanup refused"}
+  ],
+  "independent_host_recovery_agent_installed": false,
+  "host_rebooted": false,
+  "global_ssh_config_changed": false,
+  "generated_build_cleanup": {
+    "target": "/Users/ai/Documents/GitHub/virtualOS/build/DerivedData",
+    "allocated_kib_before": 170088,
+    "actual_free_gain_bytes": 175337472,
+    "free_bytes_after": 24685256704,
+    "open_files_checked": true,
+    "no_swift_or_xcode_build_running": true,
+    "installed_app_preserved": true
+  }
+}

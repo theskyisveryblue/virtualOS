@@ -20,6 +20,7 @@ Commands:
 """
 
 import argparse
+from contextlib import closing
 import hashlib
 import json
 import os
@@ -183,17 +184,17 @@ def verify(base, machine, delta_dir, limit_blocks=None):
     delta_sqlite = Path(delta_dir) / "delta.sqlite"
     if not delta_sqlite.is_file():
         raise SystemExit("verify refused: no delta.sqlite in %s" % delta_dir)
-    delta = {}
-    db = sqlite3.connect(str(delta_sqlite))
-    for idx, data in db.execute("SELECT idx, data FROM blocks"):
-        delta[int(idx)] = bytes(data)
-    db.close()
-
     checked = mismatches = 0
-    base_bytes = machine_bytes = 0
-    base_total = machine_total = delta_bytes = 0
-    with open(base_path, "rb", buffering=0) as bstream, \
+    machine_total = delta_bytes = 0
+    with closing(sqlite3.connect(delta_sqlite.resolve().as_uri() + "?mode=ro", uri=True)) as db, \
+            open(base_path, "rb", buffering=0) as bstream, \
             open(machine_path, "rb", buffering=0) as mstream:
+        # A real machine delta can be gigabytes. Stream one sorted block at a
+        # time while a read transaction pins a consistent SQLite snapshot.
+        db.execute("BEGIN")
+        delta_count = db.execute("SELECT COUNT(*) FROM blocks").fetchone()[0]
+        rows = iter(db.execute("SELECT idx, data FROM blocks WHERE idx>=0 ORDER BY idx"))
+        current = next(rows, None)
         index = 0
         while True:
             if limit_blocks is not None and index >= limit_blocks:
@@ -202,9 +203,10 @@ def verify(base, machine, delta_dir, limit_blocks=None):
             if not raw:
                 break
             # The reconstructed block is the delta's, if present, else the base's.
-            if index in delta:
-                reconstructed = delta[index]
+            if current is not None and current[0] == index:
+                reconstructed = bytes(current[1])
                 delta_bytes += len(reconstructed)
+                current = next(rows, None)
             else:
                 bstream.seek(index * BLOCK)
                 reconstructed = bstream.read(len(raw))
@@ -215,19 +217,18 @@ def verify(base, machine, delta_dir, limit_blocks=None):
             checked += 1
             if hashlib.sha256(reconstructed).hexdigest() != hashlib.sha256(raw).hexdigest():
                 mismatches += 1
-            base_total += len(reconstructed)
             machine_total += len(raw)
             index += 1
 
-    # Any delta block past the machine's end would be an inconsistency.
-    stray = sum(1 for idx in delta if idx >= checked)
+        # Negative indexes and blocks past the compared machine are invalid.
+        stray = db.execute("SELECT COUNT(*) FROM blocks WHERE idx<0 OR idx>=?", (checked,)).fetchone()[0]
     manifest = {
         "base": _label(base),
         "machine": _label(machine),
         "blocks_checked": checked,
         "mismatches": mismatches,
         "stray_delta_blocks": stray,
-        "delta_blocks": len(delta),
+        "delta_blocks": delta_count,
         "delta_bytes": delta_bytes,
         "logical_bytes": machine_total,
         "round_trip_ok": mismatches == 0 and stray == 0,
@@ -284,11 +285,38 @@ def selftest():
         except SystemExit:
             caught = True
 
+        # A negative index must not silently disappear from reconstruction.
+        with sqlite3.connect(str(delta_dir / "delta.sqlite")) as db:
+            db.execute("UPDATE blocks SET data=? WHERE idx=5", (b"\xaa" * blk,))
+            db.execute("INSERT INTO blocks VALUES (?,?)", (-1, bytes(blk)))
+        negative_caught = False
+        try:
+            verify(base, machine, delta_dir)
+        except SystemExit:
+            negative_caught = True
+
+        # Bound Python memory independently of the total delta size: this
+        # fixture previously required retaining all 4 MiB of changed blocks.
+        import tracemalloc
+        with machine.open("wb") as stream:
+            for _ in range(66):
+                stream.write(b"\x5a" * blk)
+        diff(base, machine, delta_dir)
+        tracemalloc.start()
+        try:
+            streamed = verify(base, machine, delta_dir)
+            _, peak = tracemalloc.get_traced_memory()
+        finally:
+            tracemalloc.stop()
+        assert streamed["round_trip_ok"] and peak < 1024**2, "delta verifier retained the whole delta"
+
     result = {
-        "shared_base_selftest": "passed" if (good["round_trip_ok"] and caught) else "FAILED",
+        "shared_base_selftest": "passed" if (good["round_trip_ok"] and caught and negative_caught) else "FAILED",
         "round_trip_ok": good["round_trip_ok"],
         "corruption_caught": caught,
         "blocks_checked": good["blocks_checked"],
+        "negative_index_caught": negative_caught,
+        "streamed_verifier_peak_python_bytes": peak,
     }
     print(json.dumps(result, sort_keys=True))
     if result["shared_base_selftest"] != "passed":

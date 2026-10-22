@@ -1,0 +1,21 @@
+{
+  "checked_at": "2026-10-13T18:50:52.651755+00:00",
+  "host_access_available": false,
+  "lan_ssh": "192.168.1.123:22 timed out",
+  "cloudflare_ssh": "mac-mini.mergerealestate.ca failed DNS resolution",
+  "guest_relay_live": true,
+  "guest_relay_heartbeat_age_seconds": 1,
+  "fleet_vm_state": {"vm-a": "running"},
+  "emergency_controller_local": "127.0.0.1:8897 connection refused",
+  "recorded_emergency_tunnels": {
+    "toxic-filtering-engineer-anaheim.trycloudflare.com": "failed DNS resolution",
+    "factors-fortune-streets-profiles.trycloudflare.com": "failed DNS resolution"
+  },
+  "emergency_controller_handoff_age_hours": 2545.7,
+  "authorized_cloudflare_account_id": "c24a3fb4bedba669785c18c834f51921",
+  "legacy_rendezvous_source_account_matches": false,
+  "host_recovery_agent_deployed_by_this_work": false,
+  "cloud_cache_fix_deployed_to_mini": false,
+  "diagnostic": "python3 tools/mac_mini/check_remote_access.py",
+  "plan": "tools/mac_mini/README.md#emergency-access-and-recovery-plan"
+}

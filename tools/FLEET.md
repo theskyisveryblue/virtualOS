@@ -11,6 +11,14 @@ single-VM launch path.
 everything; this document explains it. Run `tools/computer-fleet.sh help` for the
 full command list.
 
+New machines prepared by `go-live.sh` require a shared disk configuration at
+`$VOS_FLEET_HOME/shared-disks/NAME.json` (the default fleet root is
+`~/vos-fleet`). This creates a diskless machine bundle backed by one shared
+base and a per-machine overlay. Existing local-disk machines still work.
+Set `VOS_ALLOW_LOCAL_CLONE=1` only when a full local production clone is
+deliberately needed. APFS clones share blocks initially, but diverging guest
+writes can grow their physical storage; their logical disk size stays full.
+
 ## Pieces
 
 | Layer | File | Role |
@@ -101,12 +109,14 @@ Check with `tools/fleet/runbook.sh capacity`. A fleet is therefore many machines
 
 ## Multiplexer + Cloudflare
 
-`fleet.py serve` exposes one endpoint that fans out to the supervisor — the
-"stream everything out of one pipe" surface:
+`fleet.py serve` exposes a loopback endpoint for native clients that fans out to
+the supervisor. It rejects browser Origin/fetch metadata and does not offer
+CORS. The old direct browser dashboard is unsupported; use the authenticated
+Worker `/console` for browser access.
 
 ```
-tools/computer-fleet.sh up vm-a,vm-b
-# mux -> http://127.0.0.1:9300/fleet/status
+tools/fleet/fleet.py serve --port 9300
+curl http://127.0.0.1:9300/fleet/status
 ```
 
 Cloudflare relay routes (host pushes with `AUTH_TOKEN`, browser reads with

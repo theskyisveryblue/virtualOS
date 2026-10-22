@@ -1,0 +1,94 @@
+{
+  "root": "/Users/ai/vos-fleet",
+  "files": {
+    "/Users/ai/vos-fleet/vm-a.bundle": {
+      "resolved": "/Users/ai/vos-fleet/vm-a.bundle",
+      "symlink": false
+    },
+    "/Users/ai/vos-fleet/machines/vm-a.bundle": {
+      "resolved": "/Users/ai/vos-fleet/vm-a.bundle",
+      "symlink": true
+    },
+    "/Users/ai/vos-fleet/tools/fleet/shared_disk.py": {
+      "resolved": "/Users/ai/vos-fleet/.local/maintenance/compressed-shared-disk-20261020/tools/fleet/shared_disk.py",
+      "symlink": true
+    },
+    "/Users/ai/vos-fleet/vm-a.bundle/Disk.img": {
+      "size": 32212254720,
+      "inode": 212790670,
+      "device": 16777232,
+      "mtime_ns": 1792552815878983856
+    },
+    "/Users/ai/vos-fleet/vm-a.bundle/MachineIdentifier": {
+      "size": 68,
+      "inode": 212790671,
+      "device": 16777232,
+      "mtime_ns": 1778462434115979250,
+      "sha256": "b895c793d6e0f2510a54cd7dd6c1cda2275ce10ead7016ad6c62cfbd4647b56a"
+    },
+    "/Users/ai/vos-fleet/vm-a.bundle/HardwareModel": {
+      "size": 132,
+      "inode": 212790672,
+      "device": 16777232,
+      "mtime_ns": 1778462434115887874,
+      "sha256": "976e66740c64041cf9f127588f93eabf7efb9e7d3cbaee9582bcded88ba5e8d3"
+    },
+    "/Users/ai/vos-fleet/vm-a.bundle/Parameters.txt": {
+      "size": 89,
+      "inode": 212790673,
+      "device": 16777232,
+      "mtime_ns": 1791277969406873998,
+      "sha256": "8fc49b903cbcdf9084650b72c0523d0646f58f439e2a35c27a72a27a65054c92",
+      "parameters": {
+        "cpuCount": 4,
+        "memorySizeInGB": 4,
+        "screenWidth": 1500,
+        "screenHeight": 900
+      }
+    },
+    "/Users/ai/vos-fleet/vm-a.bundle/AuxiliaryStorage": {
+      "size": 33579164,
+      "inode": 212790674,
+      "device": 16777232,
+      "mtime_ns": 1792552687130744229
+    }
+  },
+  "services": {
+    "com.virtualos.fleet": {
+      "loaded": true,
+      "plist_sha256": "70789e4f6504d0604811474f505c782bf28aa54e0befee389ad975344a697cc0",
+      "arguments": [
+        "/Users/ai/vos-fleet/tools/fleet/fleet-supervisor",
+        "--root",
+        "/Users/ai/vos-fleet/machines",
+        "--names",
+        "vm-a",
+        "--http-port",
+        "9225",
+        "--base-port",
+        "9125",
+        "--start"
+      ],
+      "keep_alive": null
+    },
+    "com.virtualos.fleet-watchdog": {
+      "loaded": true,
+      "plist_sha256": "2730ff9e21388ce626bec5d3ffc380c54362c493f69cd941718ae650883f8312",
+      "arguments": [
+        "/bin/bash",
+        "-lc",
+        "exec /Users/ai/vos-fleet/tools/fleet/fleet-watchdog.sh"
+      ],
+      "keep_alive": true
+    },
+    "com.virtualos.linuxguest": {
+      "loaded": true,
+      "plist_sha256": "ede4e260de004fefeea78b6b29cbdac4ed770952219aa68684b0b12e2fb7bf18",
+      "arguments": [
+        "/Users/ai/vos-fleet/linux/run-guest.sh"
+      ],
+      "keep_alive": null
+    }
+  },
+  "frame_path": "/private/tmp/vm-a-before-migration-20261021.jpg"
+}

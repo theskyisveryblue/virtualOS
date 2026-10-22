@@ -1,0 +1,14 @@
+{
+  "observed_at": "2026-10-21T17:25:54.181750+00:00",
+  "source_sha256": {
+    "tools/.private/vm-a-migration-20261021/virtualos-verify-managed-disk.py": "af87bb682262c005d1aea4b43d108d465d47772a385e02dd8b4c027a9500508e",
+    "tools/.private/vm-a-migration-20261021/virtualos-start-migrated-vm.py": "69298dec4a99c861298c4b4aba06eba32e688f43d0b321b73e6b824ba2343a3f",
+    "tools/.private/vm-a-migration-20261021/virtualos-build-migration.py": "2e0b4e130ffbb4a9421a81eb8550b48057655b3bc1e9c23377055177c39697d5",
+    "tools/.private/vm-a-migration-20261021/virtualos-vm-release.py": "c468ff36d1476447a5dd0e7287675b03b360b4e56393cfd0f3548f72fd883eb1",
+    "tools/.private/vm-a-migration-20261021/virtualos-mini-operation.py": "466e0db041a7061f116d97633cf0d905c05d0e988a2caf41d296b7f252c9ebba",
+    "tools/.private/vm-a-migration-20261021/virtualos-retry-migrated-vm.py": "5738824db611efde0edf58b7101de130d57883ce8a3da75327a8d54a2b16791a",
+    "tools/.private/vm-a-migration-20261021/virtualos-model-offload.py": "66bb85b2d0b841099f78c694cf7740a5ecaa35bc69b085783cb2ba91c8d31680",
+    "tools/.private/vm-a-migration-20261021/virtualos-activate-compressed.py": "225b022c0518b1f0d5645794d7a5b23e09db42cb489c7cc776c593fd8616d61b"
+  },
+  "contains_credentials": false
+}

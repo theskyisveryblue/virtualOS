@@ -1,0 +1,35 @@
+{
+  "managed_shared_disk_boot": "verified",
+  "verified_at_unix": 1791851263,
+  "machine": "vm-r2-restored",
+  "local_machine_disk": "absent",
+  "writes_to_base": 0,
+  "guest_boots_verified": 2,
+  "disk_service_restart_verified": true,
+  "frame_size_gate_bytes": 30000,
+  "restart_blocks_reseeded": 0,
+  "source_disks_unchanged": true,
+  "frame_bytes": 279245,
+  "frame_sha256": "e31ff130334c396c6d885867c4360037881bd0c53eacc2ec1eb3be7a385bf048",
+  "boot_frames": [
+    {
+      "boot": 1,
+      "file": "boot-1.jpg",
+      "bytes": 279632,
+      "sha256": "60867ea8a339b537058ed86d7ce9cebe5745dee1e9b440cc9325a9f6dfd43280"
+    },
+    {
+      "boot": 2,
+      "file": "boot-2.jpg",
+      "bytes": 279245,
+      "sha256": "e31ff130334c396c6d885867c4360037881bd0c53eacc2ec1eb3be7a385bf048"
+    }
+  ],
+  "nbd_reads": 101142,
+  "nbd_writes": 14646,
+  "nbd_metrics_scope": "retained server log",
+  "overlay_blocks": 25486,
+  "overlay_allocated_bytes": 1694564352,
+  "initial_delta_bytes": 1664876544,
+  "initial_delta_sha256": "06750008529cc97d08070bf516d8664e8780995b47d92c52a1f6f72a4b63e4f0"
+}

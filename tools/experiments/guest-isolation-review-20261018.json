@@ -1,0 +1,24 @@
+{
+  "checked_at": "2026-10-18T14:07:30.498126+00:00",
+  "http_checked_at": "2026-10-18T14:10:35.429759+00:00",
+  "live_parameter_checks": {
+    "production_shared_folder_configured": false,
+    "vm_a_shared_folder_configured": false
+  },
+  "running_guests_restarted": false,
+  "schema": "virtualos-guest-isolation-review/v1",
+  "source_configuration": {
+    "applied_to_running_guests": false,
+    "build_code_signed": false,
+    "build_succeeded": true,
+    "explicit_opt_in": "VOS_SHARE_CLIPBOARD=1",
+    "host_clipboard_default": false
+  },
+  "unauthenticated_live_http_checks": {
+    "/cmd/poll": 401,
+    "/console": 200,
+    "/fleet/frame/vm-a": 401,
+    "/fleet/status": 401,
+    "/snapshots": 401
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "shared_fleet_cleanup": "completed",
+  "at": "2026-10-13T06:42:36.203413+00:00",
+  "removed": [
+    {
+      "path": "/Users/ai/vos-shared-fleet/vm-machine.bundle/Disk.img",
+      "reported_allocated_bytes": 27423260672
+    },
+    {
+      "path": "/Users/ai/vos-shared-fleet/deltas/vm-shared/delta.sqlite",
+      "reported_allocated_bytes": 1678135296
+    },
+    {
+      "path": "/Users/ai/vos-shared-fleet/shared-disks/vm-shared.json",
+      "reported_allocated_bytes": 4096
+    },
+    {
+      "path": "/Users/ai/vos-shared-fleet/.virtualos-nbd/vm-shared",
+      "reported_allocated_bytes": 1685635072
+    },
+    {
+      "path": "/Users/ai/vos-shared-fleet/vm-shared.bundle",
+      "reported_allocated_bytes": 28352512
+    }
+  ],
+  "free_before_bytes": 14598270976,
+  "free_after_bytes": 18154250240,
+  "actual_free_bytes_gained": 3555979264,
+  "existing_fleet_running": true,
+  "preserved": [
+    "production VM",
+    "existing vm-a",
+    "immutable shared base",
+    "recovered compact VM and overlay",
+    "verified recovered delta",
+    "platform metadata"
+  ],
+  "snapshot_delta_sha256": "06750008529cc97d08070bf516d8664e8780995b47d92c52a1f6f72a4b63e4f0"
+}

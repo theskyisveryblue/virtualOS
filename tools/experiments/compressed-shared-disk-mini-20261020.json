@@ -1,0 +1,68 @@
+{
+  "disk_plane_self_test_passed": true,
+  "initial_delta_copied_into_write_overlay": false,
+  "observed_at": "2026-10-21T00:55:24.632377+00:00",
+  "previous_helper": "/Users/ai/vos-fleet/.local/maintenance/compact-overlay-20261020/tools/fleet/shared_disk.py",
+  "reports": [
+    {
+      "check": "test_compressed_delta.py",
+      "passed": true,
+      "report": "......\n----------------------------------------------------------------------\nRan 6 tests in 0.055s\n\nOK\n"
+    },
+    {
+      "check": "test_compressed_delta_nbd.py",
+      "passed": true,
+      "report": ".\n----------------------------------------------------------------------\nRan 1 test in 0.143s\n\nOK\n"
+    },
+    {
+      "check": "test_compact_overlay.py",
+      "passed": true,
+      "report": ".......\n----------------------------------------------------------------------\nRan 7 tests in 0.047s\n\nOK\n"
+    },
+    {
+      "check": "test_cloud_disk_checkpoint.py",
+      "passed": true,
+      "report": "....\n----------------------------------------------------------------------\nRan 4 tests in 0.036s\n\nOK\n"
+    },
+    {
+      "check": "test_overlay_compact.py",
+      "passed": true,
+      "report": ".......\n----------------------------------------------------------------------\nRan 7 tests in 0.073s\n\nOK\n"
+    },
+    {
+      "check": "/Users/ai/vos-fleet/.local/maintenance/compressed-shared-disk-20261020/tools/fleet/test_go_live.py",
+      "passed": true,
+      "report": "..................\n----------------------------------------------------------------------\nRan 18 tests in 7.807s\n\nOK\n"
+    },
+    {
+      "check": "self-test",
+      "passed": true,
+      "report": "{\"source_delta_fingerprint\": {\"source_blocks\": 2, \"source_delta_sha256\": \"a73beec8fa73a59a86b29bb20d5d8d15e6a9508806cdda2a575df06b410421d2\", \"source_raw_bytes\": 131072}}\n{\"r2_delta_progress\": {\"completed_blocks\": 2, \"operation\": \"upload\", \"reused_bytes\": 0, \"total_blocks\": 2, \"uploaded_bytes\": 616}}\n{\"r2_delta_upload\": {\"block_count\": 2, \"delta_manifest_sha256\": \"80ac27d737b42ca80dc6803514d33232dd553ce0bda503237b6e1b94519a339a\", \"highest_changed_byte\": 393216, \"readback_verified\": true, \"reused_bytes\": 0, \"signing\": \"operator_only\", \"source_blocks\": 2, \"source_delta_sha256\": \"a73beec8fa73a59a86b29bb20d5d8d15e6a9508806cdda2a575df06b410421d2\", \"source_raw_bytes\": 131072, \"uploaded_bytes\": 616}}\n{\"r2_delta_progress\": {\"completed_blocks\": 2, \"operation\": \"pull\", \"total_blocks\": 2}}\n{\"r2_delta_pull\": {\"destination\": \"/private/tmp/vos-cloud-disk-3jnyhemm/delta-pulled.sqlite\", \"manifest_sha256\": \"80ac27d737b42ca80dc6803514d33232dd553ce0bda503237b6e1b94519a339a\", \"pulled_blocks\": 2, \"signing\": \"operator_only\", \"source_blocks\": 2, \"source_delta_sha256\": \"a73beec8fa73a59a86b29bb20d5d8d15e6a9508806cdda2a575df06b410421d2\", \"source_raw_bytes\": 131072}}\n{\"cloud_disk_self_test\": \"passed\", \"logical_bytes\": 8454656, \"temp_bytes_before_cleanup\": 16203988, \"objects\": 2, \"zero_chunks\": 1, \"overlay_survived_reopen\": true, \"cache_survived_offline\": true, \"cache_respects_host_reserve\": true, \"cache_budget_enforced_on_restart\": true, \"cache_trim_preserves_non_cache_entries\": true, \"corruption_detected\": true, \"overlay_identity_checked\": true, \"nbd_go_read_write_fua_flush\": true, \"nbd_tcp_export_name\": true, \"nbd_fua_reconnect_read\": true, \"nbd_fua_ack_survives_sigkill\": true, \"failed_base_get_preserves_overlay\": true, \"r2_signed_read_only_fake_http\": true, \"r2_stream_upload_fake_http\": true, \"r2_delta_upload_pull_verified\": true, \"manifest_schema_and_size_bounds\": true, \"reconnect_manifest_cache_reused\": true, \"overlay_prewrite_reserve\": true, \"full_block_write_skips_base_fetch\": true, \"overlay_write_evicted_cache\": true, \"overlay_checkpoint_restore_verified\": true, \"remote_overlay_checkpoint_fake_r2_verified\": true, \"overlay_limit_enforced\": true, \"base_delta_seed_readback_verified\": true, \"base_delta_restart_preserves_guest_writes\": true, \"base_delta_identity_checked\": true, \"base_delta_seed_limits_enforced\": true}\n"
+    }
+  ],
+  "running_disks_modified": false,
+  "services_changed": false,
+  "source_sha256": {
+    "tools/cloud_disk.py": "2b273187a7608d7de56f4f25c70cd54d122229576a837dd6d32b6562ae50ce75",
+    "tools/cloud_disk_checkpoint.py": "32938f29992135358b7a64c2e9acbde1a0e27a6ebe731523565c69f45557f8ad",
+    "tools/cloud_disk_r2.py": "bdf8c77c513a4ffcda1c207e1df85974108cb5d75d136ef88bcb156fbeaff712",
+    "tools/cloud_disk_r2_delegate.py": "61af76bf434be43b30ed3990111244fc31d2519be4ed34a1f63b9882483586a0",
+    "tools/cloud_disk_r2_upload.py": "089a851fdecf1049ceb955c5de779f3e2b4cf9057fdc4c9874b7ae254588c259",
+    "tools/compressed_delta.py": "e62350e1b2003f8ccc7b8d8b9a0053f8d57ccefc6ee8b2bf3ea52959fccdacc6",
+    "tools/computer-space.sh": "d332647f9d941f58ae57490e04f96ccde79c7b34e66600f6f05959e27549362f",
+    "tools/fleet/go-live.sh": "162d0fa64eb41303d59f4e3094481f6b3ea3ae239322ad0b31f6273c07ef4271",
+    "tools/fleet/runbook.sh": "e6d24fbe3773c454cd7bd4f49fb8a8e77d67551319d7c509d7213a49b0a6ff0a",
+    "tools/fleet/shared_disk.py": "654d08b35eebc57f8ec34e51a34d0bb30df8e4a2f27fc02c92b669d2b3a80281",
+    "tools/fleet/test_go_live.py": "8952bcadead791284b0ac6a1187abbd38f375512b88047c5401cb99a65daf53e",
+    "tools/overlay_compact.py": "53e32d1fefc3f4a68ce127dbe3c7174040c5864e48a7e9cdd4dd933963ad9e21",
+    "tools/test_cloud_disk_checkpoint.py": "0946be669968584b8394e5dc6fc0070bc293ca73ca1464f81c93b1bd1629a8ea",
+    "tools/test_compact_overlay.py": "52b084aff0e8585ec85a1c4cec42c68dc405e8e279be2dd7cc2f48ad2721140f",
+    "tools/test_compressed_delta.py": "420f4dce0fe745990b5d471dcf88bec02e1c577ce36ce554152e13b5a7e2a076",
+    "tools/test_compressed_delta_nbd.py": "dd6685770a7cafd632409f0c4b37cb337f90523d9fef7e3a7a639cc49bfded4a",
+    "tools/test_overlay_compact.py": "e803bf5725d79b4cd9305b936ce8d8c377f61fefd80df8ca34480d923511c80f"
+  },
+  "stage": "/Users/ai/vos-fleet/.local/maintenance/compressed-shared-disk-20261020",
+  "state": "installed_for_future_shared_disks",
+  "unit_tests_passed": 43,
+  "write_overlay_limit_bytes": 2147483648
+}

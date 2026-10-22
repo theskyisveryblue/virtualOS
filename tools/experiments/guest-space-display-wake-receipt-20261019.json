@@ -1,0 +1,25 @@
+{
+  "observed_date_utc": "2026-10-19",
+  "scope": "single authorized guest display wake",
+  "guest": "vm-a",
+  "input": {"action": "key", "key": "space", "attempts": 1, "http_status": 200},
+  "source_evidence": "tools/computer-wake.sh",
+  "frames": [
+    {"width": 1500, "height": 900, "bytes": 276328, "sha256": "b0de985736e4f43cf2ad3db453109d1b9966a1b49480f69022a7041b12068465"},
+    {"width": 1500, "height": 900, "bytes": 284878, "sha256": "4ac1312d030d53a6c51fb3feecf8698647b79b04bc53d679a9069aa708099893"},
+    {"width": 1500, "height": 900, "bytes": 284564, "sha256": "d2b0894246626b8739663b59daebb162e6bad0822a254b8bdaf28a07178c089b"}
+  ],
+  "final_frame_visually_reviewed": true,
+  "visible_state": "macOS lock screen with password prompt",
+  "display_wake_verified": true,
+  "guest_unlocked": false,
+  "task_verified": false,
+  "private_final_image": "/private/tmp/vos-space-wake-review-1xuz_i89/vm-a-2.jpg",
+  "production_pid_before_and_after": 440,
+  "supervisor_pid_before_and_after": 2503,
+  "guest_restart_performed": false,
+  "model_inference_performed": false,
+  "password_text_enter_or_clipboard_sent": false,
+  "further_guest_input_sent": false,
+  "previous_escape_result_changed": false
+}

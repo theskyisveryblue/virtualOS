@@ -1,0 +1,35 @@
+{
+  "schema": "virtualos-mini-wrapper-tokenfile-migration/v1",
+  "patched_at_unix": 1792365853,
+  "scope": "Existing Mini vos-fleet go-live and watchdog launch wrappers",
+  "replacement": "--token \"$AUTH_TOKEN\" to --token-file \"$RELAY_ENV\"",
+  "private_backup_directory": "/Users/ai/vos-fleet/.local/credential-wrapper-backups-1792365853",
+  "private_backups": true,
+  "wrappers": {
+    "tools/fleet/go-live.sh": {
+      "sha256_before": "da8ec3e1f74d9937160d959bb8885be11b0fab0c7a36901e292d2e1e7d1dce77",
+      "sha256_after": "6954df45480c5b03b9daca1706cc0c75ae6fbd88ecff64a18d8d795471355f63",
+      "only_token_argument_changed": true,
+      "bash_syntax_verified": true,
+      "token_argument_remaining": false,
+      "token_file_reference_present": true
+    },
+    "tools/fleet/fleet-watchdog.sh": {
+      "sha256_before": "b795fa6c86c534f2ff8ea42e09a00f98c39dd37c441b0d8f1d70bf864f07b3d5",
+      "sha256_after": "47dfadad47aca3addbbac0a126df99108cd8c1db49a1a08ee395b2a99aa7ce0f",
+      "only_token_argument_changed": true,
+      "bash_syntax_verified": true,
+      "token_argument_remaining": false,
+      "token_file_reference_present": true
+    }
+  },
+  "processes_restarted": false,
+  "watchdog_reloaded": false,
+  "production_guests_restarted": false,
+  "metadata_audit": {
+    "matching_launchagents_literal_token_option": false,
+    "legacy_inactive_project_copies_found": true,
+    "legacy_inactive_copies_modified": false
+  },
+  "notes": "The currently loaded secure stream process was migrated separately. These source wrappers use the existing private relay environment file on their next normal invocation; no daemon was reloaded for this patch."
+}

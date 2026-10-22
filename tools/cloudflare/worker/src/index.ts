@@ -213,7 +213,7 @@ function allowedFleetInput(body: FleetInputBody | null): boolean {
       && typeof body.ny === "number" && Number.isFinite(body.ny) && body.ny >= 0 && body.ny <= 1;
   }
   if (body.action === "type") {
-    return typeof body.text === "string" && body.text.length <= 2000;
+    return typeof body.text === "string" && body.text.length <= 512;
   }
   if (body.action === "key") {
     return typeof body.key === "string" && body.key.length <= 24
@@ -242,70 +242,134 @@ function browserConsole(): Response {
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>virtualOS guest</title><style>
 body{font:15px system-ui;background:#10151b;color:#edf2f7;max-width:1100px;margin:24px auto;padding:0 16px}
-button,input{font:inherit;padding:9px;border-radius:7px;border:1px solid #526171;background:#1d2935;color:inherit}
+button,input,select{font:inherit;padding:9px;border-radius:7px;border:1px solid #526171;background:#1d2935;color:inherit}
 button{cursor:pointer}button:disabled{opacity:.5}input{min-width:14em}.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:12px 0}
 #frame{width:100%;background:#000;border:1px solid #526171;touch-action:manipulation;cursor:crosshair}
 #message{min-height:1.5em;color:#a8d6fe}small{color:#aab8c5}
 </style></head><body>
 <h1>virtualOS guest</h1><p>Private browser control of the Mac Mini guest. The access key stays in this tab's memory.</p>
 <div class="row"><input id="token" type="password" autocomplete="off" placeholder="Browser access key"><button id="connect">Connect</button><button id="disconnect" disabled>Disconnect</button></div>
-<div class="row"><button id="refresh" disabled>Refresh frame</button><button id="unlock" disabled>Wake and unlock</button><button id="auto" disabled>Start live view</button><span id="state">Disconnected</span></div>
+<div class="row"><label for="machine">Machine</label><select id="machine" disabled></select><button id="refresh" disabled>Refresh frame</button><button id="unlock" disabled>Wake guest</button><button id="auto" disabled>Start live view</button><span id="state">Disconnected</span></div>
 <img id="frame" alt="Guest screen. Click to control the guest."><p id="message" role="status"></p>
 <div class="row"><input id="text" autocomplete="off" placeholder="Text to type in guest"><button id="type" disabled>Type</button><button id="enter" disabled>Return</button><button id="escape" disabled>Escape</button></div>
-<small>Frames are returned with commands and discarded after viewing. This page does not save screenshots, keystrokes, or the access key.</small>
+<small>Fleet live view retains each machine’s latest frame on the service. This tab does not save access keys or keystroke history. Disconnect clears the tab’s frame and text.</small>
 <script>
 (() => {
-  let token = '', timer = null, busy = false;
+  let token = '', timer = null, generation = 0, frameBusy = null, frameURL = null, capturedAt = 0;
+  const legacy = new URLSearchParams(location.search).get('legacy') === '1';
   const $ = id => document.getElementById(id);
   const message = value => { $('message').textContent = value; };
-  const enabled = on => { for (const id of ['refresh','unlock','auto','type','enter','escape','disconnect']) $(id).disabled = !on; };
+  const enabled = on => { for (const id of ['refresh','unlock','auto','type','enter','escape','disconnect']) $(id).disabled = !on; $('machine').disabled = !on || legacy; };
+  const clearFrame = () => { $('frame').removeAttribute('src'); if(frameURL) URL.revokeObjectURL(frameURL); frameURL=null; capturedAt=0; };
+  const disconnect = () => { generation++; token=''; clearInterval(timer); timer=null; clearFrame(); $('machine').replaceChildren(); $('text').value=''; $('state').textContent='Disconnected'; $('auto').textContent='Start live view'; enabled(false); };
   const request = async (path, options = {}) => {
     const response = await fetch(path, {...options, headers: {'Authorization':'Bearer '+token,'Content-Type':'application/json'},cache:'no-store'});
     if (!response.ok) throw Error('Request failed ('+response.status+')');
     return response.json();
   };
   const command = async (action, params = {}) => {
-    const queued = await request('/cmd',{method:'POST',body:JSON.stringify({action,params})});
+    const current=generation, machine=$('machine').value;
+    const base=legacy ? '/cmd' : '/fleet/input/'+encodeURIComponent(machine);
+    const body=legacy ? {action,params} : {action,...params};
+    const queued = await request(base,{method:'POST',body:JSON.stringify(body)});
     if (!queued.id) throw Error('Command was not queued');
     for (let i=0;i<90;i++) {
       await new Promise(resolve => setTimeout(resolve,500));
-      const result = await request('/cmd/'+encodeURIComponent(queued.id));
-      if (result.status === 'completed') return result.result;
+      if(current!==generation || !token) throw Error('Connection changed');
+      const result = await request(base+'/'+encodeURIComponent(queued.id));
+      if (result.status === 'completed') return {value:result.result,completedAt:result.completedAt || 0};
     }
     throw Error('Guest response timed out');
   };
   const frame = async () => {
-    if (!token || busy) return;
-    busy=true;
+    if (!token || frameBusy===generation) return;
+    const current=generation, machine=$('machine').value;
+    frameBusy=current;
     try {
-      const result=await command('frame');
-      if (!result?.ok || typeof result.data_url !== 'string' || !result.data_url.startsWith('data:image/jpeg;base64,')) throw Error('Guest frame unavailable');
-      $('frame').src=result.data_url;
-      $('state').textContent='Connected · '+new Date().toLocaleTimeString();
+      if(legacy) {
+        const reply=await command('frame'), result=reply.value;
+        if (!result?.ok || typeof result.data_url !== 'string' || !result.data_url.startsWith('data:image/jpeg;base64,')) throw Error('Guest frame unavailable');
+        if(current!==generation || !token) return;
+        $('frame').src=result.data_url;
+      } else {
+        const response=await fetch('/fleet/frame/'+encodeURIComponent(machine),{headers:{'Authorization':'Bearer '+token},cache:'no-store'});
+        if(!response.ok || !(response.headers.get('Content-Type') || '').startsWith('image/jpeg')) throw Error('Guest frame unavailable');
+        const blob=await response.blob();
+        if(current!==generation || !token) return;
+        if(blob.size>4194304) throw Error('Guest frame exceeds display limit');
+        const previous=frameURL;
+        frameURL=URL.createObjectURL(blob); $('frame').src=frameURL;
+        if(previous) URL.revokeObjectURL(previous);
+        const stamp=Number(response.headers.get('X-VOS-Frame-Captured-At'));
+        capturedAt=Number.isSafeInteger(stamp) && stamp>0 && stamp<=Date.now()+30000 ? stamp : 0;
+      }
+      const age=capturedAt ? Math.max(0,Math.round((Date.now()-capturedAt)/1000))+'s old' : 'age unavailable';
+      $('state').textContent=legacy ? 'Connected' : machine+' · frame '+age;
       message('');
-    } catch(error) { message(error.message); }
-    finally { busy=false; }
+    } catch(error) { if(current===generation) message(error.message); }
+    finally { if(frameBusy===current) frameBusy=null; }
   };
   $('connect').onclick=async()=>{
-    token=$('token').value.trim(); $('token').value='';
+    const key=$('token').value.trim(); $('token').value=''; disconnect(); token=key;
     if (!token) return;
-    try { const status=await request('/status'); if (!status.ok) throw Error('Status unavailable'); enabled(true); $('state').textContent='Connected'; await frame(); }
-    catch(error) { token=''; enabled(false); message(error.message); }
+    const current=generation;
+    try {
+      if(legacy) { const status=await request('/status'); if(!status.ok || status.liveness?.isStale) throw Error('Guest host is offline'); }
+      else {
+        const status=await request('/fleet/status');
+        if(!status.ok || status.liveness?.isStale) throw Error('Fleet host is offline');
+        if(current!==generation || !token) return;
+        $('machine').replaceChildren();
+        const machines=(status.fleet?.instances || []).filter(vm=>typeof vm.name==='string' && /^[a-z0-9._-]{1,64}$/i.test(vm.name));
+        for(const vm of machines) { const option=document.createElement('option'); option.value=vm.name; option.textContent=vm.name+' · '+vm.state; option.disabled=!vm.ready; $('machine').appendChild(option); }
+        const selected=new URLSearchParams(location.search).get('vm');
+        const chosen=machines.find(vm=>vm.ready && vm.name===selected) || machines.find(vm=>vm.ready);
+        if(!chosen) throw Error('No ready machines');
+        $('machine').value=chosen.name;
+      }
+      if(current!==generation || !token) return;
+      enabled(true); $('state').textContent='Connected'; await frame();
+    } catch(error) { if(current===generation) { disconnect(); message(error.message); } }
   };
-  $('disconnect').onclick=()=>{token=''; clearInterval(timer); timer=null; $('frame').removeAttribute('src'); $('state').textContent='Disconnected'; $('auto').textContent='Start live view'; enabled(false);};
-  $('refresh').onclick=frame;
-  $('unlock').onclick=async()=>{try{message('Waking and unlocking the guest…');const result=await command('unlock');if(!result?.ok)throw Error(result?.error||'Guest unlock failed');await frame();}catch(error){message(error.message);}};
+  $('disconnect').onclick=disconnect;
+  $('machine').onchange=()=>{ generation++; clearFrame(); $('text').value=''; frame(); };
+  $('refresh').onclick=()=>frame();
+  let acting=null;
+  const act=async(action,params={})=>{
+    const current=generation;
+    if(!token || acting===current) return;
+    acting=current;
+    try {
+      if(!legacy && action==='type' && params.text.length>512) throw Error('Use at most 512 characters per input');
+      if(!legacy && (!capturedAt || Date.now()-capturedAt>15000)) {
+        await frame();
+        if(!capturedAt || Date.now()-capturedAt>15000) throw Error('Frame is stale; refresh before controlling the guest');
+      }
+      if(current!==generation || !token) return;
+      const reply=await command(action,params);
+      if(!reply.value?.ok) throw Error(reply.value?.reason || reply.value?.error || 'Guest input failed');
+      if(action==='type' && current===generation) $('text').value='';
+      for(let i=0;i<20 && current===generation && token;i++) {
+        await frame();
+        if(legacy || capturedAt>=reply.completedAt) return;
+        await new Promise(resolve=>setTimeout(resolve,1000));
+      }
+      if(current===generation) message('Input accepted; a newer frame is still pending');
+    } catch(error) { if(current===generation) message(error.message); }
+    finally { if(acting===current) acting=null; }
+  };
+  $('unlock').onclick=()=>act('key',{key:'space'});
   $('auto').onclick=()=>{if(timer){clearInterval(timer);timer=null;$('auto').textContent='Start live view';}else{timer=setInterval(frame,1200);$('auto').textContent='Stop live view';frame();}};
-  $('frame').onclick=async event=>{if(!token || !$('frame').src)return;const r=$('frame').getBoundingClientRect();try{await command('click',{nx:(event.clientX-r.left)/r.width,ny:(event.clientY-r.top)/r.height});await frame();}catch(error){message(error.message);}};
-  $('type').onclick=async()=>{try{await command('type',{text:$('text').value});$('text').value='';await frame();}catch(error){message(error.message);}};
-  $('enter').onclick=async()=>{try{await command('key',{key:'return'});await frame();}catch(error){message(error.message);}};
-  $('escape').onclick=async()=>{try{await command('key',{key:'escape'});await frame();}catch(error){message(error.message);}};
+  $('frame').onclick=event=>{if(!token || !$('frame').src)return;const r=$('frame').getBoundingClientRect();return act('click',{nx:Math.max(0,Math.min(1,(event.clientX-r.left)/r.width)),ny:Math.max(0,Math.min(1,(event.clientY-r.top)/r.height))});};
+  $('type').onclick=()=>act('type',{text:$('text').value});
+  $('enter').onclick=()=>act('key',{key:'return'});
+  $('escape').onclick=()=>act('key',{key:'escape'});
 })();
 </script></body></html>`;
   return new Response(html, { headers: {
     "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store",
     "Referrer-Policy": "no-referrer", "X-Content-Type-Options": "nosniff",
-    "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'",
+    "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: blob:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'",
   } });
 }
 
@@ -323,6 +387,7 @@ async function downloadSnapshot(env: Env, name: string): Promise<Response> {
   const headers = new Headers();
   obj.writeHttpMetadata(headers);
   headers.set("Content-Length", String(obj.size));
+  headers.set("Cache-Control", "private, no-store");
   return new Response(obj.body, { headers });
 }
 
@@ -344,14 +409,19 @@ async function downloadScreenshot(env: Env): Promise<Response> {
   const headers = new Headers();
   obj.writeHttpMetadata(headers);
   headers.set("Content-Length", String(obj.size));
-  headers.set("Cache-Control", "no-cache");
+  headers.set("Cache-Control", "private, no-store");
   return new Response(obj.body, { headers });
 }
 
 async function uploadFleetFrame(env: Env, vm: string, req: Request): Promise<Response> {
   const key = `fleet/frames/${vm}.jpg`;
+  const capturedAt = req.headers.get("X-VOS-Frame-Captured-At") ?? "";
+  const captureTime = Number(capturedAt);
+  const validCapture = /^\d{13}$/.test(capturedAt) && Number.isSafeInteger(captureTime)
+    && captureTime <= Date.now() + 30_000;
   await env.SNAPSHOTS.put(key, req.body, {
     httpMetadata: { contentType: req.headers.get("Content-Type") ?? "image/jpeg" },
+    customMetadata: validCapture ? { capturedAt } : {},
   });
   return json({ ok: true, vm, key });
 }
@@ -362,7 +432,12 @@ async function downloadFleetFrame(env: Env, vm: string): Promise<Response> {
   const headers = new Headers();
   obj.writeHttpMetadata(headers);
   headers.set("Content-Length", String(obj.size));
-  headers.set("Cache-Control", "no-cache");
+  headers.set("Cache-Control", "private, no-store");
+  headers.set("ETag", obj.httpEtag);
+  headers.set("X-VOS-Frame-Uploaded-At", obj.uploaded.toISOString());
+  if (obj.customMetadata?.capturedAt) {
+    headers.set("X-VOS-Frame-Captured-At", obj.customMetadata.capturedAt);
+  }
   return new Response(obj.body, { headers });
 }
 
@@ -390,7 +465,7 @@ async function downloadUsageArtifact(env: Env, name: string): Promise<Response> 
   const headers = new Headers();
   obj.writeHttpMetadata(headers);
   headers.set("Content-Length", String(obj.size));
-  headers.set("Cache-Control", "no-cache");
+  headers.set("Cache-Control", "private, no-store");
   return new Response(obj.body, { headers });
 }
 
@@ -473,6 +548,7 @@ interface Command {
   action: string;
   params: Record<string, unknown>;
   createdAt: number;
+  expiresAt?: number;
   result?: unknown;
   completedAt?: number;
 }
@@ -516,6 +592,7 @@ interface FleetCommand {
   action: string;
   params: Record<string, unknown>;
   createdAt: number;
+  expiresAt?: number;
   result?: unknown;
   completedAt?: number;
 }
@@ -540,6 +617,28 @@ export class ControlRelay implements DurableObject {
   private inputTtl(): number {
     const override = Number(this.env?.INPUT_TTL_MS);
     return Number.isFinite(override) && override > 0 ? override : INPUT_TTL_MS;
+  }
+
+  private expireInput(cmd: Command): boolean {
+    if (cmd.completedAt !== undefined) {
+      cmd.params = {};
+      return true;
+    }
+    if (Date.now() < (cmd.expiresAt ?? cmd.createdAt + this.inputTtl())) return false;
+    cmd.completedAt = Date.now();
+    cmd.result = { ok: false, status: "expired", reason: "host did not complete input in time" };
+    // An expired action must neither execute nor retain its typed payload.
+    cmd.params = {};
+    return true;
+  }
+
+  private nextCommand(): Command | undefined {
+    let cmd: Command | undefined;
+    while ((cmd = this.queue.shift())) {
+      if (!this.expireInput(cmd)) return cmd;
+      this.results.set(cmd.id, cmd);
+    }
+    return undefined;
   }
 
   constructor(private state: DurableObjectState, private env: Env = {} as Env) {
@@ -580,6 +679,7 @@ export class ControlRelay implements DurableObject {
         action: body.action,
         params: body.params ?? {},
         createdAt: Date.now(),
+        expiresAt: Date.now() + this.inputTtl(),
       };
       this.queue.push(cmd);
       this.results.set(cmd.id, cmd);
@@ -606,7 +706,7 @@ export class ControlRelay implements DurableObject {
 
     // GET /cmd/poll — mac long-polls for next command
     if (path === "/cmd/poll" && method === "GET") {
-      const next = this.queue.shift();
+      const next = this.nextCommand();
       if (next) return json({ ok: true, command: next });
 
       // long-poll: wait up to 25s for a command
@@ -627,6 +727,7 @@ export class ControlRelay implements DurableObject {
       const cmd = this.results.get(id) ?? { id, action: "unknown", params: {}, createdAt: 0 };
       cmd.result = body;
       cmd.completedAt = Date.now();
+      cmd.params = {};
       this.results.set(id, cmd);
       // keep last 100 results
       if (this.results.size > 100) {
@@ -643,13 +744,11 @@ export class ControlRelay implements DurableObject {
       if (!cmd) return json({ ok: true, status: "pending" });
       if (cmd.completedAt) {
         if (cmd.action === "frame") this.results.delete(id);
-        return json({ ok: true, status: "completed", result: cmd.result });
+        return json({ ok: true, status: "completed", result: cmd.result, completedAt: cmd.completedAt });
       }
-      if (Date.now() - cmd.createdAt > this.inputTtl()) {
-        cmd.completedAt = Date.now();
-        cmd.result = { ok: false, status: "expired", reason: "host did not complete command in time" };
+      if (this.expireInput(cmd)) {
         this.results.set(id, cmd);
-        return json({ ok: true, status: "completed", result: cmd.result });
+        return json({ ok: true, status: "completed", result: cmd.result, completedAt: cmd.completedAt });
       }
       return json({ ok: true, status: "pending" });
     }
@@ -743,11 +842,20 @@ export class ControlRelay implements DurableObject {
     // Returns immediately so it can never block a concurrent /fleet/input POST
     // (Durable Object input-gate serialization otherwise deadlocks the queue).
     if (path === "/fleet/poll" && method === "GET") {
-      const next = this.fleetQueue.shift();
-      if (next) {
+      let next: FleetCommand | undefined;
+      while ((next = this.fleetQueue.shift())) {
+        const recorded = this.fleetResults.get(next.id)
+          ?? await this.state.storage.get<FleetCommand>(`fleetResult:${next.id}`);
+        const cmd = recorded ?? next;
+        if (this.expireInput(cmd)) {
+          this.fleetResults.set(cmd.id, cmd);
+          await this.persistFleetResult(cmd);
+          continue;
+        }
         await this.persistFleetQueue();
-        return json({ ok: true, command: next });
+        return json({ ok: true, command: cmd });
       }
+      await this.persistFleetQueue();
       return json({ ok: true, command: null });
     }
 
@@ -756,9 +864,12 @@ export class ControlRelay implements DurableObject {
       const id = path.split("/")[5];
       const body = await request.json();
       const cmd = this.fleetResults.get(id)
+        ?? await this.state.storage.get<FleetCommand>(`fleetResult:${id}`)
         ?? { id, vm: "unknown", action: "unknown", params: {}, createdAt: 0 };
       cmd.result = body;
       cmd.completedAt = Date.now();
+      // Keep delivery metadata, but discard typed input once the host is done.
+      cmd.params = {};
       this.fleetResults.set(id, cmd);
       await this.persistFleetResult(cmd);
       return json({ ok: true });
@@ -778,6 +889,7 @@ export class ControlRelay implements DurableObject {
           nx: body.nx, ny: body.ny, text: body.text, key: body.key,
         },
         createdAt: Date.now(),
+        expiresAt: Date.now() + this.inputTtl(),
       };
       this.fleetQueue.push(cmd);
       this.fleetResults.set(cmd.id, cmd);
@@ -796,15 +908,21 @@ export class ControlRelay implements DurableObject {
       }
       if (!cmd) return json({ ok: true, status: "pending" });
       if (cmd.completedAt) {
-        return json({ ok: true, status: "completed", result: cmd.result });
+        // Also clean historical records written before payload minimization.
+        if (Object.keys(cmd.params).length > 0) {
+          cmd.params = {};
+          this.fleetResults.set(id, cmd);
+          await this.persistFleetResult(cmd);
+        }
+        return json({ ok: true, status: "completed", result: cmd.result, completedAt: cmd.completedAt });
       }
       // Never completed: expire it after the TTL so clients stop waiting.
-      if (Date.now() - cmd.createdAt > this.inputTtl()) {
-        cmd.completedAt = Date.now();
-        cmd.result = { ok: false, status: "expired", reason: "host did not complete input in time" };
+      if (this.expireInput(cmd)) {
         this.fleetResults.set(id, cmd);
+        this.fleetQueue = this.fleetQueue.filter(queued => queued.id !== id);
+        await this.persistFleetQueue();
         await this.persistFleetResult(cmd);
-        return json({ ok: true, status: "completed", result: cmd.result });
+        return json({ ok: true, status: "completed", result: cmd.result, completedAt: cmd.completedAt });
       }
       return json({ ok: true, status: "pending" });
     }
@@ -865,9 +983,10 @@ export class ControlRelay implements DurableObject {
 
   private wakePollers() {
     while (this.waitingPollers.length > 0 && this.queue.length > 0) {
+      const cmd = this.nextCommand();
+      if (!cmd) break;
       const poller = this.waitingPollers.shift()!;
       clearTimeout(poller.timer);
-      const cmd = this.queue.shift()!;
       poller.resolve(json({ ok: true, command: cmd }));
     }
   }
@@ -883,6 +1002,7 @@ export class ControlRelay implements DurableObject {
 function json(data: unknown, status = 200): Response {
   return new Response(JSON.stringify(data), {
     status,
-    headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+    headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*",
+               "Cache-Control": "private, no-store" },
   });
 }

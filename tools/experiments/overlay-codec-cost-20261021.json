@@ -1,0 +1,63 @@
+{
+  "observed_at": "2026-10-21T20:26:58.523447+00:00",
+  "scope": "disposable 4 MiB local fixture, not a guest workload benchmark",
+  "fixture_blocks": 48,
+  "incompressible_blocks": 16,
+  "write_flush_pairs_per_format": 48,
+  "fixture_only_reserve_bytes": 0,
+  "live_host_reserves_unchanged": true,
+  "live_services_changed": false,
+  "python_memory_excludes_native_sqlite_zlib_and_os_cache": true,
+  "reports": [
+    {
+      "format": "raw",
+      "logical_written_bytes": 3145728,
+      "database_bytes": 3186688,
+      "allocated_bytes": 3186688,
+      "write_latency": {
+        "median_ms": 0.19929156405851245,
+        "p95_ms": 0.2424169797450304,
+        "max_ms": 0.44962496031075716
+      },
+      "flush_latency": {
+        "median_ms": 0.22062548669055104,
+        "p95_ms": 0.28541695792227983,
+        "max_ms": 0.40008395444601774
+      },
+      "cpu_seconds": 0.018895999999999996,
+      "wall_seconds": 0.02130999998189509,
+      "python_tracked_peak_bytes": 89401,
+      "restart_full_readback_sha256": "f2ac11e3fd801e935e0dcba74ac17854083e012c6361066e1290a589f27ced69",
+      "restart_readback_verified": true
+    },
+    {
+      "format": "zlib-v1",
+      "logical_written_bytes": 3145728,
+      "database_bytes": 1097728,
+      "allocated_bytes": 1097728,
+      "write_latency": {
+        "median_ms": 0.19252044148743153,
+        "p95_ms": 1.1144999880343676,
+        "max_ms": 1.1311669368296862
+      },
+      "flush_latency": {
+        "median_ms": 0.03870850196108222,
+        "p95_ms": 0.6616250611841679,
+        "max_ms": 0.9345840662717819
+      },
+      "cpu_seconds": 0.026267,
+      "wall_seconds": 0.03099320805631578,
+      "python_tracked_peak_bytes": 518375,
+      "restart_full_readback_sha256": "f2ac11e3fd801e935e0dcba74ac17854083e012c6361066e1290a589f27ced69",
+      "restart_readback_verified": true
+    }
+  ],
+  "stored_ratio": 0.3444730077120823,
+  "cpu_delta_seconds": 0.0073710000000000025,
+  "source_sha256": {
+    "tools/.private/compressed-writes-maintenance-20261021/codec-benchmark.py": "d4b42960ddf0d8c0ac2ca57bfeb65b05437919ff5e3c733496878711bbdeacdb",
+    "tools/cloud_disk.py": "023104b7c41a6d4dee2cd44ce489c1bd6544b61056a6926517d396bf743c4e3c",
+    "tools/compressed_delta.py": "e62350e1b2003f8ccc7b8d8b9a0053f8d57ccefc6ee8b2bf3ea52959fccdacc6",
+    "tools/compressed_write_overlay.py": "eeb0cc47585535af2f3193440485924c26459f19b1edf855059c920c95d1e07d"
+  }
+}

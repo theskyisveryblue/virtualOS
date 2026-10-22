@@ -4,21 +4,19 @@ set -euo pipefail
 REPO_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
 POLLER_SCRIPT="$REPO_DIR/tools/cloudflare/poller.sh"
 FLEET_PUSH="$REPO_DIR/tools/fleet/fleet_push.py"
+RELAY_READER="$REPO_DIR/tools/fleet/relay_read.py"
 WORKER_DIR="$REPO_DIR/tools/cloudflare/worker"
 SCREEN_NAME="virtualos-poller"
 LOG_FILE="/tmp/virtualOS-poller.log"
-RELAY_ENV_FILE="$HOME/.config/virtualos/relay.env"
+RELAY_ENV_FILE="${VOS_RELAY_ENV_FILE:-$HOME/.config/virtualos/relay.env}"
 SUPERVISOR="${VOS_FLEET_SUPERVISOR:-http://127.0.0.1:9225}"
 
 load_env() {
-  if [[ -r "$RELAY_ENV_FILE" ]]; then
-    # shellcheck disable=SC1090
-    source "$RELAY_ENV_FILE"
-  fi
-  if [[ -z "${AUTH_TOKEN:-}" ]] && [[ -n "${VOS_AUTH_TOKEN:-}" ]]; then
-    AUTH_TOKEN="$VOS_AUTH_TOKEN"
-  fi
+  # The Python reader validates the file and parses literal credentials. Never
+  # execute credential-file contents or carry the credential through screen/env.
+  RELAY_URL="${RELAY_URL:-https://virtualos-relay.ai-c24.workers.dev}"
   STREAM_SERVER="${STREAM_SERVER:-http://127.0.0.1:8899}"
+  unset AUTH_TOKEN VOS_AUTH_TOKEN
 }
 
 screen_session_exists() {
@@ -31,8 +29,8 @@ screen_session_ids() {
 
 require_env() {
   load_env
-  if [[ -z "${RELAY_URL:-}" ]] || [[ -z "${AUTH_TOKEN:-}" ]]; then
-    echo "error: set RELAY_URL and AUTH_TOKEN in $RELAY_ENV_FILE" >&2
+  if [[ ! -r "$RELAY_ENV_FILE" || ! -f "$FLEET_PUSH" || ! -f "$RELAY_READER" ]]; then
+    echo "error: protected relay settings and fleet transport helpers are required" >&2
     exit 1
   fi
 }
@@ -40,9 +38,7 @@ require_env() {
 check_relay() {
   local attempt
   for attempt in 1 2 3 4 5 6 7 8 9 10; do
-    if curl -fsS --max-time 5 "$RELAY_URL/health" 2>/dev/null | jq -e '.ok == true' >/dev/null &&
-      curl -fsS --max-time 5 "$RELAY_URL/status" \
-        -H "Authorization: Bearer $AUTH_TOKEN" 2>/dev/null | jq -e '.ok == true' >/dev/null; then
+    if python3 "$RELAY_READER" --token-file "$RELAY_ENV_FILE" >/dev/null 2>&1; then
       return 0
     fi
     sleep 3
@@ -72,18 +68,11 @@ start_session() {
     # tags this copy so stop/status can tell it apart from the agent's process.
     screen -dmS "$SCREEN_NAME" env \
       RELAY_URL="$RELAY_URL" \
-      AUTH_TOKEN="$AUTH_TOKEN" \
       STREAM_SERVER="$STREAM_SERVER" \
       VOS_POLLER_SESSION="$SCREEN_NAME" \
       python3 "$FLEET_PUSH" --relay "$RELAY_URL" --supervisor "$SUPERVISOR" \
-        --token "$AUTH_TOKEN" --interval 5 --watch --control --verbose \
+        --token-file "$RELAY_ENV_FILE" --interval 5 --watch --control --verbose \
       >>"$LOG_FILE" 2>&1
-  else
-    screen -dmS "$SCREEN_NAME" env \
-      RELAY_URL="$RELAY_URL" \
-      AUTH_TOKEN="$AUTH_TOKEN" \
-      STREAM_SERVER="$STREAM_SERVER" \
-      bash "$POLLER_SCRIPT" >>"$LOG_FILE" 2>&1
   fi
   sleep 1
   if screen_session_exists; then
@@ -117,10 +106,9 @@ status_session() {
     echo "relay poller: stopped"
   fi
 
-  if [[ -n "${RELAY_URL:-}" ]] && [[ -n "${AUTH_TOKEN:-}" ]]; then
+  if [[ -r "$RELAY_ENV_FILE" && -f "$RELAY_READER" ]]; then
     local fleet
-    fleet="$(curl -fsS --max-time 4 "$RELAY_URL/fleet/status" \
-      -H "Authorization: Bearer $AUTH_TOKEN" 2>/dev/null || true)"
+    fleet="$(python3 "$RELAY_READER" --token-file "$RELAY_ENV_FILE" 2>/dev/null || true)"
     if [[ -z "$fleet" ]]; then
       echo "relay endpoint: unreachable or unauthorized"
     else
@@ -284,6 +272,20 @@ PY
   echo 'cloud_disk_read_token=installed_on_mini secret_printed=false'
 }
 
+update_relay() {
+  # Upgrade code with the existing bindings and secrets. Provisioning a new
+  # relay below also rotates keys and restarts the host, so it is not an update.
+  local identity account_id=c24a3fb4bedba669785c18c834f51921
+  identity="$(cd "$WORKER_DIR" && wrangler whoami 2>&1)" || {
+    echo 'relay_update=refused: Wrangler authentication unavailable' >&2; return 1;
+  }
+  if ! grep -Fq "$account_id" <<< "$identity" || grep -Fq 'harris@mergerealestate.ca' <<< "$identity"; then
+    echo 'relay_update=refused: Ai account identity did not match' >&2; return 1;
+  fi
+  (cd "$WORKER_DIR" && wrangler deploy) || return 1
+  echo 'relay_update=deployed existing_secrets=preserved host_restart=false'
+}
+
 deploy_relay() {
   # Run this on the operator Mac. The Mini only receives its host secret and
   # poller scripts; the browser secret stays in a private local file.
@@ -291,6 +293,7 @@ deploy_relay() {
   local bucket=virtualos-remote-private
   local mini_host="${VOS_RELAY_MINI_HOST:-mac-mini-ai}"
   local mini_dir=/Users/ai/Documents/GitHub/virtualOS/tools/cloudflare
+  local mini_fleet_dir=/Users/ai/Documents/GitHub/virtualOS/tools/fleet
   local identity deployment relay_url host_token web_token
   command -v wrangler >/dev/null || { echo 'error: Wrangler is required' >&2; return 1; }
   command -v openssl >/dev/null || { echo 'error: OpenSSL is required' >&2; return 1; }
@@ -324,6 +327,10 @@ deploy_relay() {
   mkdir -p "$HOME/.config/virtualos"
   printf '%s\n' "$web_token" > "$HOME/.config/virtualos/browser-token"
   scp "$POLLER_SCRIPT" "$REPO_DIR/tools/cloudflare/poller-session.sh" "$mini_host:$mini_dir/" || return 1
+  ssh "$mini_host" "mkdir -p '$mini_fleet_dir'" || return 1
+  scp "$REPO_DIR/tools/fleet/relay_request.py" "$RELAY_READER" \
+    "$FLEET_PUSH" "$REPO_DIR/tools/fleet/guest_text.py" \
+    "$mini_host:$mini_fleet_dir/" || return 1
   printf 'RELAY_URL=%q\nAUTH_TOKEN=%q\n' "$relay_url" "$host_token" |
     ssh "$mini_host" 'umask 077; mkdir -p "$HOME/.config/virtualos"; cat > "$HOME/.config/virtualos/relay.env"' || return 1
   ssh "$mini_host" "$mini_dir/poller-session.sh restart" || return 1
@@ -376,6 +383,7 @@ PY
 }
 
 case "${1:-start}" in
+  update-cloudscope) load_cloudscope_ai_token; update_relay ;;
   deploy-cloudscope) load_cloudscope_ai_token; deploy_relay ;;
   cloud-disk-bucket) load_cloudscope_ai_token; prepare_cloud_disk_bucket ;;
   cloud-disk-token-probe) load_cloudscope_ai_token; probe_cloud_disk_token_permission ;;
@@ -388,7 +396,7 @@ case "${1:-start}" in
   status) status_session ;;
   logs) logs_session ;;
   *)
-    echo "usage: $(basename "$0") {deploy-cloudscope|cloud-disk-bucket|cloud-disk-token-probe|cloud-disk-read-token|clef-smoke|deploy|start|stop|restart|status|logs}" >&2
+    echo "usage: $(basename "$0") {update-cloudscope|deploy-cloudscope|cloud-disk-bucket|cloud-disk-token-probe|cloud-disk-read-token|clef-smoke|deploy|start|stop|restart|status|logs}" >&2
     exit 1
     ;;
 esac

@@ -1,0 +1,29 @@
+{
+  "schema": "virtualos-small-model-finder-preflight/v1",
+  "observed_at_unix": 1792366263,
+  "model": "qwen3.5:0.8b",
+  "workers": 1,
+  "max_steps": 1,
+  "vm": "vm-a",
+  "resource_gate": {
+    "cpu_count": 10,
+    "disk_free_kib": 10887276,
+    "load_one": 6.75,
+    "memory_free_percent": 17,
+    "swap_used_mib": 8470
+  },
+  "required": {
+    "disk_free_gib": 8,
+    "swap_used_gib_below": 8,
+    "memory_free_percent": 40,
+    "load_below_cpu_count": true,
+    "general_background_guard": true
+  },
+  "state": "waiting_for_resources",
+  "model_requested": false,
+  "password_submitted": false,
+  "guest_input_applied": false,
+  "task_verified": false,
+  "production_guests_restarted": false,
+  "mini_private_proof": "/Users/ai/vos-fleet/.local/finder-model-proof-1792366263/proof.json"
+}

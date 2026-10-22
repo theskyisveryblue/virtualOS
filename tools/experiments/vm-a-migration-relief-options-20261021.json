@@ -1,0 +1,289 @@
+{
+  "staged_files": [
+    {
+      "path": "/Users/ai/vos-fleet/.local/maintenance/ollama-metadata-20261019/ollama-darwin.tgz",
+      "size": 174459907,
+      "age_hours": 71.5
+    },
+    {
+      "path": "/Users/ai/vos-fleet/.local/maintenance/ollama-metadata-20261019/runtime/libggml-cpu-icelake.so",
+      "size": 1807440,
+      "age_hours": 48.7
+    },
+    {
+      "path": "/Users/ai/vos-fleet/.local/maintenance/ollama-metadata-20261019/runtime/libggml-cpu-sapphirerapids.so",
+      "size": 2042176,
+      "age_hours": 48.7
+    },
+    {
+      "path": "/Users/ai/vos-fleet/.local/maintenance/ollama-metadata-20261019/runtime/libllama.0.7.0.dylib",
+      "size": 4056016,
+      "age_hours": 48.7
+    },
+    {
+      "path": "/Users/ai/vos-fleet/.local/maintenance/ollama-metadata-20261019/runtime/libmtmd.0.7.0.dylib",
+      "size": 1550544,
+      "age_hours": 48.7
+    },
+    {
+      "path": "/Users/ai/vos-fleet/.local/maintenance/ollama-metadata-20261019/runtime/libllama-common.0.7.0.dylib",
+      "size": 5414912,
+      "age_hours": 48.7
+    },
+    {
+      "path": "/Users/ai/vos-fleet/.local/maintenance/ollama-metadata-20261019/runtime/libggml-cpu-sse42.so",
+      "size": 1060992,
+      "age_hours": 48.7
+    },
+    {
+      "path": "/Users/ai/vos-fleet/.local/maintenance/ollama-metadata-20261019/runtime/libggml-cpu-haswell.so",
+      "size": 1570768,
+      "age_hours": 48.7
+    },
+    {
+      "path": "/Users/ai/vos-fleet/.local/maintenance/ollama-metadata-20261019/runtime/libllama-server-impl.dylib",
+      "size": 3623264,
+      "age_hours": 48.7
+    },
+    {
+      "path": "/Users/ai/vos-fleet/.local/maintenance/ollama-metadata-20261019/runtime/libggml-cpu-cannonlake.so",
+      "size": 1814288,
+      "age_hours": 48.7
+    },
+    {
+      "path": "/Users/ai/vos-fleet/.local/maintenance/ollama-metadata-20261019/runtime/libggml-cpu-zen4.so",
+      "size": 1807552,
+      "age_hours": 48.7
+    },
+    {
+      "path": "/Users/ai/vos-fleet/.local/maintenance/ollama-metadata-20261019/runtime/libggml-cpu-alderlake.so",
+      "size": 1562512,
+      "age_hours": 48.7
+    },
+    {
+      "path": "/Users/ai/vos-fleet/.local/maintenance/ollama-metadata-20261019/runtime/libggml-cpu-sandybridge.so",
+      "size": 1426512,
+      "age_hours": 48.7
+    },
+    {
+      "path": "/Users/ai/vos-fleet/.local/maintenance/ollama-metadata-20261019/runtime/libggml-cpu-x64.so",
+      "size": 1073376,
+      "age_hours": 48.7
+    },
+    {
+      "path": "/Users/ai/vos-fleet/.local/maintenance/ollama-metadata-20261019/runtime/llama-server",
+      "size": 18722672,
+      "age_hours": 48.7
+    },
+    {
+      "path": "/Users/ai/vos-fleet/.local/maintenance/ollama-metadata-20261019/runtime/ollama",
+      "size": 52323040,
+      "age_hours": 48.7
+    },
+    {
+      "path": "/Users/ai/vos-fleet/.local/maintenance/ollama-metadata-20261019/runtime/libggml-cpu-skylakex.so",
+      "size": 1806048,
+      "age_hours": 48.7
+    },
+    {
+      "path": "/Users/ai/vos-fleet/.local/maintenance/ollama-metadata-20261019/runtime/llama-quantize",
+      "size": 11510000,
+      "age_hours": 48.7
+    },
+    {
+      "path": "/Users/ai/vos-fleet/.local/maintenance/ollama-metadata-20261019/runtime/libggml-cpu-cascadelake.so",
+      "size": 1799168,
+      "age_hours": 48.7
+    },
+    {
+      "path": "/Users/ai/vos-fleet/.local/maintenance/ollama-metadata-20261019/runtime/libggml-cpu-cooperlake.so",
+      "size": 1799296,
+      "age_hours": 48.7
+    },
+    {
+      "path": "/Users/ai/vos-fleet/.local/maintenance/ollama-metadata-20261019/runtime/libggml-cpu-ivybridge.so",
+      "size": 1406752,
+      "age_hours": 48.7
+    },
+    {
+      "path": "/Users/ai/vos-fleet/.local/maintenance/ollama-metadata-20261019/runtime/libggml-cpu-piledriver.so",
+      "size": 1419040,
+      "age_hours": 48.7
+    },
+    {
+      "path": "/Users/ai/vos-fleet/.local/maintenance/ollama-metadata-20261019/runtime/mlx_metal_v3/libmlx.dylib",
+      "size": 49720912,
+      "age_hours": 48.7
+    },
+    {
+      "path": "/Users/ai/vos-fleet/.local/maintenance/ollama-metadata-20261019/runtime/mlx_metal_v3/mlx.metallib",
+      "size": 146876416,
+      "age_hours": 48.7
+    },
+    {
+      "path": "/Users/ai/vos-fleet/.local/maintenance/ollama-metadata-20261019/runtime/mlx_metal_v3/libmlxc.dylib",
+      "size": 2062128,
+      "age_hours": 48.7
+    },
+    {
+      "path": "/Users/ai/vos-fleet/.local/maintenance/ollama-metadata-20261019/runtime/mlx_metal_v3/libollama_xgrammar.dylib",
+      "size": 5192592,
+      "age_hours": 48.7
+    },
+    {
+      "path": "/Users/ai/vos-fleet/.local/maintenance/ollama-metadata-20261019/runtime/mlx_metal_v4/libjaccl.dylib",
+      "size": 2137056,
+      "age_hours": 48.7
+    },
+    {
+      "path": "/Users/ai/vos-fleet/.local/maintenance/ollama-metadata-20261019/runtime/mlx_metal_v4/libmlx.dylib",
+      "size": 21509696,
+      "age_hours": 48.7
+    },
+    {
+      "path": "/Users/ai/vos-fleet/.local/maintenance/ollama-metadata-20261019/runtime/mlx_metal_v4/mlx.metallib",
+      "size": 214156448,
+      "age_hours": 48.7
+    },
+    {
+      "path": "/Users/ai/vos-fleet/.local/maintenance/ollama-metadata-20261019/runtime/mlx_metal_v4/libollama_xgrammar.dylib",
+      "size": 2489552,
+      "age_hours": 48.7
+    },
+    {
+      "path": "/Users/ai/vos-fleet/.local/maintenance/ollama-metadata-20261019/models/blobs/sha256-20693aeb02c63304e263a72453b6ab89e1c700a87c6948cac523ac1e6f7cade0",
+      "size": 397808000,
+      "age_hours": 48.8
+    }
+  ],
+  "tags": {
+    "models": [
+      {
+        "name": "qwen3-vl:8b-instruct",
+        "model": "qwen3-vl:8b-instruct",
+        "modified_at": "2026-10-17T23:22:10.106365455-04:00",
+        "size": 6140415975,
+        "digest": "0533d74300e4f9bc367d675d4e64ffd073d50ff16a2b4096cc2e8a1cf8c96319",
+        "details": {
+          "parent_model": "",
+          "format": "gguf",
+          "family": "qwen3vl",
+          "families": [
+            "qwen3vl"
+          ],
+          "parameter_size": "8.8B",
+          "quantization_level": "Q4_K_M"
+        }
+      },
+      {
+        "name": "xcanvas-fleet-qwen:8b",
+        "model": "xcanvas-fleet-qwen:8b",
+        "modified_at": "2026-10-17T23:12:43.672356867-04:00",
+        "size": 6140415916,
+        "digest": "3dba59818b641427300661649ebd77cf3bc3a2f98d7046529520385953950171",
+        "details": {
+          "parent_model": "",
+          "format": "gguf",
+          "family": "qwen3vl",
+          "families": [
+            "qwen3vl"
+          ],
+          "parameter_size": "8.8B",
+          "quantization_level": "Q4_K_M"
+        }
+      },
+      {
+        "name": "qwen3-vl:8b",
+        "model": "qwen3-vl:8b",
+        "modified_at": "2026-10-17T22:47:02.243381948-04:00",
+        "size": 6140415879,
+        "digest": "901cae73216286ea8c5aba8b46d307ff7188f737285ec500c795a12f05225d28",
+        "details": {
+          "parent_model": "",
+          "format": "gguf",
+          "family": "qwen3vl",
+          "families": [
+            "qwen3vl"
+          ],
+          "parameter_size": "8.8B",
+          "quantization_level": "Q4_K_M"
+        }
+      },
+      {
+        "name": "qwen3.5:0.8b",
+        "model": "qwen3.5:0.8b",
+        "modified_at": "2026-09-20T07:50:33.549349575-04:00",
+        "size": 1036046583,
+        "digest": "f3817196d142eaf72ce79dfebe53dcb20bd21da87ce13e138a8f8e10a866b3a4",
+        "details": {
+          "parent_model": "",
+          "format": "gguf",
+          "family": "qwen35",
+          "families": [
+            "qwen35"
+          ],
+          "parameter_size": "873.44M",
+          "quantization_level": "Q8_0"
+        }
+      },
+      {
+        "name": "mac-mini-sidecar-learned:latest",
+        "model": "mac-mini-sidecar-learned:latest",
+        "modified_at": "2026-08-30T21:05:30.611279498-04:00",
+        "size": 815323283,
+        "digest": "3993cf85117627633f85f87fb37ebdca69f118861425c760023215e0685447bc",
+        "details": {
+          "parent_model": "",
+          "format": "gguf",
+          "family": "gemma3",
+          "families": [
+            "gemma3"
+          ],
+          "parameter_size": "999.89M",
+          "quantization_level": "Q4_K_M"
+        }
+      }
+    ]
+  },
+  "ps": {
+    "models": [
+      {
+        "name": "qwen3.5:0.8b",
+        "model": "qwen3.5:0.8b",
+        "size": 2111662336,
+        "digest": "f3817196d142eaf72ce79dfebe53dcb20bd21da87ce13e138a8f8e10a866b3a4",
+        "details": {
+          "parent_model": "",
+          "format": "gguf",
+          "family": "qwen35",
+          "families": [
+            "qwen35"
+          ],
+          "parameter_size": "873.44M",
+          "quantization_level": "Q8_0"
+        },
+        "expires_at": "2026-10-20T23:18:41.174376-04:00",
+        "size_vram": 2111662336,
+        "context_length": 4096
+      }
+    ]
+  },
+  "simulator": {
+    "devices": {
+      "com.apple.CoreSimulator.SimRuntime.iOS-26-5": [
+        {
+          "lastBootedAt": "2026-10-18T14:31:46Z",
+          "dataPath": "/Users/ai/Library/Developer/CoreSimulator/Devices/0F92165B-EFE9-4F39-B46A-7D0064BD3C22/data",
+          "dataPathSize": 4286795776,
+          "logPath": "/Users/ai/Library/Logs/CoreSimulator/0F92165B-EFE9-4F39-B46A-7D0064BD3C22",
+          "udid": "0F92165B-EFE9-4F39-B46A-7D0064BD3C22",
+          "isAvailable": true,
+          "logPathSize": 237568,
+          "deviceTypeIdentifier": "com.apple.CoreSimulator.SimDeviceType.iPhone-17",
+          "state": "Booted",
+          "name": "iPhone 17"
+        }
+      ]
+    }
+  }
+}

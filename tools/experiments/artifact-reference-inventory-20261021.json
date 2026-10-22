@@ -1,0 +1,175 @@
+{
+  "observed_at": "2026-10-21T20:49:08.238325+00:00",
+  "read_only": true,
+  "launch_references": [
+    {
+      "label": "com.virtualos.fleet",
+      "paths": [
+        "/Users/ai/vos-fleet/tools/fleet/fleet-supervisor",
+        "/Users/ai/vos-fleet/machines"
+      ]
+    },
+    {
+      "label": "com.virtualos.linuxguest",
+      "paths": [
+        "/Users/ai/vos-fleet/linux/run-guest.sh"
+      ]
+    }
+  ],
+  "symlink_references": [
+    {
+      "path": "/Users/ai/vos-fleet/tools/fleet/shared_disk.py",
+      "target": "/Users/ai/vos-fleet/.local/maintenance/compressed-shared-disk-20261020/tools/fleet/shared_disk.py"
+    }
+  ],
+  "opaque_shell_references_prevent_automatic_cleanup": true,
+  "maintenance_directories": [
+    {
+      "path": "/Users/ai/vos-fleet/.local/maintenance/compact-overlay-20261020",
+      "owner_uid": 501,
+      "direct_launch_or_symlink_references": [],
+      "rollback_or_test_evidence_may_reference": true,
+      "safe_to_delete": false,
+      "allocated_bytes": 327680
+    },
+    {
+      "path": "/Users/ai/vos-fleet/.local/maintenance/compact-provisioning-20261020",
+      "owner_uid": 501,
+      "direct_launch_or_symlink_references": [],
+      "rollback_or_test_evidence_may_reference": true,
+      "safe_to_delete": false,
+      "allocated_bytes": 208896
+    },
+    {
+      "path": "/Users/ai/vos-fleet/.local/maintenance/compressed-shared-disk-20261020",
+      "owner_uid": 501,
+      "direct_launch_or_symlink_references": [
+        "/Users/ai/vos-fleet/.local/maintenance/compressed-shared-disk-20261020/tools/fleet/shared_disk.py"
+      ],
+      "rollback_or_test_evidence_may_reference": true,
+      "safe_to_delete": false,
+      "allocated_bytes": 364544
+    },
+    {
+      "path": "/Users/ai/vos-fleet/.local/maintenance/compressed-writes-20261021",
+      "owner_uid": 501,
+      "direct_launch_or_symlink_references": [],
+      "rollback_or_test_evidence_may_reference": true,
+      "safe_to_delete": false,
+      "allocated_bytes": 446464
+    },
+    {
+      "path": "/Users/ai/vos-fleet/.local/maintenance/current-machine-footprint-20261020",
+      "owner_uid": 501,
+      "direct_launch_or_symlink_references": [],
+      "rollback_or_test_evidence_may_reference": true,
+      "safe_to_delete": false,
+      "allocated_bytes": 4096
+    },
+    {
+      "path": "/Users/ai/vos-fleet/.local/maintenance/fleet-mux-review-20261019",
+      "owner_uid": 501,
+      "direct_launch_or_symlink_references": [],
+      "rollback_or_test_evidence_may_reference": true,
+      "safe_to_delete": false,
+      "allocated_bytes": 28672
+    },
+    {
+      "path": "/Users/ai/vos-fleet/.local/maintenance/legacy-relay-review-20261019",
+      "owner_uid": 501,
+      "direct_launch_or_symlink_references": [],
+      "rollback_or_test_evidence_may_reference": true,
+      "safe_to_delete": false,
+      "allocated_bytes": 98304
+    },
+    {
+      "path": "/Users/ai/vos-fleet/.local/maintenance/linux-maintained-selection-q2finx58",
+      "owner_uid": 501,
+      "direct_launch_or_symlink_references": [],
+      "rollback_or_test_evidence_may_reference": true,
+      "safe_to_delete": false,
+      "allocated_bytes": 23040000
+    },
+    {
+      "path": "/Users/ai/vos-fleet/.local/maintenance/model-offload-20261021",
+      "owner_uid": 501,
+      "direct_launch_or_symlink_references": [],
+      "rollback_or_test_evidence_may_reference": true,
+      "safe_to_delete": false,
+      "allocated_bytes": 8192
+    },
+    {
+      "path": "/Users/ai/vos-fleet/.local/maintenance/native-app-20261019",
+      "owner_uid": 501,
+      "direct_launch_or_symlink_references": [],
+      "rollback_or_test_evidence_may_reference": true,
+      "safe_to_delete": false,
+      "allocated_bytes": 2633728
+    },
+    {
+      "path": "/Users/ai/vos-fleet/.local/maintenance/native-http-20261019",
+      "owner_uid": 501,
+      "direct_launch_or_symlink_references": [],
+      "rollback_or_test_evidence_may_reference": true,
+      "safe_to_delete": false,
+      "allocated_bytes": 487424
+    },
+    {
+      "path": "/Users/ai/vos-fleet/.local/maintenance/ocr-readiness-20261019",
+      "owner_uid": 501,
+      "direct_launch_or_symlink_references": [],
+      "rollback_or_test_evidence_may_reference": true,
+      "safe_to_delete": false,
+      "allocated_bytes": 647168
+    },
+    {
+      "path": "/Users/ai/vos-fleet/.local/maintenance/offline-overlay-compact-20261020",
+      "owner_uid": 501,
+      "direct_launch_or_symlink_references": [],
+      "rollback_or_test_evidence_may_reference": true,
+      "safe_to_delete": false,
+      "allocated_bytes": 102400
+    },
+    {
+      "path": "/Users/ai/vos-fleet/.local/maintenance/ollama-metadata-20261019",
+      "owner_uid": 501,
+      "direct_launch_or_symlink_references": [],
+      "rollback_or_test_evidence_may_reference": true,
+      "safe_to_delete": false,
+      "allocated_bytes": 783532032
+    },
+    {
+      "path": "/Users/ai/vos-fleet/.local/maintenance/recovery-review-20261019",
+      "owner_uid": 501,
+      "direct_launch_or_symlink_references": [],
+      "rollback_or_test_evidence_may_reference": true,
+      "safe_to_delete": false,
+      "allocated_bytes": 135168
+    },
+    {
+      "path": "/Users/ai/vos-fleet/.local/maintenance/sparse-failed-linux-20261020",
+      "owner_uid": 501,
+      "direct_launch_or_symlink_references": [],
+      "rollback_or_test_evidence_may_reference": true,
+      "safe_to_delete": false,
+      "allocated_bytes": 20480
+    },
+    {
+      "path": "/Users/ai/vos-fleet/.local/maintenance/vm-a-migration-20261021",
+      "owner_uid": 501,
+      "direct_launch_or_symlink_references": [],
+      "rollback_or_test_evidence_may_reference": true,
+      "safe_to_delete": false,
+      "allocated_bytes": 118784
+    }
+  ],
+  "unreferenced_does_not_mean_unused": true,
+  "known_required_retention": [
+    "original full disk",
+    "active disk backend package",
+    "private OCR runtime and model",
+    "guest maintenance helpers",
+    "test and rollback evidence"
+  ],
+  "artifacts_removed": false
+}

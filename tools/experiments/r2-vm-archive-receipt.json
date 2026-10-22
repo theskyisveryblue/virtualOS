@@ -1,0 +1,13 @@
+{
+  "bucket": "virtualos-vm-backups",
+  "key": "vm-backups/20261011T230151Z-91132/virtualOS.bundle.tar.gz",
+  "sha256": "0073037110369885595f21c227c6df3f66f65501daca09844a80c38a07d7b711",
+  "bytes": 22266108635,
+  "account_id": "c24a3fb4bedba669785c18c834f51921",
+  "r2_vm_archive": "full_download_audited",
+  "audit_source": "existing vm-resume full-GET SHA-256 receipt",
+  "live_object_size_matches_receipt": true,
+  "published_receipt_object_bytes": 717,
+  "cold_restore_guest_boot_verified": false,
+  "inventory_checked_at": "2026-10-13T01:07:20.650468+00:00"
+}

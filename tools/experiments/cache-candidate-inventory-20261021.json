@@ -1,0 +1,580 @@
+{
+  "observed_at": "2026-10-21T20:43:59.950468+00:00",
+  "read_only": true,
+  "scan_scope": "selected package and Xcode caches, not all application data",
+  "full_scan_aborted_after_seconds": 25,
+  "per_directory_scan_budget_seconds": 2,
+  "candidates": [
+    {
+      "path": "/Users/ai/Library/Caches/Homebrew",
+      "owner_uid": 501,
+      "directory_mtime_unix": 1792601255.3938022,
+      "directory_mtime_is_not_last_use": true,
+      "last_use": "unknown; requires active-reference review",
+      "regeneration": "package/build cache can be regenerated; exact contents and references must be reviewed",
+      "allocated_bytes": 78639104,
+      "open_file_review": "not cleared",
+      "safe_to_delete": false
+    },
+    {
+      "path": "/Users/ai/Library/Caches/bun",
+      "owner_uid": 501,
+      "directory_mtime_unix": 1791457141.7102225,
+      "directory_mtime_is_not_last_use": true,
+      "last_use": "unknown; requires active-reference review",
+      "regeneration": "package/build cache can be regenerated; exact contents and references must be reviewed",
+      "allocated_bytes": 66723840,
+      "open_file_review": "not cleared",
+      "safe_to_delete": false
+    },
+    {
+      "path": "/Users/ai/Library/Caches/org.swift.swiftpm",
+      "owner_uid": 501,
+      "directory_mtime_unix": 1791855975.0756645,
+      "directory_mtime_is_not_last_use": true,
+      "last_use": "unknown; requires active-reference review",
+      "regeneration": "package/build cache can be regenerated; exact contents and references must be reviewed",
+      "allocated_bytes": 13910016,
+      "open_file_review": "not cleared",
+      "safe_to_delete": false
+    },
+    {
+      "path": "/Users/ai/Library/Caches/com.apple.dt.Xcode",
+      "owner_uid": 501,
+      "directory_mtime_unix": 1791583455.255779,
+      "directory_mtime_is_not_last_use": true,
+      "last_use": "unknown; requires active-reference review",
+      "regeneration": "package/build cache can be regenerated; exact contents and references must be reviewed",
+      "allocated_bytes": 139264,
+      "open_file_review": "not cleared",
+      "safe_to_delete": false
+    },
+    {
+      "path": "/Users/ai/Library/Caches/com.apple.dt.xcodebuild",
+      "owner_uid": 501,
+      "directory_mtime_unix": 1791855975.1083615,
+      "directory_mtime_is_not_last_use": true,
+      "last_use": "unknown; requires active-reference review",
+      "regeneration": "package/build cache can be regenerated; exact contents and references must be reviewed",
+      "allocated_bytes": 81920,
+      "open_file_review": "not cleared",
+      "safe_to_delete": false
+    },
+    {
+      "path": "/Users/ai/Library/Caches/Google",
+      "owner_uid": 501,
+      "directory_mtime_unix": 1791421645.1639833,
+      "directory_mtime_is_not_last_use": true,
+      "last_use": "unknown; requires active-reference review",
+      "regeneration": "package/build cache can be regenerated; exact contents and references must be reviewed",
+      "allocated_bytes": 0,
+      "open_file_review": "not cleared",
+      "safe_to_delete": false
+    }
+  ],
+  "errors": [],
+  "active_build_or_test_tools": [
+    {
+      "pid": 108,
+      "ppid": 1,
+      "executable": "/System/Library/CoreServices/powerd.bundle/powerd"
+    },
+    {
+      "pid": 424,
+      "ppid": 1,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/MacOS/Google Chrome for Testing"
+    },
+    {
+      "pid": 432,
+      "ppid": 1,
+      "executable": "/Applications/Xcode.app/Contents/Developer/Applications/Simulator.app/Contents/MacOS/Simulator"
+    },
+    {
+      "pid": 656,
+      "ppid": 1,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/chrome_crashpad_handler"
+    },
+    {
+      "pid": 660,
+      "ppid": 1,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/chrome_crashpad_handler"
+    },
+    {
+      "pid": 1273,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper.app/Contents/MacOS/Google Chrome for Testing Helper"
+    },
+    {
+      "pid": 1276,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper.app/Contents/MacOS/Google Chrome for Testing Helper"
+    },
+    {
+      "pid": 1302,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper.app/Contents/MacOS/Google Chrome for Testing Helper"
+    },
+    {
+      "pid": 1364,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 1396,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 2121,
+      "ppid": 1,
+      "executable": "/opt/homebrew/bin/node"
+    },
+    {
+      "pid": 2496,
+      "ppid": 1,
+      "executable": "/opt/homebrew/bin/node"
+    },
+    {
+      "pid": 2500,
+      "ppid": 1,
+      "executable": "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+    },
+    {
+      "pid": 2505,
+      "ppid": 1,
+      "executable": "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+    },
+    {
+      "pid": 2506,
+      "ppid": 1,
+      "executable": "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+    },
+    {
+      "pid": 2511,
+      "ppid": 1,
+      "executable": "/opt/homebrew/Cellar/python@3.14/3.14.8_2/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python"
+    },
+    {
+      "pid": 2521,
+      "ppid": 1,
+      "executable": "/opt/homebrew/opt/ollama/bin/ollama"
+    },
+    {
+      "pid": 2539,
+      "ppid": 1,
+      "executable": "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+    },
+    {
+      "pid": 2546,
+      "ppid": 1,
+      "executable": "/System/Library/Frameworks/CryptoTokenKit.framework/ctkahp.bundle/Contents/MacOS/ctkahp"
+    },
+    {
+      "pid": 2578,
+      "ppid": 1,
+      "executable": "/System/Library/Frameworks/CryptoTokenKit.framework/ctkahp.bundle/Contents/MacOS/ctkahp"
+    },
+    {
+      "pid": 3049,
+      "ppid": 2500,
+      "executable": "/opt/homebrew/bin/node"
+    },
+    {
+      "pid": 3054,
+      "ppid": 1,
+      "executable": "/Users/ai/.bun/bin/bun"
+    },
+    {
+      "pid": 3862,
+      "ppid": 1,
+      "executable": "/opt/homebrew/lib/node_modules/open-computer-use/dist/Open Computer Use.app/Contents/MacOS/OpenComputerUse"
+    },
+    {
+      "pid": 4614,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 4621,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 4673,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 4732,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 4808,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 4848,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 4900,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 4954,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 5008,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 5043,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 5081,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 5120,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 5185,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 5229,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 5270,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 5290,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 5337,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 5370,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 5393,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 5412,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 5478,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 5509,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 5535,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 5576,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 5580,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 5693,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 7545,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 7666,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 7672,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 7720,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 7722,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 7796,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 7825,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 7888,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 7909,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 7920,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 7972,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 7985,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 8060,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 8783,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 10069,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 11218,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 11240,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 11766,
+      "ppid": 1,
+      "executable": "/System/Cryptexes/App/System/Library/CoreServices/SafariSupport.bundle/Contents/MacOS/SafariBookmarksSyncAgent"
+    },
+    {
+      "pid": 12982,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 13317,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 13633,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 14280,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 15002,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 15398,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 15438,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 16094,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 16994,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 17229,
+      "ppid": 40819,
+      "executable": "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+    },
+    {
+      "pid": 17233,
+      "ppid": 17230,
+      "executable": "/opt/homebrew/lib/node_modules/open-computer-use/dist/Open Computer Use.app/Contents/MacOS/OpenComputerUse"
+    },
+    {
+      "pid": 17275,
+      "ppid": 40819,
+      "executable": "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+    },
+    {
+      "pid": 17276,
+      "ppid": 17274,
+      "executable": "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+    },
+    {
+      "pid": 17277,
+      "ppid": 17275,
+      "executable": "/opt/homebrew/bin/node"
+    },
+    {
+      "pid": 17280,
+      "ppid": 17276,
+      "executable": "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+    },
+    {
+      "pid": 17283,
+      "ppid": 17280,
+      "executable": "/opt/homebrew/bin/node"
+    },
+    {
+      "pid": 17291,
+      "ppid": 40819,
+      "executable": "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+    },
+    {
+      "pid": 17297,
+      "ppid": 4912,
+      "executable": "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+    },
+    {
+      "pid": 35688,
+      "ppid": 1,
+      "executable": "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+    },
+    {
+      "pid": 36520,
+      "ppid": 1,
+      "executable": "bun"
+    },
+    {
+      "pid": 36664,
+      "ppid": 1,
+      "executable": "bun"
+    },
+    {
+      "pid": 37238,
+      "ppid": 1,
+      "executable": "bun"
+    },
+    {
+      "pid": 40526,
+      "ppid": 1,
+      "executable": "/opt/homebrew/bin/node"
+    },
+    {
+      "pid": 42648,
+      "ppid": 1,
+      "executable": "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+    },
+    {
+      "pid": 55731,
+      "ppid": 1,
+      "executable": "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+    },
+    {
+      "pid": 71956,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 73300,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 73744,
+      "ppid": 40819,
+      "executable": "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+    },
+    {
+      "pid": 73956,
+      "ppid": 1,
+      "executable": "/opt/homebrew/bin/cloudflared"
+    },
+    {
+      "pid": 74390,
+      "ppid": 1,
+      "executable": "/opt/homebrew/bin/cloudflared"
+    },
+    {
+      "pid": 80950,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    },
+    {
+      "pid": 81465,
+      "ppid": 2521,
+      "executable": "/opt/homebrew/Cellar/ollama/0.23.2/libexec/ollama"
+    },
+    {
+      "pid": 85359,
+      "ppid": 424,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/153.0.8010.52/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+    }
+  ],
+  "cache_or_build_files_deleted": false,
+  "elapsed_seconds": 1.019337666
+}

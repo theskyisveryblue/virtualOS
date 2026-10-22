@@ -1,0 +1,20 @@
+{
+  "schema": "virtualos-model-offload/v1",
+  "observed_at": "2026-10-21T16:32:26.360256+00:00",
+  "offloaded_model": "qwen3-vl:8b-instruct",
+  "removed_blob_sha256": "1329cd5ab37e5ef6faef37cd8ff8660ffc96ed5b47b34fddf8eb0912e6c82466",
+  "removed_blob_bytes": 6140392672,
+  "disk_free_before_bytes": 12423622656,
+  "disk_free_after_bytes": 18565922816,
+  "remaining_models": [
+    "xcanvas-fleet-qwen:8b",
+    "qwen3-vl:8b",
+    "qwen3.5:0.8b",
+    "mac-mini-sidecar-learned:latest"
+  ],
+  "saved_manifest": "/Users/ai/vos-fleet/.local/maintenance/model-offload-20261021/qwen3-vl-8b-instruct.manifest",
+  "verified_backup_operator": "/Users/theone/Documents/GitHub/virtualOS/tools/.private/storage-backups/qwen3-vl-8b-instruct-20261021",
+  "other_models_removed": false,
+  "original_verified_backup_operator": "/private/tmp/virtualos-model-backup-20261021",
+  "backup_retained_in_private_gitignored_storage": true
+}

@@ -1,0 +1,60 @@
+{
+  "observed_at": "2026-10-21T21:14:21.206319+00:00",
+  "known_released_allocation_by_host": {
+    "mini_disposable_preview_bytes": 419495936,
+    "operator_verified_history_bytes": 33566720
+  },
+  "mini_volume_available_bytes_at_baseline": 16318533632,
+  "mini_volume_available_bytes_now": 7978934272,
+  "volume_changes_from_other_workloads_not_claimed_as_our_savings": true,
+  "live_mutable_database_bytes_before": 971431936,
+  "live_mutable_database_bytes_now": 987734016,
+  "live_mutable_codec": "raw",
+  "live_write_overlay_limit_bytes": 2147483648,
+  "unactivated_snapshot_compression_projected_saving_bytes": 541110272,
+  "projected_saving_not_added_to_reclaimed_bytes": true,
+  "original_full_disk_and_model_backup_retained": true,
+  "no_extra_cloud_objects_deleted": true,
+  "physical_volume_alert": {
+    "state": "fresh",
+    "available_bytes": 7978934272,
+    "host_reserve_reference_bytes": 10737418240,
+    "host_reserve_reference_met": false,
+    "vm_start_disk_reference_bytes": 15032385536,
+    "vm_start_disk_reference_met": false,
+    "bytes_short_of_vm_start_disk_reference": 7053451264,
+    "reference_thresholds_do_not_replace_live_resource_admission": true
+  },
+  "moats_quit_not_executed": true,
+  "moats_user_question_unanswered": true,
+  "supervisor_deadline": 1792697430.417424,
+  "remaining_primary_storage_work": [
+    "compressed_mutable_overlay",
+    "overlay_pruning_audit",
+    "overlay_boot_soak"
+  ],
+  "controller_observer_tests_passed": 48,
+  "additional_local_integrity_crash_rollback_tests_passed": 6,
+  "prior_mini_backend_tests_passed": 55,
+  "source_sha256": {
+    "tools/experiments/storage-baseline-refresh-20261021.json": "2628743fd6a45f41187f0e1976ad4e5b7aa5df062e95a9bb1974547e2164b325",
+    "tools/experiments/compressed-overlay-preview-release-20261021.json": "2aeeb569018b34326483e7291c396952b15beb292007e6320a4f999d9315cd20",
+    "tools/experiments/observer-history-compaction-20261021.json": "38a600d6f2a2b1f43a5f2c7d1a74f8ca2626a53ce8de32dc0c64668b3d505e9e",
+    "tools/experiments/overlay-growth-profile-verification-20261021.json": "e1f88ca2a515b34a26297eed0b724bfb1b9fd2fed33505435331e4a5b4004faa",
+    "tools/experiments/storage-runbook-refresh-verification-20261021.json": "b6c82f2715acd84af86cb35d45756b8e1709c5a7b5aaf09f5e9def5a453fcc0c",
+    "tools/experiments/model-backup-restore-drill-verification-20261021.json": "5a088499e0e77269cf065521f44f435ec19edab094828fab4df970c243e2edd6",
+    "tools/experiments/private-runtime-recheck-20261021.json": "ee4e9ba88580b5daad71d2506dbb0e6d0f45d1eef6c1ed60dfc4c130a9aa622d",
+    "tools/overlay_growth.py": "b7ee3f279e25b60f19a3c3714e23f411eb016f36086f274058b2351cd9f304f8"
+  },
+  "historical_source_sha256": {
+    "tools/experiments/storage-baseline-refresh-20261021.json": "2628743fd6a45f41187f0e1976ad4e5b7aa5df062e95a9bb1974547e2164b325",
+    "tools/experiments/compressed-overlay-preview-release-20261021.json": "2aeeb569018b34326483e7291c396952b15beb292007e6320a4f999d9315cd20",
+    "tools/experiments/observer-history-compaction-20261021.json": "38a600d6f2a2b1f43a5f2c7d1a74f8ca2626a53ce8de32dc0c64668b3d505e9e",
+    "tools/experiments/overlay-growth-profile-verification-20261021.json": "25cc3bbfbb186068bad96dceda4d24e002b9b7298e8e6bdb19254dbf719807c3",
+    "tools/experiments/storage-runbook-refresh-verification-20261021.json": "b6c82f2715acd84af86cb35d45756b8e1709c5a7b5aaf09f5e9def5a453fcc0c",
+    "tools/experiments/model-backup-restore-drill-verification-20261021.json": "5a088499e0e77269cf065521f44f435ec19edab094828fab4df970c243e2edd6",
+    "tools/experiments/private-runtime-recheck-20261021.json": "ee4e9ba88580b5daad71d2506dbb0e6d0f45d1eef6c1ed60dfc4c130a9aa622d",
+    "tools/overlay_growth.py": "b7ee3f279e25b60f19a3c3714e23f411eb016f36086f274058b2351cd9f304f8"
+  },
+  "source_reviewed_at": "2026-10-21T21:38:39.059287+00:00"
+}

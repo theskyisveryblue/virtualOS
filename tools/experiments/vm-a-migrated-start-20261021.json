@@ -1,0 +1,118 @@
+{
+  "observed_at": "2026-10-21T18:25:16.326918+00:00",
+  "resources": {
+    "background_work": "allowed",
+    "cpu_count": 10,
+    "disk_free_kib": 19499884,
+    "families": {
+      "ai_agents": {
+        "processes": 1,
+        "sum_rss_mib": 16.9
+      },
+      "browser_apps": {
+        "processes": 23,
+        "sum_rss_mib": 496.5
+      },
+      "browser_engines": {
+        "processes": 122,
+        "sum_rss_mib": 6131.7
+      },
+      "simulator_runtime": {
+        "processes": 0,
+        "sum_rss_mib": 0.0
+      },
+      "terminal": {
+        "processes": 1,
+        "sum_rss_mib": 6.4
+      },
+      "virtualos": {
+        "processes": 3,
+        "sum_rss_mib": 42.5
+      }
+    },
+    "load_one": 6.51,
+    "memory_free_percent": 53,
+    "reasons": [],
+    "rss_note": "RSS sums can count shared pages more than once and omit paged-out memory",
+    "swap_used_mib": 3440,
+    "top_executables": [
+      {
+        "name": "Google Chrome",
+        "processes": 77,
+        "sum_rss_mib": 4581.9
+      },
+      {
+        "name": "com.apple.WebKit.WebContent",
+        "processes": 7,
+        "sum_rss_mib": 1273.6
+      },
+      {
+        "name": "Figma",
+        "processes": 9,
+        "sum_rss_mib": 219.6
+      },
+      {
+        "name": "Paper",
+        "processes": 7,
+        "sum_rss_mib": 212.8
+      },
+      {
+        "name": "Google Chrome for Testing",
+        "processes": 8,
+        "sum_rss_mib": 104.9
+      },
+      {
+        "name": "Pen",
+        "processes": 4,
+        "sum_rss_mib": 47.9
+      },
+      {
+        "name": "com.apple.WebKit.GPU",
+        "processes": 3,
+        "sum_rss_mib": 41.2
+      },
+      {
+        "name": "virtualOS",
+        "processes": 1,
+        "sum_rss_mib": 33.8
+      }
+    ]
+  },
+  "started": true,
+  "resource_admission_passed": true,
+  "fleet": {
+    "count": 1,
+    "ok": true,
+    "root": "/Users/ai/vos-fleet/machines",
+    "capability": {
+      "platform": "macOS Version 26.2 (Build 25C56)",
+      "nestedVirtualizationSupported": true,
+      "nestedVirtualizationReason": "supported"
+    },
+    "instances": [
+      {
+        "bundle": "/Users/ai/vos-fleet/machines/vm-a.bundle",
+        "controlPort": 9125,
+        "ready": true,
+        "state": "running",
+        "name": "vm-a",
+        "error": ""
+      }
+    ],
+    "basePort": 9125
+  },
+  "guest_boot_independently_verified": false,
+  "same_operation_unload_and_start": true,
+  "admission_attempts": [
+    {
+      "observed_at": "2026-10-21T18:25:06.171801+00:00",
+      "memory_free_percent": 49,
+      "started": false
+    },
+    {
+      "observed_at": "2026-10-21T18:25:16.326918+00:00",
+      "memory_free_percent": 53,
+      "started": true
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "space_cleanup": "verified",
+  "scope": "completed inactive recovery tests; running VM disks remain local",
+  "free_before_bytes": 14598270976,
+  "free_after_bytes": 22168354816,
+  "actual_free_bytes_gained": 7570083840,
+  "local_full_test_disks_remaining": 0,
+  "production_vm_pid_preserved": 94084,
+  "existing_fleet_running": true,
+  "cold_go_live_refuses_local_clone": true,
+  "boot_path_regression_tests_passed": 16,
+  "archive_live_size_verified": 22266108635,
+  "test_fleet_reported_size": "43 MiB (du -sh)",
+  "pinned_cloud_delta_manifest_rechecked": true
+}

@@ -1,0 +1,37 @@
+{
+  "disk_plane_self_test_passed": true,
+  "observed_at": "2026-10-21T00:14:13.239166+00:00",
+  "previous_helper": "/Users/ai/vos-fleet/.local/maintenance/compact-provisioning-20261020/tools/fleet/shared_disk.py",
+  "reports": [
+    {
+      "check": "self-test",
+      "passed": true,
+      "report": "{\"source_delta_fingerprint\": {\"source_blocks\": 2, \"source_delta_sha256\": \"a73beec8fa73a59a86b29bb20d5d8d15e6a9508806cdda2a575df06b410421d2\", \"source_raw_bytes\": 131072}}\n{\"r2_delta_progress\": {\"completed_blocks\": 2, \"operation\": \"upload\", \"reused_bytes\": 0, \"total_blocks\": 2, \"uploaded_bytes\": 616}}\n{\"r2_delta_upload\": {\"block_count\": 2, \"delta_manifest_sha256\": \"80ac27d737b42ca80dc6803514d33232dd553ce0bda503237b6e1b94519a339a\", \"highest_changed_byte\": 393216, \"readback_verified\": true, \"reused_bytes\": 0, \"signing\": \"operator_only\", \"source_blocks\": 2, \"source_delta_sha256\": \"a73beec8fa73a59a86b29bb20d5d8d15e6a9508806cdda2a575df06b410421d2\", \"source_raw_bytes\": 131072, \"uploaded_bytes\": 616}}\n{\"r2_delta_progress\": {\"completed_blocks\": 2, \"operation\": \"pull\", \"total_blocks\": 2}}\n{\"r2_delta_pull\": {\"destination\": \"/private/tmp/vos-cloud-disk-bzhyyn5n/delta-pulled.sqlite\", \"manifest_sha256\": \"80ac27d737b42ca80dc6803514d33232dd553ce0bda503237b6e1b94519a339a\", \"pulled_blocks\": 2, \"signing\": \"operator_only\", \"source_blocks\": 2, \"source_delta_sha256\": \"a73beec8fa73a59a86b29bb20d5d8d15e6a9508806cdda2a575df06b410421d2\", \"source_raw_bytes\": 131072}}\n{\"cloud_disk_self_test\": \"passed\", \"logical_bytes\": 8454656, \"temp_bytes_before_cleanup\": 16203988, \"objects\": 2, \"zero_chunks\": 1, \"overlay_survived_reopen\": true, \"cache_survived_offline\": true, \"cache_respects_host_reserve\": true, \"cache_budget_enforced_on_restart\": true, \"cache_trim_preserves_non_cache_entries\": true, \"corruption_detected\": true, \"overlay_identity_checked\": true, \"nbd_go_read_write_fua_flush\": true, \"nbd_tcp_export_name\": true, \"nbd_fua_reconnect_read\": true, \"nbd_fua_ack_survives_sigkill\": true, \"failed_base_get_preserves_overlay\": true, \"r2_signed_read_only_fake_http\": true, \"r2_stream_upload_fake_http\": true, \"r2_delta_upload_pull_verified\": true, \"manifest_schema_and_size_bounds\": true, \"reconnect_manifest_cache_reused\": true, \"overlay_prewrite_reserve\": true, \"full_block_write_skips_base_fetch\": true, \"overlay_write_evicted_cache\": true, \"overlay_checkpoint_restore_verified\": true, \"remote_overlay_checkpoint_fake_r2_verified\": true, \"overlay_limit_enforced\": true, \"base_delta_seed_readback_verified\": true, \"base_delta_restart_preserves_guest_writes\": true, \"base_delta_identity_checked\": true, \"base_delta_seed_limits_enforced\": true}\n"
+    },
+    {
+      "check": "/Users/ai/vos-fleet/.local/maintenance/compact-overlay-20261020/tools/experiments/compact_overlay_measure.py",
+      "passed": true,
+      "report": "{\"changed_blocks_after\": 0, \"changed_blocks_before\": 128, \"database_bytes_after_offline_vacuum\": 16384, \"database_bytes_before\": 8470528, \"database_bytes_reclaimed\": 8454144, \"immutable_base_unchanged\": true, \"restart_readback_verified\": true, \"reusable_sqlite_pages\": 2064, \"running_disks_modified\": false, \"scope\": \"disposable_synthetic_fixture\"}\n"
+    }
+  ],
+  "running_disks_modified": false,
+  "services_changed": false,
+  "source_sha256": {
+    "cloud_disk.py": "102c06226f3e2db7adb7405b0973f6acbf6be706e22b251092b7be2b7face0b1",
+    "cloud_disk_checkpoint.py": "32938f29992135358b7a64c2e9acbde1a0e27a6ebe731523565c69f45557f8ad",
+    "cloud_disk_r2.py": "bdf8c77c513a4ffcda1c207e1df85974108cb5d75d136ef88bcb156fbeaff712",
+    "cloud_disk_r2_delegate.py": "61af76bf434be43b30ed3990111244fc31d2519be4ed34a1f63b9882483586a0",
+    "cloud_disk_r2_upload.py": "089a851fdecf1049ceb955c5de779f3e2b4cf9057fdc4c9874b7ae254588c259",
+    "computer-space.sh": "d332647f9d941f58ae57490e04f96ccde79c7b34e66600f6f05959e27549362f",
+    "experiments/compact_overlay_measure.py": "9b6dfd2dde5e75761667720063db325ad5199c90a7367465c38119a70ebb1753",
+    "fleet/go-live.sh": "162d0fa64eb41303d59f4e3094481f6b3ea3ae239322ad0b31f6273c07ef4271",
+    "fleet/runbook.sh": "e6d24fbe3773c454cd7bd4f49fb8a8e77d67551319d7c509d7213a49b0a6ff0a",
+    "fleet/shared_disk.py": "b70433f702c607d5c233ac371aede722b0c4f0ccec085ba7c4148a417a2c1cc0",
+    "fleet/test_go_live.py": "ff9ba5034544f3c238b76883093bcea77a62b6f3fc274f5a41fe5ef9ba3246a6",
+    "test_cloud_disk_checkpoint.py": "0946be669968584b8394e5dc6fc0070bc293ca73ca1464f81c93b1bd1629a8ea",
+    "test_compact_overlay.py": "52b084aff0e8585ec85a1c4cec42c68dc405e8e279be2dd7cc2f48ad2721140f"
+  },
+  "stage": "/Users/ai/vos-fleet/.local/maintenance/compact-overlay-20261020",
+  "state": "installed_for_future_shared_disks",
+  "unit_tests_passed": 28
+}

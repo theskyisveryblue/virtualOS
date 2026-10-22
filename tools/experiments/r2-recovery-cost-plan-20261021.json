@@ -1,0 +1,29 @@
+{
+  "observed_at": "2026-10-21T20:58:19.445607+00:00",
+  "logical_disk_bytes": 32212254720,
+  "full_cold_disk_chunk_transfer_upper_bound_bytes": 22267132894,
+  "retained_original_archive_bytes": 22266108635,
+  "full_raw_extraction_required": false,
+  "configured_cache_limit_bytes": 4294967296,
+  "configured_recovery_overlay_limit_bytes": 4294967296,
+  "metadata_admission_free_bytes": 10804527104,
+  "vm_start_requirements": {
+    "cpus": 2,
+    "memory_gib": 4,
+    "disk_free_gib": 14,
+    "memory_free_percent": 50,
+    "swap_used_gib_less_than": 8,
+    "load_below_cpu_count": true
+  },
+  "runtime_floor_disk_gib": 12,
+  "runtime_overlay_host_reserve_gib": 10,
+  "cache_preserves_reserve_plus_write_headroom_gib": 12,
+  "cache_budget_formula": "min(configured cache, max(0, current free bytes - 12 GiB))",
+  "cache_and_overlay_limits_are_not_guaranteed_allocations": true,
+  "repeated_boot_transfer_depends_on_working_set_and_retained_cache": true,
+  "prior_full_readback_reusable_only_when_all_pins_match": true,
+  "two_macos_slots_currently_occupied": true,
+  "recovery_approval_and_resources_still_required": true,
+  "live_boot_requested": false,
+  "archive_deletion_not_authorized": true
+}

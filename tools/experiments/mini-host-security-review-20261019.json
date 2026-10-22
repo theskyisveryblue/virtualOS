@@ -1,0 +1,155 @@
+{
+  "command_evidence": {
+    "/usr/bin/csrutil status": {
+      "exit_code": 0,
+      "stdout": "System Integrity Protection status: enabled."
+    },
+    "/usr/bin/fdesetup status": {
+      "exit_code": 0,
+      "stdout": "FileVault is Off."
+    },
+    "/usr/bin/sw_vers -buildVersion": {
+      "exit_code": 0,
+      "stdout": "25C56"
+    },
+    "/usr/bin/sw_vers -productVersion": {
+      "exit_code": 0,
+      "stdout": "26.2"
+    },
+    "/usr/libexec/ApplicationFirewall/socketfilterfw --getallowsigned": {
+      "exit_code": 0,
+      "stdout": "Automatically allow built-in signed software ENABLED.\nAutomatically allow downloaded signed software ENABLED."
+    },
+    "/usr/libexec/ApplicationFirewall/socketfilterfw --getappblocked /usr/libexec/sshd-keygen-wrapper": {
+      "exit_code": 0,
+      "stdout": "Incoming connection to /usr/libexec/sshd-keygen-wrapper is permitted."
+    },
+    "/usr/libexec/ApplicationFirewall/socketfilterfw --getappblocked /usr/sbin/sshd": {
+      "exit_code": 0,
+      "stdout": "Incoming connection to /usr/sbin/sshd is permitted."
+    },
+    "/usr/libexec/ApplicationFirewall/socketfilterfw --getblockall": {
+      "exit_code": 0,
+      "stdout": "Firewall has block all state set to disabled."
+    },
+    "/usr/libexec/ApplicationFirewall/socketfilterfw --getglobalstate": {
+      "exit_code": 0,
+      "stdout": "Firewall is disabled. (State = 0)"
+    },
+    "/usr/libexec/ApplicationFirewall/socketfilterfw --getstealthmode": {
+      "exit_code": 0,
+      "stdout": "Firewall stealth mode is off"
+    },
+    "/usr/sbin/spctl --status": {
+      "exit_code": 0,
+      "stdout": "assessments enabled"
+    }
+  },
+  "filevault_recovery_verified": false,
+  "firewall_activation_verified": false,
+  "host_settings_changed": false,
+  "interpretation": {
+    "filevault_off": "Apple silicon storage remains hardware-encrypted; FileVault adds protection requiring user credentials. This check did not enable or test FileVault.",
+    "stored_ssh_rules": "Rules currently permit both SSH executable paths, but an enabled-firewall fresh-connection test has not occurred."
+  },
+  "macos": {
+    "build": "25C56",
+    "version": "26.2"
+  },
+  "observations": {
+    "application_firewall_enabled": false,
+    "automatically_allow_builtin_signed": true,
+    "automatically_allow_downloaded_signed": true,
+    "filevault_enabled": false,
+    "firewall_block_all_enabled": false,
+    "firewall_stealth_enabled": false,
+    "gatekeeper_assessments_enabled": true,
+    "sip_enabled": true,
+    "ssh_wrapper_stored_rule": "permitted",
+    "sshd_stored_rule": "permitted"
+  },
+  "observed_at": "2026-10-19T03:24:17.255638+00:00",
+  "proposed_maintenance": {
+    "filevault": {
+      "do_not_collect_password_or_recovery_key_in_chat_or_argv": true,
+      "reboot_authorized": false,
+      "requires_owner_administrator_authentication": true,
+      "requires_private_recovery_key_handling": true,
+      "requires_verified_restart_unlock_plan": true
+    },
+    "firewall": {
+      "do_not_enable_block_all": true,
+      "preserve_existing_app_rules": true,
+      "preserve_existing_ssh_rules": true,
+      "requires_host_wide_change_approval": true,
+      "requires_prearranged_rollback_before_activation": true,
+      "target_enabled": true,
+      "target_stealth_enabled": true,
+      "verify_with_new_pinned_ssh_connection_without_controlmaster_reuse": true
+    },
+    "os_security_update": {
+      "check_post_download_free_space_reserve": true,
+      "complete_recovery_evidence_before_host_restart": true,
+      "preserve_running_guests_until_approved_window": true,
+      "requires_host_maintenance_approval": true,
+      "review_supported_same_major_update": true
+    }
+  },
+  "read_only": true,
+  "schema": "virtualos-mini-host-security-review/v1",
+  "scoped_listener_check_is_complete_host_inventory": false,
+  "scoped_native_listeners": {
+    "127.0.0.1:8845": 440,
+    "127.0.0.1:9225": 2503
+  },
+  "sources": {
+    "filevault": "https://support.apple.com/guide/deployment/intro-to-filevault-dep82064ec40/web",
+    "firewall": "https://support.apple.com/guide/mac-help/block-connections-to-your-mac-with-a-firewall-mh34041/mac"
+  },
+  "ssh_effective_authentication_review": {
+    "attempts": [
+      {
+        "exit_code": 1,
+        "operation": "unprivileged /usr/sbin/sshd -T",
+        "result": "sshd: no hostkeys available -- exiting."
+      },
+      {
+        "active_lines": [
+          "Include /etc/ssh/sshd_config.d/*",
+          "UsePAM yes",
+          "Include /etc/ssh/crypto.conf"
+        ],
+        "exit_code": 0,
+        "limit": "commented PasswordAuthentication, KbdInteractiveAuthentication and PermitRootLogin examples do not establish effective settings",
+        "operation": "read-only targeted configuration search in /etc/ssh/sshd_config and /etc/ssh/sshd_config.d"
+      },
+      {
+        "exit_code": 1,
+        "operation": "sudo -n /usr/sbin/sshd -T",
+        "password_requested_or_submitted": false,
+        "result": "sudo: a password is required"
+      }
+    ],
+    "effective_keyboard_interactive_authentication": null,
+    "effective_password_authentication": null,
+    "effective_root_login": null,
+    "new_keys_generated": false,
+    "next_step": "owner-admin effective configuration review; retain current pinned-key access and verify a fresh separate key-authenticated session before any authentication restriction",
+    "pinned_ssh_transport_still_working": true,
+    "reviewed_at": "2026-10-19T04:13:24.803074+00:00",
+    "settings_changed": false,
+    "state": "unverified_requires_owner_admin_read"
+  },
+  "vendor_security_release_review": {
+    "checked_at": "2026-10-19T03:46:50.654472+00:00",
+    "device_update_catalog_queried": false,
+    "host_restarted": false,
+    "installed_version": "26.2",
+    "installed_version_predates_listed_security_release": true,
+    "newer_same_major_security_release": "26.7.1",
+    "release_date": "2026-09-28",
+    "source": "https://support.apple.com/en-us/100100",
+    "update_installed": false,
+    "update_payload_downloaded": false
+  }
+}

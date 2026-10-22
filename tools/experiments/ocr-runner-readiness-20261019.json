@@ -1,0 +1,88 @@
+{
+  "default_mini_tools_replaced": false,
+  "deployed_to_mini": false,
+  "finder_proof_readiness_receipt": "finder-documents-experiment-readiness-20261019.json",
+  "focused_tests": {
+    "brain": 35,
+    "finder_documents_proof": 13,
+    "guest_unlock_compatibility": 12,
+    "ocr_budget": 10,
+    "passed": true,
+    "private_backend_lifecycle": 11
+  },
+  "followup_display_check": {
+    "frame_sha256": "d2b0894246626b8739663b59daebb162e6bad0822a254b8bdaf28a07178c089b",
+    "password_submitted_by_wake_check": false,
+    "receipt": "guest-space-display-wake-receipt-20261019.json",
+    "visual_state": "password_screen",
+    "vm": "vm-a",
+    "wake_key": "space",
+    "wake_verified": true
+  },
+  "followup_unlock_check": {
+    "desktop_verified": true,
+    "password_submissions": 1,
+    "receipt": "guarded-guest-unlock-20261019.json"
+  },
+  "fresh_frame": {
+    "bytes": 22987,
+    "guest_usability_verified": false,
+    "height": 900,
+    "jpeg_parser_passed": true,
+    "sha256": "d28f3c58cba3536e4436253bd339a04abb9cbd78854572fe22c8d4bc35b49443",
+    "visually_blank": true,
+    "vm": "vm-a",
+    "width": 1500
+  },
+  "guardrails": {
+    "all_runtime_files_checked_against_release_pinned_inventory": true,
+    "animated_login_uses_fresh_ocr_target_geometry": true,
+    "finder_trial_requires_foreground_app_and_known_pre_action_title": true,
+    "fresh_login_frame_and_post_focus_prompt_before_secret_read": true,
+    "global_model_activity_watched_during_private_session": true,
+    "global_model_idle_rechecked_before_yield_and_each_request": true,
+    "http_and_jpeg_dimensions_must_match": true,
+    "immutable_local_manifest_reference": true,
+    "jpeg_byte_limit": 8388608,
+    "jpeg_pixel_limit": 16777216,
+    "late_pressure_probe_cannot_signal_reused_group": true,
+    "no_mutable_tag_fallback": true,
+    "one_click_finder_trial_has_durable_request_barrier": true,
+    "per_request_resource_recheck": true,
+    "pre_action_frame_must_match": true,
+    "private_backend_external_network_denial_canary_tested": true,
+    "private_backend_loopback_only": true,
+    "private_backend_owned_group_cleanup_before_leader_reap": true,
+    "trace_failure_preserves_action_evidence": true,
+    "trace_files_require_private_owned_regular_descriptor": true,
+    "uncertain_input_not_replayed": true
+  },
+  "guest_input_applied_by_this_check": false,
+  "guest_task_verified": false,
+  "live_ocr_inference_verified": false,
+  "observed_at": "2026-10-19T01:35:03.389475+00:00",
+  "private_backend_inference_started": false,
+  "private_runtime_metadata": {
+    "full_manifest_reference_supported": true,
+    "private_process_stopped_and_reaped": true,
+    "receipt": "private-mini-ollama-metadata-20261019.json",
+    "weights_loaded": false
+  },
+  "private_runtime_provenance_receipt": "private-runtime-provenance-20261019.json",
+  "private_staged_tools_on_mini": true,
+  "schema": "virtualos-ocr-runner-readiness/v1",
+  "source_sha256": {
+    "tools/fleet/brain.py": "3e5ff56d7d45487a7deea8488c76a76079f6b475465c698cf17ee0d1aac0719e",
+    "tools/fleet/finder_documents_proof.py": "7e7ee391ecf58c48bd73f98bfccc7a7a19e4107178b25b72abd2b2c3b5223511",
+    "tools/fleet/guest_unlock.py": "b71ba2d877305e2dd6a5bfeb47e00188b743d2214188d8627e3b781555106537",
+    "tools/fleet/ocr_budget.py": "48b319aa1d44bbd78b3168fe9ceef199c94a9932ea41ea4f668b2d5a66896604",
+    "tools/fleet/private_ocr_server.py": "1d51f2e8be87812b3d2090ef765c5f7bce7a87deda12576a503fbe953a437409",
+    "tools/fleet/test_brain.py": "4eb995c34236707a17e22510b37a1cfc84a13fd43da304b2c41a3f8cae12f49e",
+    "tools/fleet/test_finder_documents_proof.py": "30f4cbd56dfb149922eb1a8c72c6f5148e91018b2b691c5035097b618082c09a",
+    "tools/fleet/test_guest_unlock.py": "3ca8e2fc458399083b33f43db374de8e9f72bcd71d1c7b61469786618bf0c3a6",
+    "tools/fleet/test_ocr_budget.py": "e1c45645fc93c880f326711c02e15065aed93beea9452246063b78d978244921",
+    "tools/fleet/test_private_ocr_server.py": "655b18fdca14d668a150f8a9fa5a34f9076112019778c5af16a7a9c3b573dc31"
+  },
+  "source_verified_at": "2026-10-19T03:37:21.265434+00:00",
+  "status": "source_verified_live_inference_deferred"
+}

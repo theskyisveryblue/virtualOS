@@ -75,12 +75,15 @@ def decode(blob: bytes) -> dict:
     if hashlib.sha256(payload).digest() != digest:
         raise ValueError("model bundle checksum mismatch")
     body_len, code_len = struct.unpack_from("<II", payload, 0)
+    if (body_len > 16 * 1024 * 1024 or code_len > 8 * 1024 * 1024 or
+            len(payload) != 8 + body_len + code_len or code_len % 2):
+        raise ValueError("invalid model bundle lengths")
     body = payload[8:8 + body_len]
     codes = payload[8 + body_len:8 + body_len + code_len]
-    if len(codes) != code_len or len(codes) % 2:
-        raise ValueError("truncated model bundle")
     counts = struct.unpack(f"<{code_len // 2}h", codes)
     skeleton = json.loads(body)
+    if len(_floats(skeleton, [])) != len(counts):
+        raise ValueError("model bundle weight count mismatch")
     return _restore(skeleton, list(counts), [0])
 
 

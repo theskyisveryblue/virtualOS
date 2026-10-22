@@ -1,0 +1,146 @@
+{
+  "observed_at": "2026-10-21T20:25:14.455469+00:00",
+  "state": "growth_profile_verified",
+  "historical_milestones": [
+    {
+      "observed_at": "2026-10-21T17:00:47.654407+00:00",
+      "phase": "prepared_before_guest_boot",
+      "changed_blocks": 0,
+      "logical_changed_bytes": 0,
+      "database_bytes": 16384,
+      "receipt": "tools/experiments/vm-a-managed-compressed-disk-verified-20261021.json"
+    },
+    {
+      "observed_at": "2026-10-21T18:29:06.717818+00:00",
+      "phase": "guest_boot",
+      "changed_blocks": 4490,
+      "logical_changed_bytes": 294256640,
+      "database_bytes": 296861696,
+      "receipt": "tools/experiments/vm-a-migrated-boot-evidence-20261021.json"
+    },
+    {
+      "observed_at": "2026-10-21T18:37:32.650512+00:00",
+      "phase": "post_boot",
+      "changed_blocks": 13797,
+      "logical_changed_bytes": 904200192,
+      "database_bytes": 912171008,
+      "receipt": "tools/experiments/post-boot-storage-audit-20261021.json"
+    },
+    {
+      "observed_at": "2026-10-21T18:53:34.684742+00:00",
+      "phase": "post_boot",
+      "changed_blocks": 13886,
+      "logical_changed_bytes": 910032896,
+      "database_bytes": 918274048,
+      "receipt": "tools/experiments/post-boot-storage-final-audit-20261021.json"
+    },
+    {
+      "observed_at": "2026-10-21T19:53:31.012016+00:00",
+      "phase": "steady_guest",
+      "changed_blocks": 14692,
+      "logical_changed_bytes": 962854912,
+      "database_bytes": 971431936,
+      "receipt": "tools/experiments/storage-baseline-refresh-20261021.json"
+    },
+    {
+      "observed_at": "2026-10-21T20:19:07.769109+00:00",
+      "phase": "steady_guest",
+      "changed_blocks": 14921,
+      "logical_changed_bytes": 977862656,
+      "database_bytes": 986673152,
+      "receipt": "tools/experiments/storage-baseline-current-20261021.json"
+    }
+  ],
+  "lifecycle_observation_span_hours": 3.4007530852821137,
+  "prepared_idle_time_included_in_lifecycle_span": true,
+  "uninterrupted_multi_hour_guest_soak_claimed": false,
+  "current_growth": {
+    "state": "fresh",
+    "sample_count": 92,
+    "rejected_samples": 0,
+    "read_only": true,
+    "observed_span_seconds": 4316.665396928787,
+    "gap_count": 2,
+    "largest_gap_seconds": 1118.8784120082855,
+    "latest_sample_age_seconds": 24.454227924346924,
+    "recent_contiguous_seconds": 128.76559901237488,
+    "logical_growth_bytes_per_hour": 0.0,
+    "allocated_growth_bytes_per_hour": 0.0,
+    "projected_hours_to_logical_limit": null,
+    "host_volume": {
+      "state": "fresh",
+      "available_bytes": 8200499200,
+      "host_reserve_reference_bytes": 10737418240,
+      "host_reserve_reference_met": false,
+      "vm_start_disk_reference_bytes": 15032385536,
+      "vm_start_disk_reference_met": false,
+      "bytes_short_of_vm_start_disk_reference": 6831886336,
+      "reference_thresholds_do_not_replace_live_resource_admission": true
+    },
+    "projection_is_a_guarantee": false,
+    "latest": {
+      "allocated_bytes": 989921280,
+      "changed_blocks": 14937,
+      "codec": "raw",
+      "database_bytes": 987734016,
+      "logical_changed_bytes": 978911232,
+      "logical_limit_bytes": 2147483648,
+      "observed_at_unix": 1792616848.452734,
+      "read_only": true,
+      "reusable_page_bytes": 65536,
+      "volume_available_bytes": 8200499200,
+      "wal_bytes": 0
+    }
+  },
+  "observation_gap_disclosed": true,
+  "vm_restarts_requested": false,
+  "model_inference_requested": false,
+  "source_sha256": {
+    "tools/cloud-disk-observe.sh": "e2cfe98fa6d029a5145a9deea4e12e030fa773ec4a77d30f44edc7d874fe7d61",
+    "tools/cloud_disk_work_loop.py": "2c968ed24fb47c88e2c4c0d7bd6a4d1784730bf50fdc3bb14d8b7204bcc1b9e3",
+    "tools/experiments/post-boot-storage-audit-20261021.json": "b651956da1c1e2c70e902292277acb2942c8634aa7187496474be7feaa079314",
+    "tools/experiments/post-boot-storage-final-audit-20261021.json": "11389fd935e8e642faaed9e20dbe22b025246b226423314e0153340e8cc65bee",
+    "tools/experiments/storage-baseline-current-20261021.json": "516c156c2b0c497991b89d0d0043d57ca36d79aff05bd9f9f91718b4bb73d5bc",
+    "tools/experiments/storage-baseline-refresh-20261021.json": "2628743fd6a45f41187f0e1976ad4e5b7aa5df062e95a9bb1974547e2164b325",
+    "tools/experiments/vm-a-managed-compressed-disk-verified-20261021.json": "9b81ae92897c7f729bc533f85ab039b1f970b6ebffa6d8488f13d86ec8afe2ef",
+    "tools/experiments/vm-a-migrated-boot-evidence-20261021.json": "4116e967ffb2dd2e003609f073e89e3fe8c2f98b38812dfe384dbccb5cf46688",
+    "tools/overlay_growth.py": "b7ee3f279e25b60f19a3c3714e23f411eb016f36086f274058b2351cd9f304f8",
+    "tools/test_cloud_disk_observe.py": "90d1edae972220b2c6117a2b9a6fefba867647f94160a76369926e9a5ee5e0f4",
+    "tools/test_overlay_growth.py": "52815afd4224baac4c52364b97862db2253750d0149ddc54f2ad46ede791f9d8"
+  },
+  "controller_observer_tests_passed": 47,
+  "original_disk_preserved": true,
+  "prior_telemetry_source_sha256": {
+    "tools/cloud-disk-observe.sh": "9e1b930830433b731011ed076666b558dc0b292487f94f38fd97c1e849f52179",
+    "tools/cloud_disk_work_loop.py": "0456e1975fc06805763161a308373c0acfc06843bb277cb2c90c994dfedcfe7c",
+    "tools/overlay_growth.py": "eb6beb64ce03e4d2a18c077d830bb9ecf578513d197e7862702c565362c9b31e",
+    "tools/test_overlay_growth.py": "cc788fa7bfa0d793d8a4906e99102ec9e980e23c7a70d31ea016a7e38bc7779e",
+    "tools/test_cloud_disk_observe.py": "1ebd1b5f10f9c0fd2d36cf4461c199c5f07daecd8ba7c33b00bd03a14c2e0563",
+    "tools/experiments/vm-a-managed-compressed-disk-verified-20261021.json": "9b81ae92897c7f729bc533f85ab039b1f970b6ebffa6d8488f13d86ec8afe2ef",
+    "tools/experiments/vm-a-migrated-boot-evidence-20261021.json": "4116e967ffb2dd2e003609f073e89e3fe8c2f98b38812dfe384dbccb5cf46688",
+    "tools/experiments/post-boot-storage-audit-20261021.json": "b651956da1c1e2c70e902292277acb2942c8634aa7187496474be7feaa079314",
+    "tools/experiments/post-boot-storage-final-audit-20261021.json": "11389fd935e8e642faaed9e20dbe22b025246b226423314e0153340e8cc65bee",
+    "tools/experiments/storage-baseline-refresh-20261021.json": "2628743fd6a45f41187f0e1976ad4e5b7aa5df062e95a9bb1974547e2164b325",
+    "tools/experiments/storage-baseline-current-20261021.json": "516c156c2b0c497991b89d0d0043d57ca36d79aff05bd9f9f91718b4bb73d5bc"
+  },
+  "telemetry_validation_after_volume_alert_update": {
+    "verified_at": "2026-10-21T21:07:52.954330+00:00",
+    "controller_observer_tests_passed": 48,
+    "guest_disk_services_changed": false
+  },
+  "historical_source_sha256": {
+    "tools/cloud-disk-observe.sh": "e2cfe98fa6d029a5145a9deea4e12e030fa773ec4a77d30f44edc7d874fe7d61",
+    "tools/cloud_disk_work_loop.py": "0456e1975fc06805763161a308373c0acfc06843bb277cb2c90c994dfedcfe7c",
+    "tools/experiments/post-boot-storage-audit-20261021.json": "b651956da1c1e2c70e902292277acb2942c8634aa7187496474be7feaa079314",
+    "tools/experiments/post-boot-storage-final-audit-20261021.json": "11389fd935e8e642faaed9e20dbe22b025246b226423314e0153340e8cc65bee",
+    "tools/experiments/storage-baseline-current-20261021.json": "516c156c2b0c497991b89d0d0043d57ca36d79aff05bd9f9f91718b4bb73d5bc",
+    "tools/experiments/storage-baseline-refresh-20261021.json": "2628743fd6a45f41187f0e1976ad4e5b7aa5df062e95a9bb1974547e2164b325",
+    "tools/experiments/vm-a-managed-compressed-disk-verified-20261021.json": "9b81ae92897c7f729bc533f85ab039b1f970b6ebffa6d8488f13d86ec8afe2ef",
+    "tools/experiments/vm-a-migrated-boot-evidence-20261021.json": "4116e967ffb2dd2e003609f073e89e3fe8c2f98b38812dfe384dbccb5cf46688",
+    "tools/overlay_growth.py": "b7ee3f279e25b60f19a3c3714e23f411eb016f36086f274058b2351cd9f304f8",
+    "tools/test_cloud_disk_observe.py": "90d1edae972220b2c6117a2b9a6fefba867647f94160a76369926e9a5ee5e0f4",
+    "tools/test_overlay_growth.py": "52815afd4224baac4c52364b97862db2253750d0149ddc54f2ad46ede791f9d8"
+  },
+  "source_reviewed_at": "2026-10-21T21:38:39.059287+00:00",
+  "source_review": "Existing growth algorithm and six-step rollback instructions unchanged. Additive fixed snapshot-audit dispatch and documentation reviewed; current applicable tests passed. Historical observations retained."
+}

@@ -194,7 +194,7 @@
 
     var rec = document.createElement("div");
     if (supported) {
-      rec.textContent = "This host can expose a hypervisor to guests: VM-in-VM is possible.";
+      rec.textContent = "This host advertises nested virtualization support; guest hypervisor access still needs a boot test.";
     } else {
       rec.textContent = "This host runs flat VMs only; nested guests will not get a hypervisor.";
     }

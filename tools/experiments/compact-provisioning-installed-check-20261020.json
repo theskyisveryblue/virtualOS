@@ -1,0 +1,14 @@
+{
+  "fixture_platform_data_is_not_a_real_boot_measurement": true,
+  "fixture_platform_files_allocated_bytes": 16384,
+  "implicit_clone_refused": true,
+  "installed_path_verified": true,
+  "local_machine_disk_present": false,
+  "preserved_processes": {
+    "2499": "./tools/fleet/linux-guest",
+    "2503": "/Users/ai/vos-fleet/tools/fleet/fleet-supervisor",
+    "440": "/Applications/virtualOS.app/Contents/MacOS/virtualOS"
+  },
+  "services_changed": false,
+  "shared_bundle_prepared": true
+}

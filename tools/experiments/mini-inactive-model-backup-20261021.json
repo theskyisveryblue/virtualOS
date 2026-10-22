@@ -1,0 +1,37 @@
+{
+  "schema": "virtualos-model-offload-backup/v1",
+  "observed_at": "2026-10-21T05:21:21.019968+00:00",
+  "backup_directory": "/Users/theone/Documents/GitHub/virtualOS/tools/.private/storage-backups/qwen3-vl-8b-instruct-20261021",
+  "files": [
+    {
+      "path": "manifests/registry.ollama.ai/library/qwen3-vl/8b-instruct",
+      "size": 893,
+      "sha256": "0533d74300e4f9bc367d675d4e64ffd073d50ff16a2b4096cc2e8a1cf8c96319"
+    },
+    {
+      "path": "blobs/sha256-35dd26e0fdc8e15cb5a05bc93a8e22d1bd8966a5c82d79ba3ff6be173f1053ea",
+      "size": 551,
+      "sha256": "35dd26e0fdc8e15cb5a05bc93a8e22d1bd8966a5c82d79ba3ff6be173f1053ea"
+    },
+    {
+      "path": "blobs/sha256-1329cd5ab37e5ef6faef37cd8ff8660ffc96ed5b47b34fddf8eb0912e6c82466",
+      "size": 6140392672,
+      "sha256": "1329cd5ab37e5ef6faef37cd8ff8660ffc96ed5b47b34fddf8eb0912e6c82466"
+    },
+    {
+      "path": "blobs/sha256-7339fa418c9ad3e8e12e74ad0fd26a9cc4be8703f9c110728a992b193be85cb2",
+      "size": 11355,
+      "sha256": "7339fa418c9ad3e8e12e74ad0fd26a9cc4be8703f9c110728a992b193be85cb2"
+    },
+    {
+      "path": "blobs/sha256-f6417cb1e26962991f8e875a93f3cb0f92bc9b4955e004881251ccbf934a19d2",
+      "size": 42,
+      "sha256": "f6417cb1e26962991f8e875a93f3cb0f92bc9b4955e004881251ccbf934a19d2"
+    }
+  ],
+  "remote_changes": false,
+  "independent_local_readback_verified": true,
+  "verified_at": "2026-10-21T11:21:08.447932+00:00",
+  "original_backup_directory": "/private/tmp/virtualos-model-backup-20261021",
+  "backup_retained_in_private_gitignored_storage": true
+}

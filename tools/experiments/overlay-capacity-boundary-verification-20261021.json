@@ -1,0 +1,17 @@
+{
+  "observed_at": "2026-10-21T20:30:49.128685+00:00",
+  "managed_default_logical_limit_bytes": 2147483648,
+  "scaled_boundary_fixture_budget_bytes": 65536,
+  "scaled_fixture_prevents_compressible_capacity_bypass": true,
+  "failed_multi_block_write_preserves_old_bytes": true,
+  "base_equivalent_write_removes_encoded_row": true,
+  "current_live_limit_receipt": "tools/experiments/storage-baseline-current-20261021.json",
+  "multi_block_existing_row_failure_receipt": "tools/experiments/overlay-corruption-matrix-verification-20261021.json",
+  "live_limits_or_services_changed": false,
+  "source_sha256": {
+    "tools/cloud_disk.py": "023104b7c41a6d4dee2cd44ce489c1bd6544b61056a6926517d396bf743c4e3c",
+    "tools/compressed_write_overlay.py": "eeb0cc47585535af2f3193440485924c26459f19b1edf855059c920c95d1e07d",
+    "tools/test_compressed_write_overlay.py": "16c3a16f884a7fd15e42a9ad5a853ae77be140991a634a70fa4b5e7689d15f4e",
+    "tools/test_overlay_corruption_matrix.py": "ed4d3555af6cacccaf96a1ff0f6ef07a21fcfb6ecc25cefdbeb8236dcfe087ae"
+  }
+}

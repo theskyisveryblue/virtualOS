@@ -3,9 +3,13 @@
 # and executes them locally against virtualOS + the streaming server.
 #
 # Usage:
-#   RELAY_URL=https://virtualos-relay.yourname.workers.dev \
-#   AUTH_TOKEN=your-secret \
+#   RELAY_URL=https://virtualos-relay.ai-c24.workers.dev \
+#   VOS_RELAY_ENV_FILE="$HOME/.config/virtualos/relay.env" \
 #   ./poller.sh
+#
+# Inactive compatibility path. Deploying this script also requires the matching
+# tools/fleet/{relay_request,relay_read,fleet_push,guest_text}.py modules. The
+# session deploy command packages these dependencies together.
 #
 # Commands the Worker can queue (via POST /cmd):
 #   { "action": "start" }                    — launch virtualOS and start VM
@@ -20,16 +24,22 @@
 #   { "action": "status" }                   — report VM status
 #   { "action": "password", "params": { "password": "..." } }
 
+set +x
 set -euo pipefail
+umask 077
 
-RELAY_URL="${RELAY_URL:?Set RELAY_URL to your Worker URL}"
-AUTH_TOKEN="${AUTH_TOKEN:?Set AUTH_TOKEN}"
+RELAY_URL="${RELAY_URL:-https://virtualos-relay.ai-c24.workers.dev}"
+RELAY_ENV_FILE="${VOS_RELAY_ENV_FILE:-$HOME/.config/virtualos/relay.env}"
+unset AUTH_TOKEN VOS_AUTH_TOKEN
 STREAM_SERVER="${STREAM_SERVER:-http://127.0.0.1:8899}"
 REPO_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
 HEARTBEAT_INTERVAL=30
 last_heartbeat=0
 
-auth_header="Authorization: Bearer $AUTH_TOKEN"
+RELAY_REQUEST="$REPO_DIR/tools/fleet/relay_request.py"
+relay_request() {
+  python3 "$RELAY_REQUEST" --token-file "$RELAY_ENV_FILE" --relay "$RELAY_URL" "$@"
+}
 
 log() { echo "[$(date '+%H:%M:%S')] $*" >&2; }
 
@@ -40,9 +50,7 @@ post_result() {
   shift
   local attempt
   for attempt in 1 2 3; do
-    if printf '%s' "$1" | curl -fsS --max-time 20 -X POST "$RELAY_URL/cmd/$cmd_id/result" \
-      -H "$auth_header" -H "Content-Type: application/json" \
-      --data-binary @- >/dev/null 2>&1; then
+    if printf '%s' "$1" | relay_request --method POST --path "/cmd/$cmd_id/result" >/dev/null 2>&1; then
       return 0
     fi
     sleep "$attempt"
@@ -52,9 +60,7 @@ post_result() {
 }
 
 post_usage_event() {
-  curl -sf -X POST "$RELAY_URL/usage" \
-    -H "$auth_header" -H "Content-Type: application/json" \
-    -d "$1" >/dev/null 2>&1 || true
+  printf '%s' "$1" | relay_request --method POST --path /usage >/dev/null 2>&1 || true
 }
 
 epoch_ms() {
@@ -63,7 +69,9 @@ epoch_ms() {
 
 capture_frame_to_file() {
   local outfile="$1"
-  curl -fsS --max-time 10 -o "$outfile" "http://127.0.0.1:8845/vm/screen" 2>/dev/null
+  curl -q -fsS --noproxy '*' --proto '=http' --connect-timeout 2 \
+    --max-time 10 --max-filesize 8388608 -o "$outfile" \
+    "http://127.0.0.1:8845/vm/screen" 2>/dev/null
 }
 
 capture_usage_artifact() {
@@ -72,7 +80,7 @@ capture_usage_artifact() {
   local phase="$3"
   local outfile
   local name
-  outfile="$(mktemp "/tmp/vos_trace_${cmd_id}_${phase}.XXXXXX.jpg")"
+  outfile="$(mktemp "/tmp/vos_trace_${cmd_id}_${phase}.XXXXXX")"
   name="${cmd_id}-${action}-${phase}.jpg"
 
   if ! capture_frame_to_file "$outfile"; then
@@ -80,9 +88,8 @@ capture_usage_artifact() {
     return 1
   fi
 
-  if curl -sf -X PUT "$RELAY_URL/usage/artifacts/$name" \
-    -H "$auth_header" -H "Content-Type: image/jpeg" \
-    --data-binary "@$outfile" >/dev/null 2>&1
+  if relay_request --method PUT --path "/usage/artifacts/$name" \
+    --content-type image/jpeg < "$outfile" >/dev/null 2>&1
   then
     rm -f "$outfile"
     echo "usage/artifacts/$name"
@@ -96,7 +103,7 @@ capture_usage_artifact() {
 traceable_action() {
   [[ "${VOS_RELAY_TRAINING_TRACE:-0}" == 1 ]] || return 1
   case "$1" in
-    status|screenshot|frame|unlock) return 1 ;;
+    status|screenshot|frame|unlock|password) return 1 ;;
     *) return 0 ;;
   esac
 }
@@ -185,13 +192,13 @@ vm_command_server_running() {
 vm_command_post() {
   local path="$1"
   local payload="$2"
-  curl -sf -X POST "http://127.0.0.1:8845$path" \
-    -H "Content-Type: application/json" \
-    -d "$payload"
+  printf '%s' "$payload" | curl -q -sf --noproxy '*' --proto '=http' \
+    --connect-timeout 2 --max-time 10 -X POST "http://127.0.0.1:8845$path" \
+    -H "Content-Type: application/json" --data-binary @-
 }
 
 json_quote() {
-  python3 -c 'import json,sys; print(json.dumps(sys.argv[1]))' "$1"
+  printf '%s' "$1" | python3 -c 'import json,sys; print(json.dumps(sys.stdin.read()))'
 }
 
 json_array() {
@@ -330,9 +337,7 @@ print(json.dumps(hb))
 PY
   ) || payload="{\"state\":\"$vm_state\",\"ts\":$(date +%s)}"
 
-  curl -sf -X POST "$RELAY_URL/status" \
-    -H "$auth_header" -H "Content-Type: application/json" \
-    -d "$payload" >/dev/null 2>&1 || true
+  printf '%s' "$payload" | relay_request --method POST --path /status >/dev/null 2>&1 || true
 }
 
 # ── command handlers ──────────────────────────────────────────────────
@@ -369,13 +374,17 @@ handle_restart() {
 
 handle_screenshot() {
   log "CMD: screenshot"
-  local tmpfile="/tmp/vos_screenshot_$$.jpg"
+  local tmpfile
+  tmpfile="$(mktemp /tmp/vos_screenshot.XXXXXX)" || { echo '{"ok":false,"error":"screenshot temp failed"}'; return; }
   if capture_frame_to_file "$tmpfile"; then
-    curl -sf -X PUT "$RELAY_URL/screenshot" \
-      -H "$auth_header" -H "Content-Type: image/jpeg" \
-      --data-binary "@$tmpfile" >/dev/null 2>&1
-    rm -f "$tmpfile"
-    echo '{"ok":true,"action":"screenshot","source":"vm_screen"}'
+    if relay_request --method PUT --path /screenshot \
+      --content-type image/jpeg < "$tmpfile" >/dev/null 2>&1; then
+      rm -f "$tmpfile"
+      echo '{"ok":true,"action":"screenshot","source":"vm_screen"}'
+    else
+      rm -f "$tmpfile"
+      echo '{"ok":false,"error":"screenshot upload failed"}'
+    fi
     return
   fi
   rm -f "$tmpfile"
@@ -384,7 +393,7 @@ handle_screenshot() {
 
 handle_frame() {
   local frame_file
-  frame_file="$(mktemp /tmp/vos_guest_frame.XXXXXX.jpg)" || { echo '{"ok":false,"error":"frame temp failed"}'; return; }
+  frame_file="$(mktemp /tmp/vos_guest_frame.XXXXXX)" || { echo '{"ok":false,"error":"frame temp failed"}'; return; }
   if ! capture_frame_to_file "$frame_file"; then
     rm -f "$frame_file"
     echo '{"ok":false,"error":"guest frame failed"}'
@@ -492,7 +501,7 @@ handle_open() {
   local app="$1"
   local url="$2"
   local path_value="$3"
-  log "CMD: open app='$app' url='$url' path='$path_value'"
+  log "CMD: open (app characters=${#app}, url characters=${#url}, path characters=${#path_value})"
   if ! vm_command_server_running; then
     echo '{"ok":false,"error":"vm command server not running"}'
     return
@@ -506,12 +515,12 @@ handle_open() {
 
 handle_spotlight() {
   local query="$1"
-  log "CMD: spotlight '$query'"
+  log "CMD: spotlight"
   if ! vm_command_server_running; then
     echo '{"ok":false,"error":"vm command server not running"}'
     return
   fi
-  vm_command_post "/vm/spotlight" "{\"query\":$(python3 -c 'import json,sys; print(json.dumps(sys.argv[1]))' "$query")}" 2>&1 || echo '{"ok":false}'
+  vm_command_post "/vm/spotlight" "{\"query\":$(json_quote "$query")}" 2>&1 || echo '{"ok":false}'
 }
 
 handle_terminal_open() {
@@ -525,22 +534,22 @@ handle_terminal_open() {
 
 handle_terminal_exec() {
   local command="$1"
-  log "CMD: terminal_exec '$command'"
+  log "CMD: terminal_exec"
   if ! vm_command_server_running; then
     echo '{"ok":false,"error":"vm command server not running"}'
     return
   fi
-  vm_command_post "/vm/terminal/exec" "{\"cmd\":$(python3 -c 'import json,sys; print(json.dumps(sys.argv[1]))' "$command"),\"newWindow\":true}" 2>&1 || echo '{"ok":false}'
+  vm_command_post "/vm/terminal/exec" "{\"cmd\":$(json_quote "$command"),\"newWindow\":true}" 2>&1 || echo '{"ok":false}'
 }
 
 handle_exec() {
   local command="$1"
-  log "CMD: exec '$command'"
+  log "CMD: exec"
   if ! vm_command_server_running; then
     echo '{"ok":false,"error":"vm command server not running"}'
     return
   fi
-  vm_command_post "/vm/exec" "{\"cmd\":$(python3 -c 'import json,sys; print(json.dumps(sys.argv[1]))' "$command"),\"paste\":true}" 2>&1 || echo '{"ok":false}'
+  vm_command_post "/vm/exec" "{\"cmd\":$(json_quote "$command"),\"paste\":true}" 2>&1 || echo '{"ok":false}'
 }
 
 handle_batch() {
@@ -588,8 +597,7 @@ while true; do
   send_heartbeat
 
   # long-poll for next command (25s timeout on server side)
-  response=$(curl -sf --max-time 30 "$RELAY_URL/cmd/poll" \
-    -H "$auth_header" 2>/dev/null) || { sleep 2; continue; }
+  response=$(relay_request --method GET --path /cmd/poll 2>/dev/null) || { sleep 2; continue; }
 
   # parse command
   cmd_id=$(echo "$response" | python3 -c "import sys,json; d=json.load(sys.stdin); c=d.get('command'); print(c['id'] if c else '')" 2>/dev/null)

@@ -8,10 +8,6 @@ if [[ $# -gt 1 || ( $# -eq 1 && "$1" != --quality ) ]]; then
 fi
 
 repo_dir="$(cd "$(dirname "$0")/.." && pwd)"
-"$repo_dir/tools/computer-resources.sh" --guard || {
-  echo 'start=refused: host resource pressure' >&2
-  exit 1
-}
 if [[ "${1:-}" == --quality ]]; then
   if pgrep -fl '[c]omputer-night.sh --quality' >/dev/null 2>&1; then
     echo 'start=refused: quality runner already active' >&2
@@ -32,6 +28,10 @@ if [[ "${1:-}" == --quality ]]; then
   printf 'start=quality-running pid=%s log=%s\n' "$pid" "$log"
   exit 0
 fi
+"$repo_dir/tools/computer-resources.sh" --guard || {
+  echo 'start=refused: host resource pressure' >&2
+  exit 1
+}
 
 floor_kb="${VOS_CUA_MIN_FREE_KB:-3145728}"
 free_kb="$(df -Pk /System/Volumes/Data | awk 'NR == 2 {print $4}')"

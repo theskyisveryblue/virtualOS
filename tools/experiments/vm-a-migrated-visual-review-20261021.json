@@ -1,0 +1,9 @@
+{
+  "guest_boot_verified": true,
+  "independently_reviewed": true,
+  "observed": "Fully restored macOS desktop with Chrome menu bar, Chrome, Finder, System Settings, Terminal, and Dock after one credential submission",
+  "frame_path": "/Users/theone/Documents/GitHub/virtualOS/tools/.private/vm-a-migration-20261021/boot-desktop-final.jpg",
+  "frame_sha256": "36f313512bf381329880d97f04e61205fd3a7116ca4501f94c8b3d56ca76b4b6",
+  "initial_unlock_helper_result": "unverified within its15-second desktop-detection window",
+  "password_retried": false
+}

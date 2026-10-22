@@ -1,0 +1,75 @@
+{
+  "schema": "virtualos-watchdog-vm-budget-migration/v1",
+  "verified_at": "2026-10-19T01:16:27.404381+00:00",
+  "backup_directory": "/Users/ai/vos-fleet/.local/watchdog-vm-budget-m4t60iij",
+  "private_backups": true,
+  "changed_script_scope": "guest_resources_ok function only",
+  "watchdog_label": "com.virtualos.fleet-watchdog",
+  "watchdog_pid_before": 64358,
+  "watchdog_pid_after": 1756,
+  "watchdog_state": "running",
+  "watchdog_reloaded": true,
+  "rolled_back": false,
+  "watchdog_sha256_before": "efb19774ce80a15d7fbded18e87b16c5eed0530567af1629f1dbf1569efaecf0",
+  "watchdog_sha256_after": "3116c067a515c07bf60136594aef8a743385f3e968cf27391d460bfab6816910",
+  "module_sha256_before": "6cabf396c4e6ad18d50992394a796fe7474e9e47ef3065ee6f11e17ba93c7f97",
+  "module_sha256_after": "086602e3b4dad2d2ce9f7db87f0baf0c22fd8c67ae89a8fd368cd6f94ca18b81",
+  "isolated_mini_tests_count": 17,
+  "isolated_mini_tests_returncode": 0,
+  "monitor_only_once_returncode": 0,
+  "actual_vm_admission_refused": true,
+  "actual_vm_admission_code": 75,
+  "resources": {
+    "cpu_count": 10,
+    "disk_free_kib": 7667508,
+    "load_one": 6.71,
+    "memory_free_percent": 13,
+    "swap_used_mib": 18089
+  },
+  "guest_pids_before": {
+    "fleet": [
+      2503
+    ],
+    "linux": [
+      2499
+    ],
+    "production": [
+      440
+    ]
+  },
+  "guest_pids_after": {
+    "fleet": [
+      2503
+    ],
+    "linux": [
+      2499
+    ],
+    "production": [
+      440
+    ]
+  },
+  "fresh_before": {
+    "relay_age": 3,
+    "relay_live": true,
+    "vm_a_running_ready": true
+  },
+  "fresh_after": {
+    "relay_age": 6,
+    "relay_live": true,
+    "vm_a_running_ready": true
+  },
+  "launchagent_plist_unchanged": true,
+  "fleet_supervisor_candidate_activated": false,
+  "stream_processes_changed": false,
+  "model_processes_changed": false,
+  "guest_or_vm_actions_invoked": false,
+  "vm_budget": {
+    "memory_gib": 4,
+    "cpu_count": 2,
+    "minimum_free_memory_percent": 50,
+    "minimum_disk_free_gib": 14,
+    "swap_used_gib_below": 8,
+    "load_below_cpu_count": true
+  },
+  "remote_proof": "/Users/ai/vos-fleet/.local/watchdog-vm-budget-m4t60iij/vm-budget-live-proof.json"
+}

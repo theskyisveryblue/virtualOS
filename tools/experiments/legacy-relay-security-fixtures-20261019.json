@@ -1,0 +1,28 @@
+{
+  "actual_vm_or_relay_requests": false,
+  "guest_or_service_actions": false,
+  "isolated_fixture_tests_passed": 13,
+  "live_deployment_invoked": false,
+  "metadata_resources": {
+    "cpu_count": 10,
+    "load_one": 6.63623046875,
+    "potentially_available_bytes": 3361030144,
+    "swapouts": 19302887
+  },
+  "private_source_directory": "/Users/ai/vos-fleet/.local/maintenance/legacy-relay-review-20261019",
+  "python_version": "3.9.6",
+  "schema": "virtualos-legacy-relay-source-security-fixtures/v1",
+  "source_sha256": {
+    "cloudflare/poller-session.sh": "bea54463a854b603e5528e370b23b0de1c3f40ab6478c5ab5a043917d988c256",
+    "cloudflare/poller.sh": "d1095f9593db2515cdb56a982e71bcb1a15ed0d33298dff3dd823947cf9d9ca5",
+    "fleet/fleet_push.py": "0da02533843022b6856a1dd9396c8a1fb4bc02d6a6626387a4d26662174c4617",
+    "fleet/guest_text.py": "aa0b3b4c004077fd53ea39d6d4c427c449e9f76587da405eff183142d786a4e6",
+    "fleet/relay_read.py": "d3d6fbf687cdc353756437be144a4ce17e7944877315efbb8f424aa992480a0a",
+    "fleet/relay_request.py": "f21f063e2218a5bd4511c25872a0c7ae7b3ebbfaa619d9bd30da2fc80b3fdfa5",
+    "fleet/test_poller_session.py": "ed7b023cd5a738f4e3c37dcfd5f14c378f0a3ebcb7c607411c9340ce0a6f915c",
+    "fleet/test_relay_request.py": "df05b23b41a504b2afd62c88dd0bd14761825beaab347465c699ecc3f9e63732"
+  },
+  "test_returncode": 0,
+  "test_summary": ".............\n----------------------------------------------------------------------\nRan 13 tests in 5.526s\n\nOK\n",
+  "verified_at": "2026-10-19T04:31:33.199122+00:00"
+}

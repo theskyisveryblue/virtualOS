@@ -1,0 +1,198 @@
+{
+  "manifests": [
+    "manifests/registry.ollama.ai/library/qwen3-vl/8b",
+    "manifests/registry.ollama.ai/library/qwen3-vl/8b-instruct",
+    "manifests/registry.ollama.ai/library/mac-mini-sidecar-learned/latest",
+    "manifests/registry.ollama.ai/library/xcanvas-fleet-qwen/8b",
+    "manifests/registry.ollama.ai/library/qwen3.5/0.8b"
+  ],
+  "blobs": [
+    {
+      "name": "sha256-1329cd5ab37e5ef6faef37cd8ff8660ffc96ed5b47b34fddf8eb0912e6c82466",
+      "size": 6140392672,
+      "allocated_bytes": 6140395520,
+      "links": 1,
+      "age_hours": 71.9,
+      "references": [
+        "manifests/registry.ollama.ai/library/qwen3-vl/8b-instruct"
+      ]
+    },
+    {
+      "name": "sha256-ed12a4674d727a74ac4816c906094ea9d3119fbea46ca93288c3ce4ffbe38c55",
+      "size": 6140392576,
+      "allocated_bytes": 6140395520,
+      "links": 1,
+      "age_hours": 72.0,
+      "references": [
+        "manifests/registry.ollama.ai/library/qwen3-vl/8b",
+        "manifests/registry.ollama.ai/library/xcanvas-fleet-qwen/8b"
+      ]
+    },
+    {
+      "name": "sha256-afb707b6b8fac6e475acc42bc8380fc0b8d2e0e4190be5a969fbf62fcc897db5",
+      "size": 1036034688,
+      "allocated_bytes": 1036038144,
+      "links": 1,
+      "age_hours": 735.4,
+      "references": [
+        "manifests/registry.ollama.ai/library/qwen3.5/0.8b"
+      ]
+    },
+    {
+      "name": "sha256-7cd4618c1faf8b7233c6c906dac1694b6a47684b37b8895d470ac688520b9c01",
+      "size": 815310432,
+      "allocated_bytes": 815312896,
+      "links": 1,
+      "age_hours": 1226.1,
+      "references": [
+        "manifests/registry.ollama.ai/library/mac-mini-sidecar-learned/latest"
+      ]
+    },
+    {
+      "name": "sha256-7339fa418c9ad3e8e12e74ad0fd26a9cc4be8703f9c110728a992b193be85cb2",
+      "size": 11355,
+      "allocated_bytes": 12288,
+      "links": 1,
+      "age_hours": 72.0,
+      "references": [
+        "manifests/registry.ollama.ai/library/qwen3-vl/8b",
+        "manifests/registry.ollama.ai/library/qwen3-vl/8b",
+        "manifests/registry.ollama.ai/library/qwen3-vl/8b-instruct",
+        "manifests/registry.ollama.ai/library/qwen3-vl/8b-instruct",
+        "manifests/registry.ollama.ai/library/xcanvas-fleet-qwen/8b",
+        "manifests/registry.ollama.ai/library/xcanvas-fleet-qwen/8b"
+      ]
+    },
+    {
+      "name": "sha256-9be69ef463066202c1b1bd299aaf42bad370a01ba4b40d293617859720776c17",
+      "size": 11354,
+      "allocated_bytes": 12288,
+      "links": 1,
+      "age_hours": 735.4,
+      "references": [
+        "manifests/registry.ollama.ai/library/qwen3.5/0.8b"
+      ]
+    },
+    {
+      "name": "sha256-dd084c7d92a3c1c14cc09ae77153b903fd2024b64a100a0cc8ec9316063d2dbc",
+      "size": 8432,
+      "allocated_bytes": 12288,
+      "links": 1,
+      "age_hours": 1226.1,
+      "references": [
+        "manifests/registry.ollama.ai/library/mac-mini-sidecar-learned/latest"
+      ]
+    },
+    {
+      "name": "sha256-16f9fa0d653156996fb3569d351099f463bec7307d009e270060fbe036061cce",
+      "size": 3401,
+      "allocated_bytes": 4096,
+      "links": 1,
+      "age_hours": 1226.1,
+      "references": [
+        "manifests/registry.ollama.ai/library/mac-mini-sidecar-learned/latest"
+      ]
+    },
+    {
+      "name": "sha256-72f3286beac6258f4c9d01cd24cf11fb72831c70673507b96600cc7527e37c08",
+      "size": 566,
+      "allocated_bytes": 4096,
+      "links": 1,
+      "age_hours": 1226.1,
+      "references": [
+        "manifests/registry.ollama.ai/library/mac-mini-sidecar-learned/latest"
+      ]
+    },
+    {
+      "name": "sha256-17e666fbe4f4c95d19936e9e4089c50c980df275d2937734edbe2a8e7f02eb40",
+      "size": 551,
+      "allocated_bytes": 4096,
+      "links": 1,
+      "age_hours": 72.4,
+      "references": [
+        "manifests/registry.ollama.ai/library/qwen3-vl/8b"
+      ]
+    },
+    {
+      "name": "sha256-ae2cf6dd5db3ab0305bd80bc090b167494df24d866baa80166df8e57e528d987",
+      "size": 551,
+      "allocated_bytes": 4096,
+      "links": 1,
+      "age_hours": 72.0,
+      "references": [
+        "manifests/registry.ollama.ai/library/xcanvas-fleet-qwen/8b"
+      ]
+    },
+    {
+      "name": "sha256-35dd26e0fdc8e15cb5a05bc93a8e22d1bd8966a5c82d79ba3ff6be173f1053ea",
+      "size": 551,
+      "allocated_bytes": 4096,
+      "links": 1,
+      "age_hours": 71.9,
+      "references": [
+        "manifests/registry.ollama.ai/library/qwen3-vl/8b-instruct"
+      ]
+    },
+    {
+      "name": "sha256-b14c6eab49f986e99b2daf9cedac5183c74d4f5ce2585ebb52b8492778adec39",
+      "size": 476,
+      "allocated_bytes": 4096,
+      "links": 1,
+      "age_hours": 735.4,
+      "references": [
+        "manifests/registry.ollama.ai/library/qwen3.5/0.8b"
+      ]
+    },
+    {
+      "name": "sha256-e0a42594d802e5d31cdc786deb4823edb8adff66094d49de8fffe976d753e348",
+      "size": 358,
+      "allocated_bytes": 4096,
+      "links": 1,
+      "age_hours": 1226.1,
+      "references": [
+        "manifests/registry.ollama.ai/library/mac-mini-sidecar-learned/latest"
+      ]
+    },
+    {
+      "name": "sha256-58abfa252fa3196a077367d816e2f1f3eac6689e6dab20218bb037d38e1bbd04",
+      "size": 94,
+      "allocated_bytes": 4096,
+      "links": 1,
+      "age_hours": 1226.1,
+      "references": [
+        "manifests/registry.ollama.ai/library/mac-mini-sidecar-learned/latest"
+      ]
+    },
+    {
+      "name": "sha256-df9d94d1f91c401bcdfa2bc1ea001c08911cb365c06e14eda21be3a8ebc9c30d",
+      "size": 79,
+      "allocated_bytes": 4096,
+      "links": 1,
+      "age_hours": 72.0,
+      "references": [
+        "manifests/registry.ollama.ai/library/xcanvas-fleet-qwen/8b"
+      ]
+    },
+    {
+      "name": "sha256-9371364b27a52acac9d87f88bd93c9db1174d8d6ec57f6888925cdc1788871ff",
+      "size": 65,
+      "allocated_bytes": 4096,
+      "links": 1,
+      "age_hours": 735.4,
+      "references": [
+        "manifests/registry.ollama.ai/library/qwen3.5/0.8b"
+      ]
+    },
+    {
+      "name": "sha256-f6417cb1e26962991f8e875a93f3cb0f92bc9b4955e004881251ccbf934a19d2",
+      "size": 42,
+      "allocated_bytes": 4096,
+      "links": 1,
+      "age_hours": 72.0,
+      "references": [
+        "manifests/registry.ollama.ai/library/qwen3-vl/8b",
+        "manifests/registry.ollama.ai/library/qwen3-vl/8b-instruct"
+      ]
+    }
+  ]
+}

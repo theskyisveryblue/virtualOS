@@ -1,0 +1,33 @@
+{
+  "allocated_bytes_after": 0,
+  "allocated_bytes_before": 268435456,
+  "allocated_bytes_reclaimed": 268435456,
+  "byte_identity_verified": true,
+  "diagnostic_logs_preserved": true,
+  "disk_free_after_bytes": 13069926400,
+  "disk_free_before_bytes": 13071110144,
+  "evaluator_review_passed": true,
+  "image": "/Users/ai/vos-fleet/linux/maintained-3.24-87c967246cf1fb8c/persistence-tests/run.uuau5W2n/root.img",
+  "log_sha256": {
+    "install-console.log": "1aacf98ae8d39decc1b1a3b2f5541b0ecb4433c5fa8f553b82bc4a8e1e313dab",
+    "lab-state.json": "e3a413581c1fc7fdee5a8f8bf03de86e638d79bd5706e6499fe7bdd3e22ab926",
+    "resource-watch.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "logical_bytes": 268435456,
+  "mini_tests_passed": 9,
+  "observed_at": "2026-10-21T00:26:03.643984+00:00",
+  "operator_storage_tests_passed": 9,
+  "operator_work_loop_tests_passed": 10,
+  "post_publish_sha256": "a6d72ac7690f53be6ae46ba88506bd97302a093f7108472bd9efc3cefda06484",
+  "production_or_verified_images_changed": false,
+  "schema": "virtualos-failed-linux-sparsification/v1",
+  "sha256": "a6d72ac7690f53be6ae46ba88506bd97302a093f7108472bd9efc3cefda06484",
+  "source_image_open_file_check": "not_unused; source retained",
+  "source_sha256": {
+    "linux_lab_storage.py": "8c3d3691f846dbbe5aef4945fec45f57673c41116696beeaebf11121d540277f",
+    "test_linux_lab_storage.py": "f0fc5eec2c66f5460573a29d75e853063df978e0705f6b74c16800d4dc24738a"
+  },
+  "sparsified": true,
+  "unique_apfs_extents_reclaimed_verified": false,
+  "volume_free_space_change_not_attributed_to_this_operation": true
+}

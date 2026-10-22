@@ -1,0 +1,49 @@
+{
+  "activation_authorized": false,
+  "elapsed_seconds": 60.09175000002142,
+  "estimated_additional_memory_gib": 1,
+  "first": {
+    "cpu_count": 14,
+    "disk_free_bytes": 11893391360,
+    "free_and_speculative_bytes": 160333824,
+    "free_physical_bytes": 71155712,
+    "inactive_bytes": 4109041664,
+    "load_one": 6.9033203125,
+    "loaded_model_count": 0,
+    "observed_at": "2026-10-19T01:06:09.060406+00:00",
+    "possible_model_or_compile_jobs": [],
+    "swap_used_mib": 31395.56,
+    "swapouts_bytes": 1360360652800
+  },
+  "guest_input_applied": false,
+  "inference_requested": false,
+  "measurement_note": "Inactive pages are only potentially reclaimable. Even free plus speculative plus inactive memory stayed below 6 GiB; swap allocation declined while active swapouts exceeded 1 GiB during the real paired interval.",
+  "no_guest_unlock_attempted": true,
+  "no_models_loaded_or_unloaded": true,
+  "proposed_context": 2048,
+  "proposed_cpu_threads": 2,
+  "proposed_keep_alive": 0,
+  "proposed_model": "qwen2.5-coder:0.5b",
+  "proposed_predict_tokens": 64,
+  "reasons": [
+    "physical_free_and_potentially_reclaimable_memory_below_6_gib",
+    "active_swapout_pressure"
+  ],
+  "schema": "virtualos-operator-cpu-model-budget/v1",
+  "second": {
+    "cpu_count": 14,
+    "disk_free_bytes": 12779274240,
+    "free_and_speculative_bytes": 114524160,
+    "free_physical_bytes": 65896448,
+    "inactive_bytes": 4292624384,
+    "load_one": 6.4482421875,
+    "loaded_model_count": 0,
+    "observed_at": "2026-10-19T01:07:09.152966+00:00",
+    "possible_model_or_compile_jobs": [],
+    "swap_used_mib": 31045.06,
+    "swapouts_bytes": 1361848385536
+  },
+  "state": "waiting_for_resources",
+  "swap_growth_mib": -350.5,
+  "swapout_growth_mib": 1418.8125
+}

@@ -1,0 +1,27 @@
+{
+  "observed_at": "2026-10-21T21:09:22.142595+00:00",
+  "historical_supervisor_ticks": 3430,
+  "historical_tick_span_hours": 88.93310543477536,
+  "current_supervisor_pid": 18133,
+  "current_supervisor_state": "supervising",
+  "current_deadline_preserved": 1792697430.417424,
+  "singleton_locks_held": true,
+  "background_lease_renewal_forbidden_by_passing_fixture": true,
+  "full_current_24h_window_elapsed": false,
+  "monitoring_restarts_and_gaps_disclosed": true,
+  "vm_services_restarted": false,
+  "source_sha256": {
+    "tools/cloud_disk_work_loop.py": "2c968ed24fb47c88e2c4c0d7bd6a4d1784730bf50fdc3bb14d8b7204bcc1b9e3",
+    "tools/test_cloud_disk_work_loop.py": "b50050e9e9390663e8b49601acdb11463be137714fad44816d580e7b0d29ced9",
+    "tools/cloud-disk-observe.sh": "e2cfe98fa6d029a5145a9deea4e12e030fa773ec4a77d30f44edc7d874fe7d61",
+    "tools/test_cloud_disk_observe.py": "90d1edae972220b2c6117a2b9a6fefba867647f94160a76369926e9a5ee5e0f4"
+  },
+  "historical_source_sha256": {
+    "tools/cloud_disk_work_loop.py": "0456e1975fc06805763161a308373c0acfc06843bb277cb2c90c994dfedcfe7c",
+    "tools/test_cloud_disk_work_loop.py": "ca35f48017b9d6ee900fa45784662dc407ca2043cc13f8baced75a56236cae11",
+    "tools/cloud-disk-observe.sh": "e2cfe98fa6d029a5145a9deea4e12e030fa773ec4a77d30f44edc7d874fe7d61",
+    "tools/test_cloud_disk_observe.py": "90d1edae972220b2c6117a2b9a6fefba867647f94160a76369926e9a5ee5e0f4"
+  },
+  "source_reviewed_at": "2026-10-21T21:38:02.500465+00:00",
+  "source_review": "Additive fixed snapshot-audit job; existing tick cadence, deadline, locks, recovery admission and agent lease behavior preserved. Current controller suite 63 tests passed; historical soak observations remain historical."
+}

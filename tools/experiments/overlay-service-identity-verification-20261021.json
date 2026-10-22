@@ -1,0 +1,18 @@
+{
+  "observed_at": "2026-10-21T20:32:12.148651+00:00",
+  "read_only": true,
+  "config_matches_managed_pin": true,
+  "service_pid": 88374,
+  "service_matches_config": true,
+  "codec": "raw",
+  "logical_limit_bytes": 2147483648,
+  "seed_pin_matches_service": "ed2a522a2ff69e3210927c83df8784478794474d849371215168f8bd8332ba6b",
+  "actual_deployed_code_sha256": {
+    "/Users/ai/vos-fleet/.local/maintenance/compressed-shared-disk-20261020/tools/computer-space.sh": "d332647f9d941f58ae57490e04f96ccde79c7b34e66600f6f05959e27549362f",
+    "/Users/ai/vos-fleet/.local/maintenance/compressed-shared-disk-20261020/tools/cloud_disk.py": "2b273187a7608d7de56f4f25c70cd54d122229576a837dd6d32b6562ae50ce75",
+    "/Users/ai/vos-fleet/.local/maintenance/compressed-shared-disk-20261020/tools/fleet/shared_disk.py": "654d08b35eebc57f8ec34e51a34d0bb30df8e4a2f27fc02c92b669d2b3a80281"
+  },
+  "candidate_activated": false,
+  "attached_nbd_session_probed_or_interrupted": false,
+  "original_disk_retained": true
+}

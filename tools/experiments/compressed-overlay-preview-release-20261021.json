@@ -1,0 +1,14 @@
+{
+  "observed_at": "2026-10-21T20:25:50.029765+00:00",
+  "round_trip_verified": true,
+  "original_live_overlay_preserved": true,
+  "original_disk_retained": true,
+  "removed_disposable_preview": "/Users/ai/vos-fleet/.local/maintenance/compressed-writes-20261021/real-overlay-preview/compressed-preview.sqlite",
+  "removed_allocated_bytes": 419495936,
+  "removed_logical_bytes": 417488896,
+  "free_bytes_before": 10584584192,
+  "free_bytes_after": 11004350464,
+  "live_vm_disk_compression_activated": false,
+  "scope": "only this operation generated preview; live overlay and preserved original unchanged",
+  "preview_logical_fingerprint": "659a6b41a37a47eb4c634d5656f41dff7d6e554ac17cd5a7781b69ffff2f560d"
+}

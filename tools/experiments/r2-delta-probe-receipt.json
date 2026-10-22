@@ -1,0 +1,15 @@
+{
+  "account_id": "c24a3fb4bedba669785c18c834f51921",
+  "block_count": 3,
+  "bucket": "virtualos-cloud-disks",
+  "conditional_reuse_verified": true,
+  "delta_manifest_sha256": "4fcd688216c7a0b217d96a7579f474366c03caac07e6c19e7af69e54d647bef8",
+  "encoded_bytes": 66177,
+  "object_prefix": "fleet/delta-probe-20261012t015534z-d937f9543929",
+  "r2_delta_probe": "passed",
+  "raw_bytes": 196608,
+  "readback_verified": true,
+  "remote_objects_retained": 4,
+  "scope": "synthetic blocks; no VM boot or archive",
+  "wrong_pin_preserves_destination": true
+}

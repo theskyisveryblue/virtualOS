@@ -1,0 +1,19 @@
+{
+  "chromium_sandbox": true,
+  "connected": {
+    "image_height": 900,
+    "image_width": 1500,
+    "key_field_empty": true,
+    "local_storage_entries": 0,
+    "machine": "vm-a",
+    "session_storage_entries": 0
+  },
+  "console_url": "https://virtualos-relay.ai-c24.workers.dev/console",
+  "disconnect_cleared": true,
+  "guest_input_sent": false,
+  "isolated_browser": true,
+  "page_errors": [],
+  "relay_version": "5e68261a-941a-4456-bd65-eaa5859052d6",
+  "schema": "virtualos-live-console-check/v1",
+  "verified_at": "2026-10-18T04:10:07.125Z"
+}

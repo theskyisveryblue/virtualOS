@@ -1,0 +1,22 @@
+{
+  "schema": "virtualos-stopped-machine-compressed-conversion/v1",
+  "observed_at": "2026-10-21T16:51:46.416194+00:00",
+  "base": "/Users/ai/vos-fleet/vm-a-base-20261021.bundle/Disk.img",
+  "machine": "/Users/ai/vos-fleet/vm-a.bundle/Disk.img",
+  "delta": "/Users/ai/vos-fleet/deltas/vm-a-compressed-20261021.sqlite",
+  "build": {
+    "format": "virtualos-compressed-delta/v1",
+    "delta_sha256": "ed2a522a2ff69e3210927c83df8784478794474d849371215168f8bd8332ba6b",
+    "blocks": 34475,
+    "raw_delta_bytes": 2259353600,
+    "encoded_payload_bytes": 1164404475,
+    "stored_bytes": 1192714240,
+    "base_sha256": "88c845e35d2d23d0981bd7ce57dac4d6888ffe872f52d71a3f1b1d1ed9ebacf5",
+    "machine_sha256": "89fc38f20630f1d55023bb616b2e5edf387d13b94e3a608d888ed7708e156690"
+  },
+  "full_reconstruction_sha256": "89fc38f20630f1d55023bb616b2e5edf387d13b94e3a608d888ed7708e156690",
+  "full_reconstruction_verified": true,
+  "original_disk_retained": true,
+  "source_machine_unchanged": true,
+  "elapsed_seconds": 119.3034975
+}

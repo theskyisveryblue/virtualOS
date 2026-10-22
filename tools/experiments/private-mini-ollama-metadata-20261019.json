@@ -1,0 +1,50 @@
+{
+  "global_daemon_metadata_unchanged": true,
+  "global_model_store_writes": false,
+  "guest_input_applied": false,
+  "inference_requested": false,
+  "initial_metadata_resources": {
+    "cpu_count": 10,
+    "load_one": 6.099609375,
+    "potentially_available_bytes": 3263528960,
+    "swapouts": 19121091
+  },
+  "manifest_sha256": "4ff64a7f502a08b7616edb8ca0a79eb1853fc363d842b7df4b46915d11a3fb09",
+  "minimum_free_disk_bytes": 10737418240,
+  "model_blob_bytes": 397821516,
+  "model_blobs_verified": 5,
+  "model_download_requested": false,
+  "observed_at": "2026-10-19T02:37:00.935053+00:00",
+  "post_stage_free_bytes": 22850736128,
+  "private_process_stopped_and_reaped": true,
+  "proof": {
+    "capabilities": [
+      "completion",
+      "tools",
+      "insert"
+    ],
+    "credential_environment_scrubbed": true,
+    "full_digest_reference_supported": true,
+    "full_manifest_reference": "sha256-4ff64a7f502a08b7616edb8ca0a79eb1853fc363d842b7df4b46915d11a3fb09",
+    "global_writes_denied_by_sandbox": true,
+    "models_loaded": 0,
+    "private_port": 57504,
+    "private_server_pid": 65564,
+    "private_server_version": "0.40.6"
+  },
+  "runtime": {
+    "archive_sha256": "b2b55434865a668decb494110d7fd970eed3ecc8837be2872f672ccbb95df974",
+    "decoded_bytes": 565969764,
+    "entries": 59,
+    "main_sha256": "69fcb23ae7b95af30b5184998751f6158df84d0071f930670ee5c22db667c2ff",
+    "runtime_bytes_verified": 565969764,
+    "runtime_entries_verified": 59,
+    "runtime_files_verified": 47,
+    "runtime_integrity_checked_at": "2026-10-19T02:59:39.787794+00:00",
+    "runtime_inventory_sha256": "8e2986b681848675b29a05d2e626f1954c5b204b0ad042d182ee1366ca07dde5",
+    "strict_codesign_verified_files": 32
+  },
+  "schema": "virtualos-private-ollama-metadata-proof/v1",
+  "stage_directory": "/Users/ai/vos-fleet/.local/maintenance/ollama-metadata-20261019",
+  "state": "metadata_verified"
+}

@@ -1,0 +1,29 @@
+{
+  "observed_at": "2026-10-21T20:54:23.236855+00:00",
+  "read_only": true,
+  "manifest_sha256_verified": "40f4506a2a21af31d82bca6c900e5d197842d9dd777cc130aa227e29336f6963",
+  "manifest_prefix": "disks/archive-base-0073037110369885",
+  "logical_bytes": 32212254720,
+  "chunk_count": 7680,
+  "nonzero_chunk_count": 6510,
+  "unique_chunk_object_count": 6510,
+  "sum_referenced_encoded_chunk_bytes": 22267132894,
+  "sample_chunk_reread_sha256": "ed78aae1d943f403e4c0ed479e3d31986ad708e638a79ae84f20963f52a3c2d5",
+  "full_raw_readback_not_repeated": true,
+  "prior_full_readback_receipt": "tools/experiments/r2-independent-base-readback-20261019.json",
+  "archive_bucket": "virtualos-vm-backups",
+  "archive_key": "vm-backups/20261011T230151Z-91132/virtualOS.bundle.tar.gz",
+  "archive_current_bytes": 22266108635,
+  "multipart_inventory": [
+    {
+      "bucket": "virtualos-vm-backups",
+      "uploads": []
+    },
+    {
+      "bucket": "virtualos-cloud-disks",
+      "uploads": []
+    }
+  ],
+  "objects_or_uploads_deleted": false,
+  "archive_and_base_retained_until_recovery_boot_verified": true
+}

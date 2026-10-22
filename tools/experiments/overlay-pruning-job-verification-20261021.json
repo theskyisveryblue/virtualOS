@@ -1,0 +1,140 @@
+{
+  "verified_at": "2026-10-21T21:38:02.500465+00:00",
+  "state": "prepared_waiting_for_resources",
+  "local_tests_passed": 63,
+  "additional_backend_regressions_passed": 6,
+  "real_overlay_audit_completed": false,
+  "source_sha256": {
+    "tools/overlay_pruning_audit.py": "12c190b9cf455ddaab8a50d576379b013054771176829bdd08da9f19c334029e",
+    "tools/test_overlay_pruning_audit.py": "c4fd42596ea1a955063241a7b51ddbeb3ba1749673df0925e4e6eb76fdc88b24",
+    "tools/storage_pruning_job.py": "91a82d98df7e6fd9139eaaaca983841f9ef03c3b3785eec3ca3694581cc52fc4",
+    "tools/storage_pruning_remote.py": "bedb01abeba42628a53983a9e47a2d06e2cfe9eca8a11c61ae93bc162e9dd84c",
+    "tools/test_storage_pruning_job.py": "5ba39eb9c3be5494cb7e3ad01fee735c1c568749c5186f54c8a8c571e0c307aa",
+    "tools/test_storage_pruning_remote.py": "785f6fbd7a68dff25cf7a9bfcc99291baef8126e99899eb1dd32b6f5b613a93c",
+    "tools/cloud_disk_work_loop.py": "2c968ed24fb47c88e2c4c0d7bd6a4d1784730bf50fdc3bb14d8b7204bcc1b9e3",
+    "tools/test_cloud_disk_work_loop.py": "b50050e9e9390663e8b49601acdb11463be137714fad44816d580e7b0d29ced9",
+    "tools/cloud_disk.py": "023104b7c41a6d4dee2cd44ce489c1bd6544b61056a6926517d396bf743c4e3c",
+    "tools/compressed_delta.py": "e62350e1b2003f8ccc7b8d8b9a0053f8d57ccefc6ee8b2bf3ea52959fccdacc6",
+    "tools/overlay_compact.py": "53e32d1fefc3f4a68ce127dbe3c7174040c5864e48a7e9cdd4dd933963ad9e21"
+  },
+  "remote_preflight": {
+    "observed_at": "2026-10-21T21:33:36.936427+00:00",
+    "read_only": true,
+    "state": "blocked_resources",
+    "checks": {
+      "snapshot_headroom": true,
+      "load_below_cpu": false,
+      "memory_at_least_25_percent": true,
+      "swap_below_16_gib": false
+    },
+    "resources": {
+      "background_work": "paused",
+      "cpu_count": 10,
+      "disk_free_kib": 14761092,
+      "families": {
+        "ai_agents": {
+          "processes": 2,
+          "sum_rss_mib": 991.9
+        },
+        "browser_apps": {
+          "processes": 23,
+          "sum_rss_mib": 301.3
+        },
+        "browser_engines": {
+          "processes": 266,
+          "sum_rss_mib": 8157.6
+        },
+        "simulator_runtime": {
+          "processes": 0,
+          "sum_rss_mib": 0.0
+        },
+        "terminal": {
+          "processes": 1,
+          "sum_rss_mib": 9.3
+        },
+        "virtualos": {
+          "processes": 4,
+          "sum_rss_mib": 47.1
+        }
+      },
+      "load_one": 36.61,
+      "memory_free_percent": 27,
+      "reasons": [
+        "swap_at_least_8_gib",
+        "load_at_least_2x_cpu"
+      ],
+      "rss_note": "RSS sums can count shared pages more than once and omit paged-out memory",
+      "swap_used_mib": 17734,
+      "top_executables": [
+        {
+          "name": "Google Chrome for Testing",
+          "processes": 152,
+          "sum_rss_mib": 5553.0
+        },
+        {
+          "name": "Google Chrome",
+          "processes": 74,
+          "sum_rss_mib": 2082.3
+        },
+        {
+          "name": "ollama",
+          "processes": 2,
+          "sum_rss_mib": 991.9
+        },
+        {
+          "name": "com.apple.WebKit.WebContent",
+          "processes": 7,
+          "sum_rss_mib": 388.0
+        },
+        {
+          "name": "Figma",
+          "processes": 9,
+          "sum_rss_mib": 138.1
+        },
+        {
+          "name": "Paper",
+          "processes": 7,
+          "sum_rss_mib": 119.2
+        },
+        {
+          "name": "chrome_crashpad_handler",
+          "processes": 19,
+          "sum_rss_mib": 35.3
+        },
+        {
+          "name": "com.apple.Virtualization.VirtualMachine",
+          "processes": 3,
+          "sum_rss_mib": 33.7
+        }
+      ]
+    },
+    "available_bytes": 15115366400,
+    "snapshot_source_bytes": 987734016,
+    "snapshot_created": false,
+    "real_pruning_audit_performed": false,
+    "guest_services_changed": false,
+    "apps_closed": false,
+    "preserved_processes": "  440 /Applications/virtualOS.app/Contents/MacOS/virtualOS\n 2499 ./tools/fleet/linux-guest\n80901 /Users/ai/vos-fleet/tools/fleet/fleet-supervisor\n"
+  },
+  "deadline": 1792697430.417424,
+  "apps_closed": false,
+  "vm_services_changed": false,
+  "live_shell_supervisor": 55151,
+  "live_audit_job": {
+    "result": {
+      "guest_services_changed": false,
+      "observed_at": "2026-10-21T21:38:07.869694+00:00",
+      "reason": "host load",
+      "remote_program_sha256": "bedb01abeba42628a53983a9e47a2d06e2cfe9eca8a11c61ae93bc162e9dd84c",
+      "resources": {},
+      "state": "waiting_for_resources"
+    },
+    "state": "waiting_for_resources",
+    "updated_at": 1792618687.761972
+  },
+  "background_job_deployed_and_resource_gate_exercised": true,
+  "checked_at": "2026-10-21T21:39:29.131248+00:00",
+  "subsequent_supervisor_tick_verified": true,
+  "five_minute_resource_retry_not_repeated_on_next_minute_tick": true,
+  "latest_supervisor_tick": 1792618747.924775
+}

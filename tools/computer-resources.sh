@@ -49,8 +49,11 @@ if mode in ('--report', '--guard-offline'):
     except (OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired):
         result['memory_free_percent'] = None
 if mode in ('--stale-simulator-check', '--reclaim-stale-simulator'):
-    devices = json.loads(subprocess.check_output(
-        ['xcrun', 'simctl', 'list', 'devices', '--json'], text=True, timeout=15))
+    try:
+        devices = json.loads(subprocess.check_output(
+            ['xcrun', 'simctl', 'list', 'devices', '--json'], text=True, timeout=15))
+    except (OSError, ValueError, subprocess.CalledProcessError, subprocess.TimeoutExpired) as error:
+        raise SystemExit(f'stale_simulator=unavailable: device inventory failed ({type(error).__name__})')
     states = [device.get('state') for group in devices.get('devices', {}).values()
               for device in group]
     if not states or any(state != 'Shutdown' for state in states):

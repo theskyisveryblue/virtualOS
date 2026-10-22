@@ -1,0 +1,31 @@
+{
+  "actual_vm_or_cloud_requests": false,
+  "fixture_backend": "synthetic local HTTP server only",
+  "live_activated": false,
+  "mini_services_changed": false,
+  "real_local_tcp_fixture_tests_passed": 8,
+  "schema": "virtualos-fleet-mux-native-boundary-source/v1",
+  "source_reviewed_limits": [
+    "8KiB header budget; body-free routes; bounded backend replies; absolute5s request deadlines",
+    "maximum8 active clients",
+    "request/backend deadline timers cancelled and joined before socket release"
+  ],
+  "source_sha256": {
+    "tools/FLEET.md": "6adb4997f02c3ae1fa69ffead4b646c32d7b4e9d252ddbf8bcedf658ab94c3f8",
+    "tools/fleet/fleet.py": "3a42d2a4f080dfd5c08994ba1a651246d0a7ae9eb5f057847485d3a56a72d895",
+    "tools/fleet/test_fleet_mux.py": "ae9960a9d3852648c5a59cd3fc1ee53e996911b684f6e8c6e143f4aee6a26359",
+    "tools/fleet/web/README.md": "f0d9057ec87188eb603b4a05eeede5e15db6ec4519515d5031b7d82fccc69c1a"
+  },
+  "state": "source_only_not_activated",
+  "tested_behavior": [
+    "native status/capability/frame and exact start-all/named start/named stop forward correctly",
+    "browser Origin/fetch metadata denied before backend calls",
+    "wrong/missing/duplicate Host and ambiguous framing denied before backend calls",
+    "OPTIONS and unknown routes do not contact backend; no wildcard CORS",
+    "segmented request accepted; stalled headers closed by deadline",
+    "non-loopback binds/backend URLs refused"
+  ],
+  "tests_seconds": 12.079,
+  "verified_at": "2026-10-19T04:38:31.861677+00:00",
+  "whitespace_check_passed": true
+}

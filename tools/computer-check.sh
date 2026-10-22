@@ -96,6 +96,10 @@ if [[ ! -x "$repo_dir/tools/virtualos_stream_server/inputctl" ]]; then
   echo 'preflight=failed: guest OCR helper missing' >&2
   exit 1
 fi
+if [[ "$repo_dir/tools/virtualos_stream_server/inputctl.swift" -nt "$repo_dir/tools/virtualos_stream_server/inputctl" ]]; then
+  echo 'preflight=failed: guest OCR helper is older than its source; run ./tools/computer-check.sh --build-ocr' >&2
+  exit 1
+fi
 if ! health_json="$(curl -fsS --max-time 3 http://127.0.0.1:8845/vm/health 2>/dev/null)" \
     || ! printf '%s' "$health_json" | python3 -c 'import json,sys
 try: h=json.load(sys.stdin)

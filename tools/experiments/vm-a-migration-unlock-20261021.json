@@ -1,0 +1,7 @@
+{
+  "credential_route": "loopback_only",
+  "guest_unlock": "verified_desktop",
+  "password_logged": false,
+  "password_submitted": true,
+  "helper_exit_code": 0
+}

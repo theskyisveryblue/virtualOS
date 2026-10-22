@@ -1,0 +1,17 @@
+{
+  "r2_machine_storage": "verified",
+  "verified_at": "2026-10-13T00:10:11.328609+00:00",
+  "account_id": "c24a3fb4bedba669785c18c834f51921",
+  "bucket": "virtualos-cloud-disks",
+  "object_prefix": "fleet/vm-shared-20261012-verified",
+  "scope": "real-machine delta and manifest; shared base remains on Mini",
+  "manifest_sha256": "cb3b06e85a39a8fc875af693da227d214bca641e66d73ea780b17fa73c5ca8f4",
+  "referenced_blocks": 25404,
+  "unique_block_objects": 25376,
+  "stored_objects": 25377,
+  "stored_bytes": 824983105,
+  "manifest_bytes": 5124493,
+  "raw_delta_bytes": 1664876544,
+  "required_base_bytes": 32212254720,
+  "inventory_matches_verified_manifest": true
+}

@@ -1,0 +1,58 @@
+{
+  "schema": "virtualos-linux-persistence-receipt/v1",
+  "scope": "isolated legacy Alpine 3.20 baseline; maintained Alpine 3.24 remains a separate unbooted stage",
+  "verified_at": "2026-10-18T16:07:26.561251+00:00",
+  "integrity_checked_at": "2026-10-18T18:17:12.527738+00:00",
+  "mini_run_directory": "/Users/ai/vos-fleet/linux/persistence-tests/run.f0jNUGtl",
+  "kernel_release": "6.6.142-0-virt",
+  "kernel_sha256": "4f5b3afb7439ea96f5c1950b35dee7c919ccc92dadee9df8acb41c9ef48a135e",
+  "initramfs_sha256": "70914fa9a71d36dfcc538ffdfeba4cc503a992dc475c755cf375d66188a092ba",
+  "kernel_package_sha256": "35cb4b105e28bf34ed192a33cf23dc834e90492d9d7e8467a699885cf12b0e89",
+  "kernel_package_signature_verified": true,
+  "formatted": true,
+  "rootfs_laid_down": true,
+  "init_installed": true,
+  "root_login_locked": true,
+  "root_shadow_mode": "0600",
+  "root_mount_verified": "ext4,rw",
+  "disk_rooted_boot_1": true,
+  "disk_rooted_boot_2": true,
+  "persist_marker_counts": [1, 2],
+  "marker_boot_1": "init: boot #0 at 0.35",
+  "marker_boot_2": "init: boot #1 at 0.38",
+  "persistent": true,
+  "guest_budget": {"cpus": 1, "memory_gib": 1},
+  "resource_checks_before_all_boots": "allowed",
+  "production_guests_restarted_by_lab": false,
+  "source_disk_formatted": false,
+  "proof_disk_retained": true,
+  "logs_preserved": true,
+  "files": {
+    "root.img": {
+      "bytes": 268435456,
+      "allocated_bytes": 15589376,
+      "sha256": "b594a3f6818bca73b8ece5643e1b26cfda7f7e8d12368e33d7416d598da9f07c",
+      "mode": "0600"
+    },
+    "install-console.log": {
+      "bytes": 8423,
+      "sha256": "46f8c9ea0456cce4a2fbc3c099dcffd0f60754a1a0af2dd2884bcf4810a4ea78"
+    },
+    "reboot1-console.log": {
+      "bytes": 2274,
+      "sha256": "e7b0c86fd4d6aa1f5e7aacd100dcd317b1a83cf9a004b18366abbf560783b10f"
+    },
+    "reboot2-console.log": {
+      "bytes": 2500,
+      "sha256": "227b7091b2e344c235bc76b2e60dc4c6058d46630e1b4d0a78879d795c1da6ad"
+    },
+    "lab-state.json": {
+      "bytes": 230,
+      "sha256": "d37e6a16be226a1304d9578f4bea994053e3c89aa2a144d945d6bd26475b8295",
+      "state": "verified",
+      "exit_status": 0
+    }
+  },
+  "maintained_alpine_324_boot_verified": false,
+  "notes": "The package database bootstrap and explicit writable-root remount were fixed before this successful run. Root password login was locked before installation completed. The successful proof disk and all logs are retained; resource-aborted disks are eligible only for strict private unused-file cleanup. This does not prove support status, nested virtualization, or maintained Alpine 3.24 boot."
+}

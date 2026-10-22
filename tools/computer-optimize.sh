@@ -8,7 +8,9 @@ if [[ $# -ne 1 || ( "$1" != --status && "$1" != --verify ) ]]; then
 fi
 
 repo_dir="$(cd "$(dirname "$0")/.." && pwd)"
-mini_tools=/Users/ai/Documents/GitHub/virtualOS/tools
+# The Mini's Documents checkout may be cloud-backed and block reads. The
+# staged fleet tools are local to the Mini and are the live runtime copy.
+mini_tools=/Users/ai/vos-fleet/tools
 
 mini_readonly() {
   ssh -o BatchMode=yes -o ConnectTimeout=8 mac-mini-ai "$1"

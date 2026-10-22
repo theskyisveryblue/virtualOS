@@ -1,0 +1,26 @@
+{
+  "scope": "vm-a compressed storage migration",
+  "user_response": "ssure",
+  "authorized": [
+    "stop and restart test vm-a",
+    "preserve original disk for rollback"
+  ],
+  "preserve": [
+    "production macOS",
+    "Linux",
+    "global models",
+    "simulators"
+  ],
+  "resource_limits_unchanged": true,
+  "inactive_model_offload": {
+    "model": "qwen3-vl:8b-instruct",
+    "authorization": "User replied keep working to the explicit offload approval request",
+    "verified_backup_required": true
+  },
+  "temporary_workload_pauses": {
+    "authorization": "User replied keep working to explicit temporary pause request",
+    "simulator": "iPhone 17",
+    "model_ram_only": "qwen3.5:0.8b",
+    "preserve_data_and_installed_models": true
+  }
+}

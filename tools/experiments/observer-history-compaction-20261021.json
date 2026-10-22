@@ -1,0 +1,12 @@
+{
+  "observed_at": "2026-10-21T21:02:58.803847+00:00",
+  "old_log_bytes": 38944798,
+  "old_log_allocated_bytes": 38948864,
+  "archive": "/private/tmp/virtualos-archive-conversion/observer-history-20261021T210258Z.log.gz",
+  "archive_bytes": 1184806,
+  "retained_hot_log_bytes": 4193647,
+  "original_log_sha256": "85e2f905b095e48dd917d5d5b39968107ec0e1c31d6c864c075956830f3a5788",
+  "full_archive_round_trip_verified": true,
+  "allocated_bytes_released": 33566720,
+  "vm_services_restarted": false
+}

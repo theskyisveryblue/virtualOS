@@ -1,0 +1,41 @@
+{
+  "additional_recovery_disk_needed_bytes": 5344636928,
+  "clone_apparent_bytes_are_not_unique_extents": true,
+  "completed": [
+    "Mini SSH restored and observed",
+    "observer probe isolation and singleton verified",
+    "abandoned browser profiles and idle updater cache reclaimed",
+    "supervisor candidate and rollback evidence refreshed"
+  ],
+  "inactive_chrome_clones_verified": false,
+  "latest_free_disk_bytes": 9687748608,
+  "linux_pid_preserved": 2499,
+  "measured_free_bytes_gained": 2842386432,
+  "ocr_minimum_free_disk_bytes": 8589934592,
+  "pending_approval": [
+    "shutdown iPhone 17 simulator, preserving its data",
+    "unload qwen3.5:0.8b only if still idle",
+    "stop/restart only vm-a for the prepared R2 recovery and supervisor activation"
+  ],
+  "production_pid_preserved": 440,
+  "recovery_minimum_free_disk_bytes": 15032385536,
+  "remaining": [
+    "fresh 6 GiB available memory and idle global models for OCR",
+    "14 GiB free disk and 50 percent free memory for recovery",
+    "one free macOS slot for recovery",
+    "explicit host security maintenance and owner-controlled restart recovery"
+  ],
+  "schema": "virtualos-blocker-resolution/v1",
+  "source_sha256": {
+    "tools/mac_mini/reclaim_idle_artifacts.py": "447fbda123a1ac77e635015e8b9b59324dfc093298d8b3c01f4d65b182bc97f9",
+    "tools/mac_mini/resource_readiness.py": "5efa5e7a028b9f2d787a510331113ccc6c35ee0d08765245d79b5292a101396b",
+    "tools/test_mini_reclaim.py": "61472069cb6fed94f93773c9ea28f9d710091c7f20403f84d9719d9ca0b8cd8e"
+  },
+  "sources": [
+    "tools/experiments/mini-idle-artifact-cleanup-20261020.json",
+    "tools/experiments/maintenance-readiness-20261020.json",
+    "tools/experiments/test-fleet-maintenance-plan-20261020.json"
+  ],
+  "test_supervisor_pid_preserved": 2503,
+  "updated_at": "2026-10-20T23:52:27.240431+00:00"
+}

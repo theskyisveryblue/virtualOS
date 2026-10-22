@@ -1,0 +1,148 @@
+{
+  "observed_at": "2026-10-21T18:53:34.684742+00:00",
+  "changes_made": false,
+  "fleet": {
+    "count": 1,
+    "instances": [
+      {
+        "ready": true,
+        "error": "",
+        "bundle": "/Users/ai/vos-fleet/machines/vm-a.bundle",
+        "name": "vm-a",
+        "controlPort": 9125,
+        "state": "running"
+      }
+    ],
+    "ok": true,
+    "basePort": 9125,
+    "root": "/Users/ai/vos-fleet/machines",
+    "capability": {
+      "nestedVirtualizationSupported": true,
+      "nestedVirtualizationReason": "supported",
+      "platform": "macOS Version 26.2 (Build 25C56)"
+    }
+  },
+  "protected_processes": "  440 /Applications/virtualOS.app/Contents/MacOS/virtualOS\n 2499 ./tools/fleet/linux-guest\n",
+  "overlay": {
+    "bytes": 918274048,
+    "wal_bytes": 4140632,
+    "blocks": 13886,
+    "raw_payload_bytes": 910032896,
+    "compression_sample_blocks": 256,
+    "sample_raw_bytes": 16777216,
+    "sample_zlib1_bytes": 5623297
+  },
+  "staging": {
+    "archive_exists": true,
+    "archive_bytes": 174459907,
+    "children": [
+      {
+        "name": "ocr-session.lock",
+        "is_dir": false,
+        "size": 0
+      },
+      {
+        "name": "runtime-compression-activated.json",
+        "is_dir": false,
+        "size": 1652
+      },
+      {
+        "name": "preparation.json",
+        "is_dir": false,
+        "size": 301
+      },
+      {
+        "name": "runtime-compression-candidate.json",
+        "is_dir": false,
+        "size": 11848
+      },
+      {
+        "name": "runtime-inventory.json",
+        "is_dir": false,
+        "size": 8838
+      },
+      {
+        "name": "metadata-proof.json",
+        "is_dir": false,
+        "size": 1724
+      },
+      {
+        "name": "cache",
+        "is_dir": true,
+        "size": 64
+      },
+      {
+        "name": "runtime-proof.json",
+        "is_dir": false,
+        "size": 514
+      },
+      {
+        "name": "ollama-darwin.tgz",
+        "is_dir": false,
+        "size": 174459907
+      },
+      {
+        "name": "model-manifest",
+        "is_dir": false,
+        "size": 857
+      },
+      {
+        "name": "runtime",
+        "is_dir": true,
+        "size": 1600
+      },
+      {
+        "name": "models",
+        "is_dir": true,
+        "size": 160
+      },
+      {
+        "name": "runtime-inventory-verification.json",
+        "is_dir": false,
+        "size": 350
+      },
+      {
+        "name": "sandbox-check.log",
+        "is_dir": false,
+        "size": 112
+      },
+      {
+        "name": "server.log",
+        "is_dir": false,
+        "size": 2965
+      },
+      {
+        "name": "tmp",
+        "is_dir": true,
+        "size": 64
+      },
+      {
+        "name": "helpers",
+        "is_dir": true,
+        "size": 256
+      },
+      {
+        "name": "model-blobs.json",
+        "is_dir": false,
+        "size": 409
+      }
+    ],
+    "archive_regular_files": 47,
+    "archive_sample_names": [
+      "ollama",
+      "llama-server",
+      "llama-quantize",
+      "libggml-blas.so",
+      "libggml-cpu-alderlake.so",
+      "libggml-cpu-cannonlake.so",
+      "libggml-cpu-cascadelake.so",
+      "libggml-cpu-cooperlake.so",
+      "libggml-cpu-haswell.so",
+      "libggml-cpu-icelake.so",
+      "libggml-cpu-ivybridge.so",
+      "libggml-cpu-piledriver.so"
+    ],
+    "allocated_sizes": "0\t/Users/ai/vos-fleet/.local/maintenance/ollama-metadata-20261019/cache\n224316\t/Users/ai/vos-fleet/.local/maintenance/ollama-metadata-20261019/runtime\n388528\t/Users/ai/vos-fleet/.local/maintenance/ollama-metadata-20261019/models\n0\t/Users/ai/vos-fleet/.local/maintenance/ollama-metadata-20261019/tmp\n92\t/Users/ai/vos-fleet/.local/maintenance/ollama-metadata-20261019/helpers\n783368\t/Users/ai/vos-fleet/.local/maintenance/ollama-metadata-20261019\n"
+  },
+  "disk_free_bytes": 16931819520
+}

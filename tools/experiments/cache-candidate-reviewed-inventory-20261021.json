@@ -1,0 +1,93 @@
+{
+  "observed_at": "2026-10-21T20:49:07.339551+00:00",
+  "candidates": [
+    {
+      "path": "/Users/ai/Library/Caches/Homebrew",
+      "owner_uid": 501,
+      "directory_mtime_unix": 1792601255.3938022,
+      "directory_mtime_is_not_last_use": true,
+      "last_use": "unknown; requires active-reference review",
+      "regeneration": "package/build cache can be regenerated; exact contents and references must be reviewed",
+      "allocated_bytes": 78639104,
+      "open_file_review": "not cleared",
+      "safe_to_delete": false
+    },
+    {
+      "path": "/Users/ai/Library/Caches/bun",
+      "owner_uid": 501,
+      "directory_mtime_unix": 1791457141.7102225,
+      "directory_mtime_is_not_last_use": true,
+      "last_use": "unknown; requires active-reference review",
+      "regeneration": "package/build cache can be regenerated; exact contents and references must be reviewed",
+      "allocated_bytes": 66723840,
+      "open_file_review": "not cleared",
+      "safe_to_delete": false
+    },
+    {
+      "path": "/Users/ai/Library/Caches/org.swift.swiftpm",
+      "owner_uid": 501,
+      "directory_mtime_unix": 1791855975.0756645,
+      "directory_mtime_is_not_last_use": true,
+      "last_use": "unknown; requires active-reference review",
+      "regeneration": "package/build cache can be regenerated; exact contents and references must be reviewed",
+      "allocated_bytes": 13910016,
+      "open_file_review": "not cleared",
+      "safe_to_delete": false
+    },
+    {
+      "path": "/Users/ai/Library/Caches/com.apple.dt.Xcode",
+      "owner_uid": 501,
+      "directory_mtime_unix": 1791583455.255779,
+      "directory_mtime_is_not_last_use": true,
+      "last_use": "unknown; requires active-reference review",
+      "regeneration": "package/build cache can be regenerated; exact contents and references must be reviewed",
+      "allocated_bytes": 139264,
+      "open_file_review": "not cleared",
+      "safe_to_delete": false
+    },
+    {
+      "path": "/Users/ai/Library/Caches/com.apple.dt.xcodebuild",
+      "owner_uid": 501,
+      "directory_mtime_unix": 1791855975.1083615,
+      "directory_mtime_is_not_last_use": true,
+      "last_use": "unknown; requires active-reference review",
+      "regeneration": "package/build cache can be regenerated; exact contents and references must be reviewed",
+      "allocated_bytes": 81920,
+      "open_file_review": "not cleared",
+      "safe_to_delete": false
+    },
+    {
+      "path": "/Users/ai/Library/Caches/Google",
+      "owner_uid": 501,
+      "directory_mtime_unix": 1791421645.1639833,
+      "directory_mtime_is_not_last_use": true,
+      "last_use": "unknown; requires active-reference review",
+      "regeneration": "package/build cache can be regenerated; exact contents and references must be reviewed",
+      "allocated_bytes": 0,
+      "open_file_review": "not cleared",
+      "safe_to_delete": false
+    }
+  ],
+  "scan_scope": "selected package and Xcode caches, not all application data",
+  "full_scan_timed_out": true,
+  "bounded_selected_scan_completed": true,
+  "active_build_tools": [],
+  "browser_roots": [
+    {
+      "pid": 424,
+      "ppid": 1,
+      "executable": "/Users/ai/Applications/Moats Browser.app/Contents/MacOS/Google Chrome for Testing"
+    }
+  ],
+  "browser_executable_name_does_not_establish_a_test_job": true,
+  "homebrew_download_directory_open_review": {
+    "all_closed": false,
+    "reason": "no regular downloads directory"
+  },
+  "last_use_unknown_candidates_not_cleared_for_deletion": true,
+  "cache_files_deleted": false,
+  "source_receipts": [
+    "tools/experiments/cache-candidate-inventory-20261021.json",
+    "tools/experiments/cache-active-reference-review-20261021.json"
+  ]
+}

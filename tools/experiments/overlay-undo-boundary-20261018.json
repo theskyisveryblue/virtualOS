@@ -1,0 +1,21 @@
+{
+  "date": "2026-10-18",
+  "state": "local_storage_protocol_verified",
+  "execution_host": "operator",
+  "network_or_vm_started": false,
+  "production_disk_accessed": false,
+  "fixture_logical_bytes": 262144,
+  "snapshot_with_active_sqlite_connection": true,
+  "restored_earlier_contents": true,
+  "preserved_current_overlay_later_edits": true,
+  "restored_bytes_verified_over_two_fresh_nbd_connections": true,
+  "current_overlay_bytes_verified_over_separate_nbd_connection": true,
+  "existing_destination_refused": true,
+  "fifo_symlink_hardlink_shared_writable_inputs_refused": true,
+  "unpinned_remote_manifest_refused_before_object_fetch": true,
+  "focused_tests_passed": 4,
+  "signed_fake_r2_roundtrip_passed": true,
+  "real_r2_test_performed_this_run": false,
+  "running_guest_rollback_verified": false,
+  "test_source": "tools/test_cloud_disk_checkpoint.py"
+}

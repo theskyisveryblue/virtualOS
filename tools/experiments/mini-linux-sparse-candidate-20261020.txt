@@ -1,0 +1,4 @@
+{"directory": "/Users/ai/vos-fleet/linux/maintained-3.24-87c967246cf1fb8c/persistence-tests/run.uuau5W2n", "files": ["root.img", "lab-state.json", "install-console.log", "resource-watch.log"]}
+lab_state={"created_at": 1792348120.9502752, "disk_retained": true, "exit_status": 1, "finished_at": 1792348174.011439, "schema": "virtualos-linux-lab-storage/v1", "source": "/Users/ai/vos-fleet/linux/inner-root.img", "state": "failed"}
+
+{"disk": "/Users/ai/vos-fleet/linux/maintained-3.24-87c967246cf1fb8c/persistence-tests/run.uuau5W2n/root.img", "logical_bytes": 268435456, "allocated_bytes": 268435456, "zero_64k_chunks": 4096, "total_chunks": 4096, "sha256": "a6d72ac7690f53be6ae46ba88506bd97302a093f7108472bd9efc3cefda06484", "no_open_files": true}

@@ -4,6 +4,7 @@
 import base64
 import binascii
 import http.client
+import hashlib
 from http.server import HTTPServer
 import json
 from pathlib import Path
@@ -125,6 +126,24 @@ class ModelBundleTest(unittest.TestCase):
         blob[40] ^= 0xFF
         with self.assertRaises(ValueError):
             model_bundle.decode(bytes(blob))
+
+    def test_rejects_valid_checksum_with_bad_lengths_or_weight_count(self):
+        original = model_bundle.encode({"x": [1.0, 2.0]})
+        offset = len(model_bundle.MAGIC) + 32
+        payload = bytearray(original[offset:])
+        body_len, code_len = struct.unpack_from("<II", payload)
+        # A valid checksum must not make an inconsistent length header safe.
+        struct.pack_into("<I", payload, 0, body_len + 1)
+        altered = model_bundle.MAGIC + hashlib.sha256(payload).digest() + payload
+        with self.assertRaises(ValueError):
+            model_bundle.decode(altered)
+        # Extra codes must not be silently ignored by the decoder.
+        payload = bytearray(original[offset:])
+        payload.extend(struct.pack("<h", 123))
+        struct.pack_into("<I", payload, 4, code_len + 2)
+        altered = model_bundle.MAGIC + hashlib.sha256(payload).digest() + payload
+        with self.assertRaises(ValueError):
+            model_bundle.decode(altered)
 
 
 class BundledApiTest(ModelApiTest):

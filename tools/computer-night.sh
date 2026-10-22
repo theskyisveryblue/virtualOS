@@ -29,17 +29,35 @@ if [[ "${1:-}" == --quality ]]; then
       exit 0
     fi
     now="$(date +%s)"
+    resource_allowed=1
     if ! "$repo_dir/tools/computer-resources.sh" --guard; then
       echo 'quality=paused: host resource pressure'
-      sleep "$interval"
-      continue
+      resource_allowed=0
     fi
     free_kb="$(df -Pk /System/Volumes/Data | awk 'NR==2 {print $4}')"
     if (( now - last_check >= 3600 )); then
-      if "$repo_dir/tools/computer-grounding.sh" --check-guard; then
-        echo 'quality=guard_check_passed'
+      guest_usable=0
+      if (( resource_allowed == 0 )); then
+        echo 'quality=guest_checks_deferred_resource_pressure'
       else
-        echo 'quality=guard_check_failed'
+        guest_prepared=1
+        if ! "$repo_dir/tools/computer-wake.sh"; then
+          guest_prepared=0
+        elif ! "$repo_dir/tools/computer-unlock.sh"; then
+          guest_prepared=0
+        fi
+        if (( guest_prepared )) &&
+           doctor_json="$("$repo_dir/tools/vosctl" computer doctor 2>/dev/null)" &&
+           printf '%s' "$doctor_json" | python3 -c 'import json,sys; sys.exit(0 if json.load(sys.stdin).get("screenshot_usable") else 1)' 2>/dev/null; then
+          guest_usable=1
+        fi
+        if (( guest_usable == 0 )); then
+          echo 'quality=guest_screen_unusable; guarded guest checks deferred'
+        elif "$repo_dir/tools/computer-grounding.sh" --check-guard; then
+          echo 'quality=guard_check_passed'
+        else
+          echo 'quality=guard_check_failed'
+        fi
       fi
       "$repo_dir/tools/computer-eval.sh" 60 || echo 'quality=eval_failed'
       for source in "$HOME/Library/Application Support/virtualOS/computer-use" \
@@ -47,9 +65,13 @@ if [[ "${1:-}" == --quality ]]; then
         VOS_CUA_TRACE_DIR="$source" "$repo_dir/tools/computer-dataset.sh" --readiness \
           || echo "quality=readiness_failed source=$source"
       done
-      if [[ "${VOS_CUA_QUALITY_CURRICULUM:-0}" == 1 ]]; then
+      if [[ "${VOS_CUA_QUALITY_CURRICULUM:-0}" == 1 && "$resource_allowed" == 0 ]]; then
+        echo 'quality=curriculum_deferred_resource_pressure'
+      elif [[ "${VOS_CUA_QUALITY_CURRICULUM:-0}" == 1 && "$guest_usable" == 0 ]]; then
+        echo 'quality=curriculum_deferred_blank_guest'
+      elif [[ "${VOS_CUA_QUALITY_CURRICULUM:-0}" == 1 ]]; then
         target="$("$repo_dir/tools/computer-decision.sh" --next-visible-finder-target \
-          | python3 -c 'import json,sys; print(json.load(sys.stdin).get("target") or "")')" || target=''
+          | python3 -c 'import json,sys; print(json.load(sys.stdin).get("target") or "")' 2>/dev/null)" || target=''
         if [[ "$target" =~ ^(Applications|Downloads|Documents|Desktop|Recents)$ ]]; then
           if "$repo_dir/tools/computer-journey.sh" --one-shot --target "$target"; then
             echo "quality=curriculum_verified target=$target"
@@ -68,7 +90,7 @@ if [[ "${1:-}" == --quality ]]; then
       echo "quality=observation_only low_disk_free_kib=$free_kb"
     else
       echo "quality=observation_only free_kib=$free_kb"
-      if (( free_kb >= 6291456 && last_free_kb >= 6291456
+      if (( resource_allowed && free_kb >= 6291456 && last_free_kb >= 6291456
             && benchmark_done == 0 && benchmark_failures < 3 )); then
         if "$repo_dir/tools/computer-grounding.sh" --benchmark; then
           echo 'quality=benchmark_complete'
@@ -86,7 +108,7 @@ if [[ "${1:-}" == --quality ]]; then
     fi
     sleep "$interval"
   done
-  echo 'quality=finished: ten-hour window elapsed'
+  echo 'quality=finished: bounded window elapsed'
   exit 0
 fi
 

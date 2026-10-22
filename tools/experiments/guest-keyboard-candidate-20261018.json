@@ -1,0 +1,18 @@
+{
+  "schema": "virtualos-guest-keyboard-candidate/v1",
+  "state": "staged_not_active",
+  "candidate_sha256": "ebfe05c96002993275c116e2b8d743c289501170586f70574466ff5f26e1c77f",
+  "original_sha256": "e326458b651e982ad03fed7f2b339113af9a80a06c435fc6f45b53b1d09c997f",
+  "mini_private_stage": "/Users/ai/vos-fleet/maintenance/keyboard-20261018",
+  "signature_verified_on_mini": true,
+  "compiled_ascii_mapping_self_test_passed": true,
+  "fleet_isolated_self_test_passed": true,
+  "live_legacy_text_refusal_verified": true,
+  "live_python_typing_completion_guard_installed": true,
+  "live_single_character_guard_installed": true,
+  "live_transport_redirect_and_proxy_protection_installed": true,
+  "ascii_shift_delivery_in_guest_verified": false,
+  "activation_requires_test_fleet_restart": true,
+  "production_vm_restarted": false,
+  "original_linux_guest_restarted": false
+}

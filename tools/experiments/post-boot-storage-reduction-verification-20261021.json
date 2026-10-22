@@ -1,0 +1,29 @@
+{
+  "schema": "virtualos-post-boot-storage-reduction/v1",
+  "state": "verified",
+  "observed_at": "2026-10-21T18:52:03.276982+00:00",
+  "runtime_allocated_before_bytes": 566071296,
+  "runtime_allocated_after_bytes": 229699584,
+  "runtime_allocated_reduction_bytes": 336371712,
+  "files_verified": 47,
+  "strict_code_signatures_verified": 32,
+  "private_stage_verifier_passed": true,
+  "sandboxed_executable_check_passed": true,
+  "archive_and_model_preserved": true,
+  "guests_or_global_models_restarted": false,
+  "live_overlay_measured_without_mutation": true,
+  "source_sha256": {
+    "tools/.private/post-boot-storage-reduction-20261021/virtualos-storage-audit.py": "5cfed2b14162ec839611c90f1363d1b1bdaec09a2d966d244fb8e792d4d5da13",
+    "tools/.private/post-boot-storage-reduction-20261021/virtualos-compress-runtime-candidate.py": "ae4c61a2eed450efc35f376a496559212df86ea36b4945634d600a2fd1775352",
+    "tools/.private/post-boot-storage-reduction-20261021/virtualos-repair-compressed-runtime.py": "61bb2228b588a90d8265930d45b956e0446ec4eeadbb6de63ecb3667457e07f2",
+    "tools/.private/post-boot-storage-reduction-20261021/virtualos-activate-runtime-compression.py": "f48cf22ce69e759add3b4d104ff603fff8775c07330680eb1c12389525cd4922",
+    "tools/ollama_private_metadata.py": "8c60219c48147ccf40db9a63f77c09e2e958897307f496b8a76296377acaf3ad",
+    "tools/fleet/private_ocr_server.py": "1d51f2e8be87812b3d2090ef765c5f7bce7a87deda12576a503fbe953a437409",
+    "tools/linux_guest_selection.py": "fbab8f41165dff7dcd4aa5d52436f73d46be4e891f0aba74a87b97c557310ed9"
+  },
+  "evidence": {
+    "post-boot-storage-audit-20261021.json": "b651956da1c1e2c70e902292277acb2942c8634aa7187496474be7feaa079314",
+    "private-runtime-compression-candidate-20261021.json": "b141f083f0453ae16f9755a00782363c512013b806e56f3a2211b324decb88c1",
+    "private-runtime-compression-activated-20261021.json": "f3d9bc43e8e78cac1d9d2532648fa3db60529d7cd5a2d80b34aa8785c1b1dbc2"
+  }
+}

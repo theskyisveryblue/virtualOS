@@ -1,0 +1,256 @@
+{
+  "observed_at": "2026-10-21T20:59:46.937078+00:00",
+  "historical_resource_points": [
+    {
+      "receipt": "tools/experiments/vm-a-migrated-start-20261021.json",
+      "observed_at": "2026-10-21T18:25:16.326918+00:00",
+      "disk_free_kib": 19499884,
+      "memory_free_percent": 53,
+      "swap_used_mib": 3440,
+      "load_one": 6.51,
+      "cpu_count": 10
+    },
+    {
+      "receipt": "tools/experiments/storage-baseline-refresh-20261021.json",
+      "observed_at": "2026-10-21T19:53:31.012016+00:00",
+      "disk_free_kib": 15936056,
+      "memory_free_percent": 30,
+      "swap_used_mib": 5935,
+      "load_one": 7.17,
+      "cpu_count": 10
+    },
+    {
+      "receipt": "tools/experiments/storage-baseline-current-20261021.json",
+      "observed_at": "2026-10-21T20:19:07.769109+00:00",
+      "disk_free_kib": 11273484,
+      "memory_free_percent": 28,
+      "swap_used_mib": 10091,
+      "load_one": 19.06,
+      "cpu_count": 10
+    },
+    {
+      "receipt": "tools/experiments/host-resource-current-20261021.json",
+      "observed_at": "2026-10-21T20:58:20.336674+00:00",
+      "disk_free_kib": 8040912,
+      "memory_free_percent": 31,
+      "swap_used_mib": 14902,
+      "load_one": 39.25,
+      "cpu_count": 10
+    }
+  ],
+  "five_minute_sampler": {
+    "read_only": true,
+    "resources": [
+      {
+        "observed_at": "2026-10-21T20:22:16.771364+00:00",
+        "disk_free_kib": 11572460,
+        "memory_free_percent": 35,
+        "swap_used_mib": 10737,
+        "load_one": 10.07,
+        "cpu_count": 10,
+        "background_work": "paused",
+        "browser_engine_rss_mib": 10936.2
+      },
+      {
+        "observed_at": "2026-10-21T20:22:46.899555+00:00",
+        "disk_free_kib": 11570580,
+        "memory_free_percent": 33,
+        "swap_used_mib": 10681,
+        "load_one": 8.6,
+        "cpu_count": 10,
+        "background_work": "paused",
+        "browser_engine_rss_mib": 10813.6
+      },
+      {
+        "observed_at": "2026-10-21T20:23:17.012841+00:00",
+        "disk_free_kib": 11522012,
+        "memory_free_percent": 32,
+        "swap_used_mib": 11108,
+        "load_one": 7.93,
+        "cpu_count": 10,
+        "background_work": "paused",
+        "browser_engine_rss_mib": 10303.5
+      },
+      {
+        "observed_at": "2026-10-21T20:23:48.056426+00:00",
+        "disk_free_kib": 10355092,
+        "memory_free_percent": 26,
+        "swap_used_mib": 12154,
+        "load_one": 11.45,
+        "cpu_count": 10,
+        "background_work": "paused",
+        "browser_engine_rss_mib": 11662.2
+      },
+      {
+        "observed_at": "2026-10-21T20:24:18.278283+00:00",
+        "disk_free_kib": 10348120,
+        "memory_free_percent": 32,
+        "swap_used_mib": 12177,
+        "load_one": 14.37,
+        "cpu_count": 10,
+        "background_work": "paused",
+        "browser_engine_rss_mib": 11814.7
+      },
+      {
+        "observed_at": "2026-10-21T20:24:48.913016+00:00",
+        "disk_free_kib": 10345556,
+        "memory_free_percent": 29,
+        "swap_used_mib": 11969,
+        "load_one": 15.75,
+        "cpu_count": 10,
+        "background_work": "paused",
+        "browser_engine_rss_mib": 12097.6
+      },
+      {
+        "observed_at": "2026-10-21T20:25:19.170334+00:00",
+        "disk_free_kib": 10343836,
+        "memory_free_percent": 28,
+        "swap_used_mib": 11803,
+        "load_one": 14.63,
+        "cpu_count": 10,
+        "background_work": "paused",
+        "browser_engine_rss_mib": 11605.1
+      },
+      {
+        "observed_at": "2026-10-21T20:25:49.558579+00:00",
+        "disk_free_kib": 10336552,
+        "memory_free_percent": 28,
+        "swap_used_mib": 12007,
+        "load_one": 20.71,
+        "cpu_count": 10,
+        "background_work": "paused",
+        "browser_engine_rss_mib": 12242.4
+      },
+      {
+        "observed_at": "2026-10-21T20:26:19.842418+00:00",
+        "disk_free_kib": 10746856,
+        "memory_free_percent": 31,
+        "swap_used_mib": 12100,
+        "load_one": 23.52,
+        "cpu_count": 10,
+        "background_work": "paused",
+        "browser_engine_rss_mib": 8225.3
+      },
+      {
+        "observed_at": "2026-10-21T20:26:50.076775+00:00",
+        "disk_free_kib": 10735584,
+        "memory_free_percent": 29,
+        "swap_used_mib": 11852,
+        "load_one": 22.46,
+        "cpu_count": 10,
+        "background_work": "paused",
+        "browser_engine_rss_mib": 8566.5
+      },
+      {
+        "observed_at": "2026-10-21T20:27:20.559594+00:00",
+        "disk_free_kib": 10726252,
+        "memory_free_percent": 29,
+        "swap_used_mib": 12410,
+        "load_one": 22.93,
+        "cpu_count": 10,
+        "background_work": "paused",
+        "browser_engine_rss_mib": 8570.9
+      }
+    ],
+    "elapsed_seconds": 300,
+    "host_workloads_stopped": false
+  },
+  "latest": {
+    "observed_at": "2026-10-21T20:58:20.336674+00:00",
+    "read_only": true,
+    "resources": {
+      "background_work": "paused",
+      "cpu_count": 10,
+      "disk_free_kib": 8040912,
+      "families": {
+        "ai_agents": {
+          "processes": 2,
+          "sum_rss_mib": 993.0
+        },
+        "browser_apps": {
+          "processes": 23,
+          "sum_rss_mib": 286.9
+        },
+        "browser_engines": {
+          "processes": 215,
+          "sum_rss_mib": 7140.2
+        },
+        "simulator_runtime": {
+          "processes": 0,
+          "sum_rss_mib": 0.0
+        },
+        "terminal": {
+          "processes": 1,
+          "sum_rss_mib": 8.9
+        },
+        "virtualos": {
+          "processes": 4,
+          "sum_rss_mib": 66.4
+        }
+      },
+      "load_one": 39.25,
+      "memory_free_percent": 31,
+      "reasons": [
+        "swap_at_least_8_gib",
+        "load_at_least_2x_cpu"
+      ],
+      "rss_note": "RSS sums can count shared pages more than once and omit paged-out memory",
+      "swap_used_mib": 14902,
+      "top_executables": [
+        {
+          "name": "Google Chrome for Testing",
+          "processes": 100,
+          "sum_rss_mib": 4843.1
+        },
+        {
+          "name": "Google Chrome",
+          "processes": 77,
+          "sum_rss_mib": 1652.3
+        },
+        {
+          "name": "ollama",
+          "processes": 2,
+          "sum_rss_mib": 993.0
+        },
+        {
+          "name": "com.apple.WebKit.WebContent",
+          "processes": 7,
+          "sum_rss_mib": 516.3
+        },
+        {
+          "name": "Figma",
+          "processes": 9,
+          "sum_rss_mib": 121.9
+        },
+        {
+          "name": "Paper",
+          "processes": 7,
+          "sum_rss_mib": 113.4
+        },
+        {
+          "name": "com.apple.Virtualization.VirtualMachine",
+          "processes": 3,
+          "sum_rss_mib": 55.0
+        },
+        {
+          "name": "Pen",
+          "processes": 4,
+          "sum_rss_mib": 35.5
+        }
+      ]
+    },
+    "moats_process_count": 102,
+    "moats_sum_rss_bytes": 5066440704,
+    "rss_sums_are_not_unique_physical_memory": true,
+    "swapfile_metadata": [],
+    "swap_metadata_error": null,
+    "swapfile_allocated_bytes": null,
+    "no_apps_closed": true,
+    "no_system_settings_changed": true,
+    "swap_file_allocation_measured": false,
+    "swap_file_location_not_established": true
+  },
+  "moats_application_not_assumed_to_be_a_test_job": true,
+  "apps_or_system_settings_changed": false,
+  "cause_of_all_volume_changes_not_claimed": true
+}

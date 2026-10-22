@@ -1,0 +1,106 @@
+{
+  "observed_at": "2026-10-21T16:48:15.475194+00:00",
+  "fleet": {
+    "basePort": 9125,
+    "root": "/Users/ai/vos-fleet/machines",
+    "ok": true,
+    "count": 1,
+    "capability": {
+      "nestedVirtualizationSupported": true,
+      "platform": "macOS Version 26.2 (Build 25C56)",
+      "nestedVirtualizationReason": "supported"
+    },
+    "instances": [
+      {
+        "error": "Invalid virtual machine state transition. Transition from state \u201cstopped\u201d to state \u201cstopping\u201d is invalid.",
+        "bundle": "/Users/ai/vos-fleet/machines/vm-a.bundle",
+        "ready": false,
+        "name": "vm-a",
+        "controlPort": 9125,
+        "state": "idle"
+      }
+    ]
+  },
+  "original_disk_closed": true,
+  "resources": {
+    "background_work": "allowed",
+    "cpu_count": 10,
+    "disk_free_kib": 20184712,
+    "families": {
+      "ai_agents": {
+        "processes": 2,
+        "sum_rss_mib": 997.2
+      },
+      "browser_apps": {
+        "processes": 24,
+        "sum_rss_mib": 505.5
+      },
+      "browser_engines": {
+        "processes": 114,
+        "sum_rss_mib": 4781.0
+      },
+      "simulator_runtime": {
+        "processes": 148,
+        "sum_rss_mib": 3138.8
+      },
+      "terminal": {
+        "processes": 1,
+        "sum_rss_mib": 7.1
+      },
+      "virtualos": {
+        "processes": 3,
+        "sum_rss_mib": 34.1
+      }
+    },
+    "load_one": 5.01,
+    "memory_free_percent": 43,
+    "reasons": [],
+    "rss_note": "RSS sums can count shared pages more than once and omit paged-out memory",
+    "swap_used_mib": 4993,
+    "top_executables": [
+      {
+        "name": "Google Chrome",
+        "processes": 69,
+        "sum_rss_mib": 3321.6
+      },
+      {
+        "name": "com.apple.WebKit.WebContent",
+        "processes": 7,
+        "sum_rss_mib": 1169.6
+      },
+      {
+        "name": "ollama",
+        "processes": 2,
+        "sum_rss_mib": 997.2
+      },
+      {
+        "name": "Figma",
+        "processes": 9,
+        "sum_rss_mib": 234.6
+      },
+      {
+        "name": "Paper",
+        "processes": 7,
+        "sum_rss_mib": 206.8
+      },
+      {
+        "name": "NewsToday2",
+        "processes": 1,
+        "sum_rss_mib": 142.6
+      },
+      {
+        "name": "Google Chrome for Testing",
+        "processes": 8,
+        "sum_rss_mib": 141.7
+      },
+      {
+        "name": "ScreenTimeWidgetExtension",
+        "processes": 1,
+        "sum_rss_mib": 108.5
+      }
+    ]
+  },
+  "preserved_processes": "  440 /Applications/virtualOS.app/Contents/MacOS/virtualOS\n 2499 ./tools/fleet/linux-guest\n 2503 /Users/ai/vos-fleet/tools/fleet/fleet-supervisor\n",
+  "guest_shutdown_dialog_confirmed": true,
+  "guest_filesystem_consistency_independently_verified": false
+}

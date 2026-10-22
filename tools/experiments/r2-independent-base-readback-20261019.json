@@ -1,0 +1,36 @@
+{
+  "disk_service_restart_verified": false,
+  "disk_sha256": "b8d7a8499d279c74f3f9c9fa13f91fb498f95f14a08c79c403adf4edd3548321",
+  "evidence": "terminal delegated recovery result; exact disk, manifest, byte and source pins compared with completed conversion receipt",
+  "full_r2_readback_verified": true,
+  "guest_boot_verified": false,
+  "initial_full_audit_completed_at": "2026-10-19T04:36:15.333940+00:00",
+  "local_full_disk_extracted": false,
+  "logical_bytes": 32212254720,
+  "manifest_sha256": "40f4506a2a21af31d82bca6c900e5d197842d9dd777cc130aa227e29336f6963",
+  "mini_durable_audit": {
+    "all_pins_and_source_match": true,
+    "bytes": 389,
+    "independently_read_by_evaluator": true,
+    "mode": "0600",
+    "mtime_utc": "2026-10-19T04:36:15.333940+00:00",
+    "owned_regular_single_link_verified": true,
+    "path": "/Users/ai/vos-shared-fleet/archive-recovery/40f4506a2a21af31d82bca6c900e5d197842d9dd777cc130aa227e29336f6963/base-readback.json",
+    "sha256": "ff754848f531287277e27876f4a0186ab2f46df9550e513f10f00d7c10847e92"
+  },
+  "note": "This full raw-disk read/hash pass is independent of conversion write/readback; capacity retries reuse the successful audit.",
+  "production_restarted": false,
+  "recorded_at": "2026-10-19T04:38:46.092349+00:00",
+  "running_disks_retired": false,
+  "running_macos_guests": 2,
+  "schema": "virtualos-independent-r2-base-readback/v1",
+  "signing": "operator_only",
+  "source": {
+    "account_id": "c24a3fb4bedba669785c18c834f51921",
+    "bucket": "virtualos-cloud-disks",
+    "object_prefix": "disks/archive-base-0073037110369885"
+  },
+  "state": "waiting_for_capacity",
+  "terminal_result_sha256": "4985b4af9bd521bc2caaf72167cd63a84daa1cb08cc290d22e02552875a1d8ea",
+  "terminal_retry_completed_at": 1792384699.774692
+}

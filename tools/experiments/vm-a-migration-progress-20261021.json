@@ -1,0 +1,83 @@
+{
+  "conversion": {
+    "state": "verified"
+  },
+  "resources": {
+    "background_work": "allowed",
+    "cpu_count": 10,
+    "disk_free_kib": 18606228,
+    "families": {
+      "ai_agents": {
+        "processes": 2,
+        "sum_rss_mib": 1023.8
+      },
+      "browser_apps": {
+        "processes": 24,
+        "sum_rss_mib": 457.3
+      },
+      "browser_engines": {
+        "processes": 123,
+        "sum_rss_mib": 4568.2
+      },
+      "simulator_runtime": {
+        "processes": 150,
+        "sum_rss_mib": 2108.5
+      },
+      "terminal": {
+        "processes": 1,
+        "sum_rss_mib": 9.4
+      },
+      "virtualos": {
+        "processes": 3,
+        "sum_rss_mib": 41.7
+      }
+    },
+    "load_one": 5.81,
+    "memory_free_percent": 40,
+    "reasons": [],
+    "rss_note": "RSS sums can count shared pages more than once and omit paged-out memory",
+    "swap_used_mib": 4882,
+    "top_executables": [
+      {
+        "name": "Google Chrome",
+        "processes": 75,
+        "sum_rss_mib": 3191.5
+      },
+      {
+        "name": "com.apple.WebKit.WebContent",
+        "processes": 7,
+        "sum_rss_mib": 1091.2
+      },
+      {
+        "name": "ollama",
+        "processes": 2,
+        "sum_rss_mib": 1023.8
+      },
+      {
+        "name": "Paper",
+        "processes": 7,
+        "sum_rss_mib": 222.6
+      },
+      {
+        "name": "Figma",
+        "processes": 9,
+        "sum_rss_mib": 165.1
+      },
+      {
+        "name": "NewsToday2",
+        "processes": 1,
+        "sum_rss_mib": 127.1
+      },
+      {
+        "name": "icloudmailagent",
+        "processes": 1,
+        "sum_rss_mib": 109.2
+      },
+      {
+        "name": "Google Chrome for Testing",
+        "processes": 8,
+        "sum_rss_mib": 102.5
+      }
+    ]
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "elapsed_s": 2.047,
+  "frame_freshness_check": {
+    "capture_age_s": 8.923,
+    "frame_bytes": 266588,
+    "relay_frame_headers": {
+      "Cache-Control": "private, no-store",
+      "ETag": "\"56c91efdeab287d5a3aaa227b6d6fd3e\"",
+      "X-VOS-Frame-Captured-At": "1792291002646",
+      "X-VOS-Frame-Uploaded-At": "2026-10-18T02:36:46.743Z"
+    }
+  },
+  "host_accessibility_prompt": false,
+  "host_screen_recording_prompt": false,
+  "id": "024279bb-899a-47c6-83cf-67080dc14bd1",
+  "initial_relay_frame_was_stale": true,
+  "model_inference_used": false,
+  "production_guest_restarted": false,
+  "relay_version": "530ba812-01cb-4c4f-8fab-d56c21b25623",
+  "result": {
+    "ok": true,
+    "result": {
+      "ok": true,
+      "status": 200
+    },
+    "status": "completed"
+  },
+  "schema": "virtualos-browser-guest-task/v1",
+  "step": "click visually confirmed Documents sidebar",
+  "task": "Open Documents in Finder",
+  "task_verified": true,
+  "verification": "Independent fresh guest frame visually confirms Documents window title and selected Documents sidebar",
+  "verified_at": 1792290542.270439,
+  "verified_frame_sha256": "6f48b4278c1631b52dd4e6e6043a940b15a92e96fff53a3292362c519efb7dda"
+}

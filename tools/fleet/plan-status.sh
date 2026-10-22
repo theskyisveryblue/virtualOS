@@ -27,27 +27,16 @@ MINI="${VOS_MINI_HOST:-mac-mini-ai}"
 
 line() { printf '%-26s %s\n' "$1" "$2"; }
 sep()  { printf -- '----------------------------------------------------------------\n'; }
-
-# A read-only relay token. The host token lives on the Mini; the operator Mac
-# only has the browser token, which is allowed to GET /fleet/status.
-relay_token() {
-  [[ -n "${AUTH_TOKEN:-}" ]] && printf '%s\n' "${AUTH_TOKEN}"
-  [[ -n "${VOS_AUTH_TOKEN:-}" ]] && printf '%s\n' "${VOS_AUTH_TOKEN}"
-  [[ -f "$HOME/.config/virtualos/browser-token" ]] && { cat "$HOME/.config/virtualos/browser-token"; printf '\n'; }
-  return 0
+host_probe_status() {
+  if [[ "$QUICK" == --quick ]]; then
+    printf 'not checked (--quick)'
+  else
+    printf 'SSH unavailable from here'
+  fi
 }
 
 relay_status_json() {
-  local tok body
-  while IFS= read -r tok; do
-    [[ -z "$tok" ]] && continue
-    body="$(curl -s -m 6 -H "Authorization: Bearer $tok" "$RELAY_URL/fleet/status" 2>/dev/null)"
-    if printf '%s' "$body" | python3 -c 'import sys,json;json.load(sys.stdin)' >/dev/null 2>&1; then
-      printf '%s' "$body"
-      return 0
-    fi
-  done < <(relay_token)
-  return 1
+  python3 "$HERE/relay_read.py"
 }
 
 # Read one dotted field out of a JSON blob passed as the first argument.
@@ -64,10 +53,7 @@ except Exception:
 ' "$1" "${2:-}" 2>/dev/null || true
 }
 
-if [[ -f "$HOME/.config/virtualos/relay.env" ]]; then
-  # shellcheck disable=SC1090
-  source "$HOME/.config/virtualos/relay.env"
-fi
+RELAY_URL="${RELAY_URL:-https://virtualos-relay.ai-c24.workers.dev}"
 RELAY_BODY="$(relay_status_json 2>/dev/null || true)"
 
 # The Mini may be off this host's LAN (operator roaming). Probe once, quietly.
@@ -166,7 +152,7 @@ d = json.loads(sys.argv[1])
 print("%-26s delta=%.1f MB (%.2f%% of disk)%s" % ("shared base+delta", d["delta_bytes"]/1e6, d["delta_pct"], sys.argv[2]))
 PY
 elif [[ "$MINI_UP" == "0" ]]; then
-  line "shared base+delta" "not reachable from here (Mini off-LAN)"
+  line "shared base+delta" "$(host_probe_status)"
 else
   line "shared base+delta" "not measured — run experiments/run.sh on the Mini"
 fi
@@ -189,7 +175,7 @@ print("%-26s %s  delta=%.0f MB (%.2f%%)  blocks=%d  mismatches=%d" % (
     d.get("blocks_checked", 0), d.get("mismatches", -1)))
 PY
 elif [[ "$MINI_UP" == "0" ]]; then
-  line "base+delta round-trip" "not reachable from here (Mini off-LAN)"
+  line "base+delta round-trip" "$(host_probe_status)"
 else
   line "base+delta round-trip" "no receipt — run experiments shared_base.py verify"
 fi
@@ -200,17 +186,178 @@ if grep -q "base-delta-serve" "$ROOT/tools/cloud_disk.py" 2>/dev/null; then
 else
   line "base+delta serve" "not wired"
 fi
+if grep -q "def upload_delta" "$ROOT/tools/cloud_disk_r2_upload.py" 2>/dev/null &&
+   grep -q "def pull_delta" "$ROOT/tools/cloud_disk_r2_upload.py" 2>/dev/null; then
+  line "R2 delta transfer" "wired; local signed-HTTP round-trip tested"
+else
+  line "R2 delta transfer" "not wired"
+fi
+
+# Historical cloud evidence and current local backup receipts. Pending parts
+# are transfer progress; they are never presented as a recoverable archive.
+python3 - "$ROOT" <<'PY'
+import json
+from pathlib import Path
+import re
+import sys
+import time
+
+root = Path(sys.argv[1])
+def show(label, value):
+    print('%-26s %s' % (label, value))
+
+boot = root / 'tools/experiments/managed-shared-boot-receipt.json'
+if boot.exists():
+    try:
+        d = json.loads(boot.read_text())
+        verified = (d.get('managed_shared_disk_boot') == 'verified' and
+                    d.get('guest_boots_verified', 0) >= 2 and
+                    d.get('disk_service_restart_verified') is True and
+                    d.get('restart_blocks_reseeded') == 0 and
+                    d.get('source_disks_unchanged') is True and
+                    d.get('local_machine_disk') == 'absent')
+        if verified:
+            show('managed shared boot', 'VERIFIED: %s guest boots; service restart; overlay %.1f MB (historical receipt)' %
+                 (d['guest_boots_verified'], d['overlay_allocated_bytes'] / 1e6))
+        else:
+            show('managed shared boot', 'receipt does not prove boot + restart')
+    except (OSError, ValueError, KeyError, TypeError):
+        show('managed shared boot', 'invalid receipt')
+else:
+    show('managed shared boot', 'no real guest boot receipt')
+
+upload = root / 'tools/experiments/r2-machine-upload-receipt.json'
+if upload.exists():
+    try:
+        d = json.loads(upload.read_text())
+        if (d.get('r2_machine_upload') != 'verified' or d.get('readback_verified') is not True or
+            d.get('account_id') != 'c24a3fb4bedba669785c18c834f51921' or
+            d.get('bucket') != 'virtualos-cloud-disks' or
+            type(d.get('block_count')) is not int or d['block_count'] <= 0 or
+            d.get('source_blocks') != d['block_count'] or
+            d.get('source_raw_bytes') != d['block_count'] * 65536 or
+            not re.fullmatch(r'[0-9a-f]{64}', d.get('delta_manifest_sha256', ''))):
+            raise ValueError('invalid upload receipt')
+        show('R2 machine upload', 'VERIFIED: %s blocks + manifest; recovery reported separately' % d['block_count'])
+    except (OSError, ValueError, KeyError, TypeError, AttributeError):
+        show('R2 machine upload', 'invalid receipt')
+
+storage = root / 'tools/experiments/r2-machine-storage-receipt.json'
+if storage.exists():
+    try:
+        d = json.loads(storage.read_text())
+        if (d.get('r2_machine_storage') != 'verified' or
+            d.get('inventory_matches_verified_manifest') is not True or
+            d.get('account_id') != 'c24a3fb4bedba669785c18c834f51921' or
+            d.get('bucket') != 'virtualos-cloud-disks' or
+            any(type(d.get(key)) is not int for key in
+                ('unique_block_objects', 'stored_objects', 'stored_bytes', 'manifest_bytes')) or
+            d['unique_block_objects'] <= 0 or d['stored_objects'] != d['unique_block_objects'] + 1 or
+            not 0 < d['manifest_bytes'] < d['stored_bytes'] or
+            not re.fullmatch(r'[0-9a-f]{64}', d.get('manifest_sha256', ''))):
+            raise ValueError('invalid storage inventory receipt')
+        show('R2 delta stored', '%.1f MB; %s unique blocks + manifest (historical inventory)' %
+             (d['stored_bytes'] / 1e6, d['unique_block_objects']))
+    except (OSError, ValueError, KeyError, TypeError, AttributeError):
+        show('R2 delta stored', 'invalid inventory receipt')
+
+machine_delta = root / 'tools/experiments/r2-machine-delta-receipt.json'
+if machine_delta.exists():
+    try:
+        d = json.loads(machine_delta.read_text())
+        if (d.get('r2_machine_delta') != 'verified' or
+            d.get('account_id') != 'c24a3fb4bedba669785c18c834f51921' or
+            d.get('bucket') != 'virtualos-cloud-disks' or
+            d.get('all_blocks_readback_verified') is not True or
+            d.get('recovered_delta_matches_source') is not True or
+            type(d.get('block_count')) is not int or d['block_count'] <= 0 or
+            type(d.get('raw_bytes')) is not int or d['raw_bytes'] != d['block_count'] * 65536 or
+            any(not re.fullmatch(r'[0-9a-f]{64}', d.get(key, '')) for key in
+                ('manifest_sha256', 'source_delta_sha256', 'required_base_sha256'))):
+            raise ValueError('invalid real-machine evidence')
+        show('R2 real machine delta', 'VERIFIED: %s blocks; %.3f GB; exact recovery (historical receipt)' %
+             (d['block_count'], d['raw_bytes'] / 1e9))
+        boot_path = root / 'tools/experiments/r2-recovered-boot-receipt.json'
+        recovered = json.loads(boot_path.read_text()) if boot_path.exists() else {}
+        boot_verified = (d.get('recovered_guest_boot_verified') is True and
+                         d.get('recovered_guest_boots') == 2 and
+                         d.get('recovered_disk_service_restart_verified') is True and
+                         recovered.get('managed_shared_disk_boot') == 'verified' and
+                         recovered.get('guest_boots_verified') == 2 and
+                         recovered.get('restart_blocks_reseeded') == 0 and
+                         recovered.get('source_disks_unchanged') is True and
+                         recovered.get('initial_delta_sha256') == d['source_delta_sha256'] and
+                         recovered.get('local_machine_disk') == 'absent')
+        show('R2 recovered guest', 'VERIFIED: two boots + service restart (historical)' if boot_verified else
+             'boot verification incomplete')
+        if d.get('local_base_present') is False:
+            show('R2 local test disks', 'removed; cold restore requires archived base + pinned delta')
+        else:
+            show('R2 recovery base', 'required shared base remains on Mini; full archive guest restore unverified')
+    except (OSError, ValueError, KeyError, TypeError, AttributeError):
+        show('R2 real machine delta', 'invalid receipt; recovery unverified')
+else:
+    show('R2 real machine delta', 'no completed real-machine recovery receipt')
+
+probe = root / 'tools/experiments/r2-delta-probe-receipt.json'
+if probe.exists():
+    try:
+        row = json.loads(probe.read_text())
+        if (row.get('account_id') != 'c24a3fb4bedba669785c18c834f51921' or
+            row.get('bucket') != 'virtualos-cloud-disks' or
+            row.get('r2_delta_probe') != 'passed' or row.get('readback_verified') is not True or
+            row.get('scope') != 'synthetic blocks; no VM boot or archive' or
+            not re.fullmatch(r'[0-9a-f]{64}', row.get('delta_manifest_sha256', ''))):
+            raise ValueError('invalid cloud evidence')
+        show('R2 delta evidence', 'PROVEN synthetic %s blocks; no VM delta/boot proof' % row['block_count'])
+    except (ValueError, KeyError, TypeError, AttributeError):
+        show('R2 delta evidence', 'invalid receipt')
+
+state = Path.home() / '.config/virtualos'
+receipt = state / 'vm-r2-receipt.json'
+if receipt.exists():
+    try:
+        row = json.loads(receipt.read_text())
+        if (row.get('bucket') != 'virtualos-vm-backups' or
+            not re.fullmatch(r'vm-backups/[0-9]{8}T[0-9]{6}Z-[0-9]+/virtualOS\.bundle\.tar\.gz', row.get('key', '')) or
+            not re.fullmatch(r'[0-9a-f]{64}', row.get('sha256', '')) or
+            type(row.get('bytes')) is not int or row['bytes'] <= 0):
+            raise ValueError('invalid archive receipt')
+        show('VM archive', 'verified local receipt %.2f GB; live object not re-audited' % (row['bytes'] / 1e9))
+    except (ValueError, KeyError, TypeError, AttributeError):
+        show('VM archive', 'invalid receipt; recovery unverified')
+else:
+    show('VM archive', 'unverified; no completed download-audit receipt')
+
+usage = state / 'r2-usage.jsonl'
+if usage.exists():
+    with usage.open('rb') as stream:
+        stream.seek(max(0, usage.stat().st_size - 65536))
+        rows = []
+        for line in stream.read().splitlines():
+            try:
+                row = json.loads(line)
+                if (row.get('bucket') == 'virtualos-vm-backups' and
+                    type(row.get('pending_uploaded_bytes')) is int and
+                    type(row.get('pending_parts')) is int and type(row.get('at')) is int):
+                    rows.append(row)
+            except (ValueError, AttributeError):
+                pass
+    if rows:
+        row = rows[-1]
+        show('VM upload last sample', '%.2f GB pending; %s parts; age=%ss' % (
+            row['pending_uploaded_bytes'] / 1e9, row['pending_parts'], max(0, int(time.time()) - row['at'])))
+PY
 
 # --- P2: agency / guest input ---------------------------------------------
 echo; echo "[P2] agency"
 line "single-guest input" "$([[ -f "$ROOT/tools/virtualos_stream_server/inputctl.swift" ]] && echo 'inputctl present' || echo 'missing')"
-# fleet input is wired when the relay exposes /fleet/poll + /fleet/input and a
-# host poller long-polls it. Only the host token can drain the queue, so the
-# operator reports the wiring and the Mini proves the flow.
-if [[ -n "${RELAY_URL:-}" ]]; then
-  pinfo="$(curl -s -m 6 -H "Authorization: Bearer ${AUTH_TOKEN:-${VOS_AUTH_TOKEN:-}}" "$RELAY_URL/fleet/poll" \
-    | python3 -c 'import sys,json;d=json.load(sys.stdin);print("poll=ok" if d.get("ok") else "poll=host-token-only")' 2>/dev/null || echo "poll=unreachable")"
-  line "fleet input" "wired (relay /fleet/poll + /fleet/input; $pinfo)"
+# Polling removes a command from the host's queue. Reuse the read-only status
+# response instead; a scoreboard must never steal a click from the real poller.
+if [[ -n "$RELAY_BODY" ]]; then
+  line "fleet input" "worker+host wiring present; relay status reachable; task proof separate"
+elif [[ -n "${RELAY_URL:-}" ]]; then
+  line "fleet input" "worker+host wiring present; relay status unavailable"
 else
   line "fleet input" "wired in worker+host; no relay.env to probe"
 fi
@@ -218,6 +365,7 @@ line "offline brain" "$([[ -f "$ROOT/tools/fleet/brain.py" ]] && echo 'brain.py 
 
 # --- P3: breadth -----------------------------------------------------------
 echo; echo "[P3] breadth"
+python3 "$HERE/linux_evidence.py" "$ROOT"
 # Linux guest boot leaves a version in its console log: the `Linux (none) <ver>`
 # banner or the shell's osrelease echo (`<ver>-0-virt`). Accept either.
 LINUX_REMOTE="tr -d '\\000' < ~/vos-fleet/linux/console.log 2>/dev/null | sed 's/\\r/\\n/g' | grep -aoE 'Linux \\(none\\) [0-9][^ ]*|[0-9]+\\.[0-9]+\\.[0-9]+-[0-9a-z-]*virt' | tail -1"
@@ -233,7 +381,7 @@ fi
 if [[ -n "$kern" ]]; then
   line "linux guest" "${kern}${linux_src}"
 elif [[ "$MINI_UP" == "0" ]]; then
-  line "linux guest" "not reachable from here (Mini off-LAN)"
+  line "linux guest" "$(host_probe_status)"
 else
   line "linux guest" "not booted this session"
 fi
@@ -255,7 +403,7 @@ elif [[ "$MINI_UP" == "1" ]]; then
   st="$(mini_run '[[ -x ~/vos-fleet/tools/fleet/self_test.sh ]] && echo "mini" || echo n/a' || echo n/a)"
   line "fleet self-test" "$st"
 else
-  line "fleet self-test" "not reachable from here (Mini off-LAN)"
+  line "fleet self-test" "$(host_probe_status)"
 fi
 relay_test="$ROOT/tools/cloudflare/worker/test_relay_local.sh"
 [[ -f "$relay_test" ]] && line "relay test" "offline (wrangler dev --local)" || line "relay test" "missing"
